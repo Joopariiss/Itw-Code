@@ -114,6 +114,14 @@ nav ul li a:hover {
   transform: scale(1.05);
 }
 
+/* Sección valoraciones */
+#funciones {
+  padding: 60px 20px;
+  background: rgba(255, 255, 255, 0.9);
+  color: rgb(0, 0, 0);
+  text-align: center;
+}
+
 /* Sección contacto */
 #contacto {
   padding: 60px 20px;
