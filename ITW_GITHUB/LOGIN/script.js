@@ -1,5 +1,5 @@
 // scriptLogin.js
-console.log("../USER_INTERFAZ/script.js cargado correctamente");
+console.log("../PERFIL/script.js cargado correctamente");
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
@@ -34,7 +34,7 @@ document.querySelector("form").addEventListener("submit", function (e) {
     .then((userCredential) => {
       // Login exitoso
       console.log("Login correcto:", userCredential.user);
-      window.location.href = "../USER_INTERFAZ/user.html"; // Redirigir
+      window.location.href = "../PERFIL/perfil.html"; // Redirigir
     })
     .catch((error) => {
       console.error("Error en login:", error);
