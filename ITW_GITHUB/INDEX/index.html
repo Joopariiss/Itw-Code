@@ -1,47 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Into The World</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    
-    <nav id="navbar">
-      <ul>
-        <li><a href="#Inicio">Inicio</a></li>
-        <li><a href="#funciones">Funciones</a></li>
-        <li><a href="#contacto">Contactanos</a></li>
-        <li><a href="#valoraciones">Valoraciones</a></li>
-      </ul>
-    </nav>
-
+    <!-- Video de fondo -->
     <video autoplay muted loop class="bg-video">
       <source src="../VIDEOS/forest.mp4" type="video/mp4" />
       Tu navegador no soporta video.
     </video>
 
-    <main class="main-wrapper">
+    <!-- Navbar -->
+    <nav id="navbar">
+      <ul>
+        <li><a href="#Inicio">Inicio</a></li>
+        <li><a href="#funciones">Funciones</a></li>
+        <li><a href="#valoraciones">Valoraciones</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+    </nav>
+
+    <!-- Sección principal -->
+    <main class="main-wrapper" id="Inicio">
       <h1>INTO THE WORLD</h1>
-      <p id="informacion">Organiza tus Viajes</p>
-      <button class="btn-primary" id="loginBtn">Iniciar Sesión</button>
+      <p id="informacion">Organiza tus viajes de manera colaborativa</p>
+      <div class="btn-container">
+        <button class="btn-primary" id="loginBtn">Iniciar Sesión</button>
+        <button class="btn-primary" id="registerBtn">Registrarse</button>
+      </div>
     </main>
 
-    <section id="funciones">
-      <h2>Funciones</h2>
-      <p>Organiza tus viajes he Itinerario</p>
+    <!-- FUNCIONES -->
+    <section id="funciones" class="section-split">
+      <div class="text-side">
+        <h2>Funciones Principales</h2>
+        <p>
+          Con <strong>Into The World</strong> puedes crear itinerarios personalizados, compartirlos con amigos y descubrir
+          nuevos destinos según tus intereses. Organiza tus vuelos, estadías y actividades desde un solo lugar.
+        </p>
+        <ul>
+          <li>📅 Planificación inteligente y colaborativa</li>
+          <li>🌍 Exploración de destinos recomendados</li>
+          <li>💬 Interacción entre viajeros</li>
+        </ul>
+      </div>
+      <div class="image-side">
+        <img src="../IMAGES/funciones.jpg" alt="Funciones principales" />
+      </div>
     </section>
 
-    <section id="valoraciones">
-      <h2>valoraciones</h2>
-      <p>Próximamente podrás revisar funciones exclusivas.</p>
+    <!-- VALORACIONES -->
+    <section id="valoraciones" class="section-split reverse">
+      <div class="image-side">
+        <img src="../IMAGES/valoraciones.jpg" alt="Valoraciones de usuarios" />
+      </div>
+      <div class="text-side">
+        <h2>Valoraciones de Usuarios</h2>
+        <p>
+          Nuestra comunidad de viajeros crece cada día. Conoce las experiencias de quienes ya usan la aplicación para
+          planificar sus aventuras.
+        </p>
+        <blockquote>
+          "La mejor app para organizar mis viajes, fácil de usar y muy intuitiva."
+          <footer>- María González, Chile</footer>
+        </blockquote>
+        <blockquote>
+          "Pude compartir itinerarios con mis amigos, todo desde el mismo lugar."
+          <footer>- Andrés Romero, México</footer>
+        </blockquote>
+      </div>
     </section>
 
+    <!-- CONTACTO -->
     <section id="contacto">
-      <h2>Contacto</h2>
-      <p>Correo: intotheworld@itw.la | Teléfono: +56 9 1234 5678</p>
+      <h2>Contáctanos</h2>
+      <p>¿Tienes dudas o sugerencias? Escríbenos:</p>
+
+      <form id="contactForm">
+        <input type="text" placeholder="Tu nombre" required />
+        <input type="email" placeholder="Tu correo" required />
+        <textarea placeholder="Tu mensaje..." rows="4" required></textarea>
+        <button type="submit" class="btn-primary">Enviar Mensaje</button>
+      </form>
+
+      <p class="contact-info">📧 intotheworld@itw.la | ☎️ +56 9 1234 5678</p>
     </section>
 
     <script src="script.js" defer></script>
