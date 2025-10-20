@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Into The World</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- VIDEO DE FONDO -->
+  <video autoplay muted loop class="bg-video">
+    <source src="../VIDEOS/forest.mp4" type="video/mp4" />
+    Tu navegador no soporta video.
+  </video>
+
+  <header>
+    <h1>Mis Carpetas</h1>
+  </header>
+
+  <div class="menu-toggle" id="menu-toggle">Agregar Carpeta</div>
+
+  <main>
+    <div class="trip-list" id="tripList"></div>
+  </main>
+
+  <!-- Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <h2>Nueva carpeta</h2>
+      <input type="text" id="tripName" placeholder="Nombre de la Carpeta" />
+      <div class="modal-buttons">
+        <button id="cancelBtn">Cancelar</button>
+        <button id="addTripBtn">Agregar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+
+</body>
