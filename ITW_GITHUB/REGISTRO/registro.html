@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registro</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <video autoplay muted loop class="bg-video">
+      <source src="../VIDEOS/forest.mp4" type="video/mp4" />
+      Tu navegador no soporta video.
+    </video>
+
+    <div class="wrapper">
+      <form id="registerForm">
+        <h1>Crear Cuenta</h1>
+
+        <div class="input-box">
+          <input type="text" id="nombre" placeholder="Nombre" required />
+        </div>
+
+        <div class="input-box">
+          <input type="text" id="apellido" placeholder="Apellido" required />
+        </div>
+
+        <div class="input-box">
+          <input type="text" id="pais" placeholder="País" required />
+        </div>
+
+        <div class="input-box">
+          <input type="number" id="edad" placeholder="Edad" required />
+        </div>
+
+        <div class="input-box">
+          <input type="email" id="email" placeholder="Correo electrónico" required />
+        </div>
+
+        <div class="input-box">
+          <input type="password" id="password" placeholder="Contraseña" required />
+        </div>
+
+        <div class="input-box">
+          <input type="password" id="confirmPassword" placeholder="Confirmar contraseña" required />
+        </div>
+
+        <button type="submit" class="btn">Registrarse</button>
+
+        <p><a href="../LOGIN/login.html">¿Ya tienes una cuenta? Inicia sesión</a></p>
+      </form>
+    </div>
+
+    <script type="module" src="script.js" defer></script>
+  </body>
+</html>
