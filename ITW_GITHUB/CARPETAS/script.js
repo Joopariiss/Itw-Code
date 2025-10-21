@@ -1,41 +1,45 @@
-const menuToggle = document.getElementById('menu-toggle');
-const modal = document.getElementById('modal');
-const cancelBtn = document.getElementById('cancelBtn');
-const addTripBtn = document.getElementById('addTripBtn');
+import { auth } from "../firebase.js";
+import { createFolder, getUserFolders } from "./db.js";
+
 const tripList = document.getElementById('tripList');
+const modal = document.getElementById('modal');
+const menuToggle = document.getElementById('menu-toggle');
+const addTripBtn = document.getElementById('addTripBtn');
+const cancelBtn = document.getElementById('cancelBtn');
 const tripNameInput = document.getElementById('tripName');
 
-// Abrir modal al hacer click en el botón
-menuToggle.addEventListener('click', () => {
-  modal.style.display = 'flex'; // 🔹 mostrar el modal
-  tripNameInput.focus();         // opcional: enfoca el input
-});
+// Modal básico
+menuToggle.addEventListener('click', () => { modal.style.display = 'flex'; tripNameInput.focus(); });
+cancelBtn.addEventListener('click', () => { modal.style.display = 'none'; tripNameInput.value = ''; });
+window.addEventListener('click', e => { if(e.target === modal){ modal.style.display='none'; tripNameInput.value=''; } });
 
-// Cerrar modal al presionar cancelar
-cancelBtn.addEventListener('click', () => {
-  modal.style.display = 'none';
-  tripNameInput.value = '';
-});
+// Detectar usuario logueado
+auth.onAuthStateChanged(async (user) => {
+  if (!user) return;
 
-// Agregar nueva "carpeta" y cerrar modal
-addTripBtn.addEventListener('click', () => {
-  const name = tripNameInput.value.trim();
-  if(name) {
-    const tripDiv = document.createElement('div');
-    tripDiv.classList.add('trip');
-    tripDiv.textContent = name;
-    tripList.appendChild(tripDiv);
-    tripNameInput.value = '';
-    modal.style.display = 'none';
-  } else {
-    alert('Por favor ingresa un nombre para el viaje.');
-  }
-});
+  console.log("Usuario logueado:", user.uid);
 
-// Cerrar modal al hacer click fuera del contenido
-window.addEventListener('click', (e) => {
-  if(e.target === modal) {
-    modal.style.display = 'none';
-    tripNameInput.value = '';
-  }
+  // Mostrar carpetas existentes
+  const folders = await getUserFolders(user.uid);
+  folders.forEach(folder => {
+    const div = document.createElement('div');
+    div.classList.add('trip');
+    div.textContent = folder.name;
+    tripList.appendChild(div);
+  });
+
+  // Crear nueva carpeta
+  addTripBtn.addEventListener('click', async () => {
+    const name = tripNameInput.value.trim();
+    if(!name) return alert('Ingresa un nombre');
+    const folder = await createFolder(name, user.uid);
+    if(folder){
+      const div = document.createElement('div');
+      div.classList.add('trip');
+      div.textContent = folder.name;
+      tripList.appendChild(div);
+      tripNameInput.value = '';
+      modal.style.display='none';
+    }
+  });
 });
