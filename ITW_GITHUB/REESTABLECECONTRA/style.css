@@ -72,7 +72,7 @@ body {
 }
 
 .remember-forgot label input {
-  accent-color: #ffffff;
+  accent-color: #080808;
   text-decoration: 3px;
 }
 
@@ -128,6 +128,14 @@ body {
 .wrapper {
   position: relative; /* asegura que se superponga al video */
   z-index: 1;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.1) inset;
+  -webkit-text-fill-color: #ffffff;
 }
 
 /* Corrige el autocompletado de Chrome */
