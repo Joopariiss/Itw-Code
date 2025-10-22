@@ -72,12 +72,12 @@ body {
 }
 
 .remember-forgot label input {
-  accent-color: #080808;
+  accent-color: #ffffff;
   text-decoration: 3px;
 }
 
 .remember-forgot a {
-  color: #111111;
+  color: #ffffff;
   text-decoration: none;
 }
 
@@ -106,7 +106,7 @@ body {
 }
 
 .register-link p a {
-  color: #080808;
+  color: #ffffff;
   text-decoration: none;
   font-weight: 600;
 }
@@ -128,4 +128,17 @@ body {
 .wrapper {
   position: relative; /* asegura que se superponga al video */
   z-index: 1;
+}
+
+/* Corrige el autocompletado de Chrome */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.1) inset !important; /* simula transparencia */
+  -webkit-text-fill-color: #ffffff !important; /* texto blanco */
+  transition: background-color 5000s ease-in-out 0s !important;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 40px;
+  font-size: 16px;
 }
