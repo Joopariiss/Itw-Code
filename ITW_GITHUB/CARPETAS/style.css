@@ -142,22 +142,54 @@ main {
   color: white;
 }
 
-
-.menu-toggle {
+/* Contenedor de botones del menú */
+.menu-container {
   position: fixed;
   top: 20px;
   right: 25px;
-  font-size: 28px;
+  display: flex;
+  flex-direction: column; /* los coloca uno debajo del otro */
+  gap: 10px; /* separación entre ellos */
+  z-index: 110;
+}
+
+/* Estilo general de los botones */
+.menu-toggle {
+  font-size: 18px;
   color: white;
   cursor: pointer;
-  z-index: 110;
   background-color: rgba(0, 0, 0, 0.4);
   border-radius: 6px;
-  padding: 6px 10px;
+  padding: 8px 12px;
+  text-align: center;
   transition: background 0.3s ease;
 }
 
 .menu-toggle:hover {
   background-color: rgba(255, 255, 255, 0.2);
+}
+
+.trip:hover {
+  transform: scale(1.03);
+}
+
+.trip:active {
+  transform: scale(0.98);
+}
+
+body[data-mode="modificar"] .trip:hover {
+  background: #ffe08a;
+}
+
+body[data-mode="eliminar"] .trip:hover {
+  background: #ffb3b3;
+}
+
+body[data-mode="modificar"] .trip:hover {
+  background-color: #ffe08a;
+}
+
+body[data-mode="eliminar"] .trip:hover {
+  background-color: #ffb3b3;
 }
 
