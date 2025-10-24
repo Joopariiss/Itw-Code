@@ -1,144 +1,131 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 
-* {
+body, html {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
+  height: 100%;
+  font-family: 'Poppins', sans-serif;
 }
 
-body {
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+
+.left-panel {
+  flex: 1;
+  position: relative;   /* necesario para posicionar el video dentro */
+  overflow: hidden;     /* para que no se salga del panel */
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background-size: cover;
-  background-position: center;
+  background: linear-gradient(180deg, #0d0d0d, #1a1a1a); /* opcional si el video tiene transparencias */
 }
 
-.wrapper {
-  width: 420px;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  color: #ffffff;
-  border-radius: 10px;
-  padding: 20px 40px;
-}
-
-.wrapper h1 {
-  font-size: 36px;
-  text-align: center;
-}
-
-.wrapper .input-box {
-  position: relative;
-  width: 100%;
-  height: 50px;
-  margin: 30px 0;
-}
-
-.input-box input {
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  border: none;
-  outline: none;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 40px;
-  font-size: 16px;
-  color: #ffffff;
-  padding: 20px 45px 20px 20px;
-}
-
-.input-box input::placeholder {
-  color: #ffffff;
-}
-
-.input-box i {
+.left-panel .video-bg {
   position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 20px;
-}
-
-.wrapper .remember-forgot {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14.5px;
-  margin: -15px 0 15px;
-}
-
-.remember-forgot label input {
-  accent-color: #ffffff;
-  text-decoration: 3px;
-}
-
-.remember-forgot a {
-  color: #ffffff;
-  text-decoration: none;
-}
-
-.remember-forgot a:hover {
-  text-decoration: underline;
-}
-
-.wrapper .btn {
-  width: 100%;
-  height: 45px;
-  background: #fff;
-  border: none;
-  outline: none;
-  border-radius: 40px;
-  box-shadow: 0 0 10px rgb(8, 8, 8);
-  cursor: pointer;
-  font-size: 16px;
-  color: #333;
-  font-weight: 600;
-}
-
-.wrapper .register-link {
-  font-size: 14.5px;
-  text-align: center;
-  margin: 20px 0 15px;
-}
-
-.register-link p a {
-  color: #ffffff;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.register-link p a:hover {
-  text-decoration: underline;
-}
-
-.bg-video {
-  position: fixed; /* se queda fijo en la pantalla */
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* hace que el video llene la pantalla */
-  z-index: -1; /* lo manda al fondo */
+  object-fit: cover; /* asegura que el video llene todo el panel sin deformarse */
+  z-index: 0;        /* para que quede detrás de cualquier contenido que quieras poner encima */
 }
 
-.wrapper {
-  position: relative; /* asegura que se superponga al video */
-  z-index: 1;
+
+/* Panel izquierdo */
+.left-panel {
+  flex: 1;
+  background: linear-gradient(180deg, #0d0d0d, #1a1a1a);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* Corrige el autocompletado de Chrome */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.1) inset !important; /* simula transparencia */
-  -webkit-text-fill-color: #ffffff !important; /* texto blanco */
-  transition: background-color 5000s ease-in-out 0s !important;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 40px;
+.left-panel .illustration {
+  width: 60%;
+  max-width: 400px;
+}
+
+/* Panel derecho */
+.right-panel {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f8f8f8;
+}
+
+form {
+  width: 80%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+input {
+  padding: 12px 15px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
   font-size: 16px;
+}
+
+.btn {
+  background-color: #24292f;
+  color: white;
+  border: none;
+  padding: 12px;
+  margin-top: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.btn:hover {
+  background-color: #444c56;
+}
+
+.social-buttons button {
+  width: 100%;
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.social-buttons .google {
+  background-color: #fff;
+}
+
+.social-buttons .apple {
+  background-color: #000;
+  color: #fff;
+}
+
+.divider {
+  text-align: center;
+  margin: 15px 0;
+  color: #666;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.login-link a {
+  color: #0366d6;
+  text-decoration: none;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
 }

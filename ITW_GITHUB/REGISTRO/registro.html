@@ -1,56 +1,49 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registro</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <video autoplay muted loop class="bg-video">
-      <source src="../VIDEOS/forest.mp4" type="video/mp4" />
-      Tu navegador no soporta video.
-    </video>
-
-    <div class="wrapper">
-      <form id="registerForm">
-        <h1>Crear Cuenta</h1>
-
-        <div class="input-box">
-          <input type="text" id="nombre" placeholder="Nombre" required />
-        </div>
-
-        <div class="input-box">
-          <input type="text" id="apellido" placeholder="Apellido" required />
-        </div>
-
-        <div class="input-box">
-          <input type="text" id="pais" placeholder="País" required />
-        </div>
-
-        <div class="input-box">
-          <input type="date" id="fechaNacimiento" required />
-        </div>
-
-
-        <div class="input-box">
-          <input type="email" id="email" placeholder="Correo electrónico" required />
-        </div>
-
-        <div class="input-box">
-          <input type="password" id="password" placeholder="Contraseña" required />
-        </div>
-
-        <div class="input-box">
-          <input type="password" id="confirmPassword" placeholder="Confirmar contraseña" required />
-        </div>
-
-        <button type="submit" class="btn">Registrarse</button>
-
-        <p><a href="../LOGIN/login.html">¿Ya tienes una cuenta? Inicia sesión</a></p>
-      </form>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro estilo GitHub</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Parte izquierda: ilustración -->
+    <div class="left-panel">
+      <video autoplay muted loop class="video-bg">
+        <source src="../VIDEOS/forest.mp4" type="video/mp4">
+        Tu navegador no soporta el video.
+      </video>
     </div>
 
-    <script type="module" src="script.js" defer></script>
-  </body>
+    <!-- Parte derecha: formulario -->
+    <div class="right-panel">
+      <form id="registerForm">
+        <h1>Crear tu cuenta</h1>
+
+        <!--
+        <div class="social-buttons">
+          <button class="google">Continuar con Google</button>
+          <button class="apple">Continuar con Apple</button>
+        </div>
+        <div class="divider">o</div>
+        -->
+
+        <input type="text" id="nombre" placeholder="Nombre" required>
+        <input type="text" id="apellido" placeholder="Apellido" required>
+        <input type="text" id="pais" placeholder="pais" required>
+        <input type="date" id="fechaNacimiento" required>
+        <input type="email" id="email" placeholder="Correo electrónico" required>
+        <input type="password" id="password" placeholder="Contraseña" required>
+        <input type="password" id="confirmPassword" placeholder="Confirmar contraseña" required>
+
+        <button type="submit" class="btn">Crear cuenta</button>
+
+        <p class="login-link">¿Ya tienes una cuenta? <a href="../LOGIN/login.html">Inicia sesión</a></p>
+      </form>
+      
+      <script type="module" src="script.js" defer></script>
+    </div>
+  </div>
+</body>
 </html>
