@@ -124,13 +124,13 @@ function deleteItemById(id) {
 
 // ---------- Sugerencias (similar a utilizar IA) ----------
 const SUGGESTIONS = [
-  'Tent',
-  'Sleeping Bag',
-  'First Aid Kit',
-  'Portable Charger',
-  'Jacket',
-  'Toiletries',
-  'Water Bottle'
+  'Carpa',
+  'Saco de Dormir',
+  'Kit Primeros Auxilios',
+  'Cargador Portatil',
+  'Chaqueta GTX',
+  'Articulo Aseo',
+  'Botella de Agua'
 ];
 
 function renderSuggestions() {
