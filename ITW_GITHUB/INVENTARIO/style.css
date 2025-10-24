@@ -27,6 +27,36 @@ body{
   -moz-osx-font-smoothing:grayscale;
 }
 
+
+.hero-header {
+  position: relative;
+  height: 200px; /* puedes ajustar la altura */
+  background-image: url('../IMAGES/image3.jpg'); /* tu imagen */
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.hero-header .overlay {
+  background-color: rgba(0, 0, 0, 0.4); /* overlay oscuro para que el texto destaque */
+  padding: 2rem;
+  border-radius: 1rem;
+  text-align: center;
+}
+
+.hero-header h1 {
+  font-size: 3rem;
+  margin: 0;
+}
+
+.hero-header p {
+  font-size: 1.25rem;
+  margin-top: 0.5rem;
+}
+
 /* Layout helpers */
 .container{
   max-width:var(--container-width);
