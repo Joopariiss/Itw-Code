@@ -15,7 +15,37 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.hero-header {
+  position: relative;
+  height: 200px; /* puedes ajustar la altura */
+  background-image: url('../IMAGES/image3.jpg'); /* tu imagen */
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.hero-header .overlay {
+  background-color: rgba(0, 0, 0, 0.4); /* overlay oscuro para que el texto destaque */
+  padding: 2rem;
+  border-radius: 1rem;
+  text-align: center;
+}
+
+.hero-header h1 {
+  font-size: 3rem;
+  margin: 0;
+}
+
+.hero-header p {
+  font-size: 1.25rem;
+  margin-top: 0.5rem;
+}
+
 /* VIDEO DE FONDO */
+/*
 .bg-video {
   position: fixed;
   top: 0;
@@ -25,7 +55,7 @@ body {
   object-fit: cover;
   z-index: -2;
 }
-
+*/
 /* Capa de oscurecimiento */
 .bg-video::after {
   content: "";
@@ -155,24 +185,24 @@ h1 {
   border-collapse: collapse;
   margin: 100px auto;
   width: 80%;
-  max-width: 500px;
-  background-color: rgba(0, 0, 0, 0.9);
+  max-width: 600px;
+  background-color: rgba(51, 110, 66, 0.5);
   border-radius: 10px;
   overflow: hidden;
 }
 
 .perfil-container th,
 .perfil-container td {
-  border: 1px solid rgba(112, 98, 57, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.9);
   padding: 12px 16px;
   text-align: center;
 }
 
 .perfil-container th {
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(51, 110, 66, 0.5);
   font-weight: 600;
 }
 
 .perfil-container td {
-  color: #f0f0f0;
+  color: #000000;
 }
