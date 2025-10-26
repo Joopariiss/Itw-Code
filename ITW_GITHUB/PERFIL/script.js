@@ -27,11 +27,8 @@ const db = getFirestore(app);
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     console.log("Usuario logeado:", user.uid);
-
-    // Mostrar la tabla o contenedor del perfil
     document.getElementById("perfil-container").style.display = "block";
 
-    // Traer datos del usuario desde Firestore
     const docRef = doc(db, "usuarios", user.uid);
     const docSnap = await getDoc(docRef);
 
@@ -39,26 +36,43 @@ onAuthStateChanged(auth, async (user) => {
       const data = docSnap.data();
       console.log("Datos del usuario:", data);
 
-      // Rellenar los campos de la tabla
+      // Calcular edad si hay fecha de nacimiento
+      let fechaNacimientoTexto = "No registrada";
+      if (data.fechaNacimiento) {
+        const fechaNac = data.fechaNacimiento.toDate
+          ? data.fechaNacimiento.toDate() // Firestore Timestamp
+          : new Date(data.fechaNacimiento); // Si es string/Date normal
+
+        // Calcular edad
+        const hoy = new Date();
+        let edad = hoy.getFullYear() - fechaNac.getFullYear();
+        const mes = hoy.getMonth() - fechaNac.getMonth();
+        if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+          edad--;
+        }
+
+        // Mostrar fecha y edad
+        const fechaFormateada = fechaNac.toLocaleDateString("es-ES");
+        fechaNacimientoTexto = `${edad} años`;
+      }
+
+      // Rellenar campos de perfil
       document.getElementById("nombre").textContent = data.nombre || "";
       document.getElementById("apellido").textContent = data.apellido || "";
       document.getElementById("pais").textContent = data.pais || "";
-      document.getElementById("fechaNacimiento").textContent = data.edad
-        ? data.edad + " años"
-        : "";
+      document.getElementById("fechaNacimiento").textContent = fechaNacimientoTexto;
       document.getElementById("email").textContent = data.email || "";
       document.getElementById("fechaRegistro").textContent = data.fechaRegistro
-        ? new Date(data.fechaRegistro).toLocaleDateString()
+        ? new Date(data.fechaRegistro).toLocaleDateString("es-ES")
         : "No registrada";
 
-      // Saludo personalizado
       document.getElementById("saludo").textContent = `Hola, ${data.nombre}! 👋`;
     } else {
       console.warn("No se encontraron datos del usuario en Firestore.");
     }
   } else {
     console.log("No hay usuario logeado.");
-    window.location.href = "../LOGIN/login.html"; // Redirigir si no hay sesión
+    window.location.href = "../LOGIN/login.html";
   }
 });
 

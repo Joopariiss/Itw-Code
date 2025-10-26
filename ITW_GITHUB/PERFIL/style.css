@@ -173,10 +173,10 @@ h1 {
 /*TABLA DE PERFIL DE USUARIO*/
 .perfil-container {
   position: relative;
-  top: 150px;
+  top: 80px;
   left: 50%;
   transform: translateX(-50%);
-  color: white;
+  color: rgb(0, 0, 0);
   text-align: center;
   margin-top: 40px;
 }
