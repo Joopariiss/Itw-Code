@@ -18,6 +18,18 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Función para calcular edad (por si la necesitas en el perfil)
+function calcularEdad(fechaNacimiento) {
+  const hoy = new Date();
+  const fechaNac = new Date(fechaNacimiento);
+  let edad = hoy.getFullYear() - fechaNac.getFullYear();
+  const mes = hoy.getMonth() - fechaNac.getMonth();
+  if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+    edad--;
+  }
+  return edad;
+}
+
 // Registro
 document.getElementById("registerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -25,19 +37,24 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
   const nombre = document.getElementById("nombre").value;
   const apellido = document.getElementById("apellido").value;
   const pais = document.getElementById("pais").value;
-  const edad = parseInt(document.getElementById("edad").value);
+  const fechaNacimiento = document.getElementById("fechaNacimiento").value;
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
   const confirmPassword = document.getElementById("confirmPassword").value;
 
-  // Validar contraseñas
+  // Validaciones básicas
   if (password !== confirmPassword) {
     alert("⚠️ Las contraseñas no coinciden.");
     return;
   }
 
+  if (!fechaNacimiento) {
+    alert("⚠️ Debes ingresar tu fecha de nacimiento.");
+    return;
+  }
+
   try {
-    // Crear usuario en Authentication
+    // Crear usuario en Firebase Authentication
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
@@ -46,16 +63,32 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
       nombre,
       apellido,
       pais,
-      edad,
+      fechaNacimiento,
       email,
-      uid: user.uid
+      uid: user.uid,
+      fechaRegistro: new Date().toISOString()
     });
 
-    console.log("Usuario registrado:", user);
-    alert("✅ Registro exitoso. Bienvenido " + nombre + "!");
-    window.location.href = "../PERFIL/perfil.html"; // Redirige al perfil o login
+    // Guardar nombre localmente para mostrar luego
+    localStorage.setItem("usuarioNombre", nombre);
+
+    alert("✅ Registro exitoso. ¡Bienvenido " + nombre + "!");
+    window.location.href = "../PERFIL/perfil.html";
   } catch (error) {
-    console.error("Error en el registro:", error.message);
-    alert("❌ Error al registrar: " + error.message);
+    let mensaje = "";
+    switch (error.code) {
+      case "auth/email-already-in-use":
+        mensaje = "El correo ya está registrado.";
+        break;
+      case "auth/invalid-email":
+        mensaje = "El formato del correo no es válido.";
+        break;
+      case "auth/weak-password":
+        mensaje = "La contraseña es demasiado débil.";
+        break;
+      default:
+        mensaje = "Error desconocido: " + error.message;
+    }
+    alert("❌ " + mensaje);
   }
 });

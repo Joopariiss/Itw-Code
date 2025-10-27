@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travel Planner</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Flatpickr CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+  <header class="hero-header">
+    <div class="overlay">
+      <h1>Planificador de Viaje</h1>
+      <p>Into The World</p>
+    </div>
+  </header>
+
+
+  <main class="container">
+    <!-- Sección de fechas del viaje -->
+    <!--
+    <section id="calendar-section" class="card">
+      <h2>Trip Dates</h2>
+      <label>Start Date: <input type="date" id="start-date"></label>
+      <label>End Date: <input type="date" id="end-date"></label>
+      <button id="generate-days-btn">Generate Days</button>
+    </section>
+    -->
+    <section id="calendar-section" class="card">
+      <h2>Fechas del Viaje</h2>
+      <div id="trip-calendar"></div>
+    </section>
+
+    <!-- Sección del itinerario -->
+    <section id="itinerary-section">
+      <!-- Los días se añadirán dinámicamente aquí -->
+    </section>
+  </main>
+
+  <!-- Modal para agregar/editar actividad -->
+  <div id="activity-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3 id="modal-title">Add Activity</h3>
+      <label>Time: <input type="time" id="activity-time" value="12:00"></label>
+      <label>Description: <textarea id="activity-desc" rows="3"></textarea></label>
+      <div class="modal-buttons">
+        <button id="save-activity-btn">Save</button>
+        <button id="cancel-activity-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="script.js"></script>
+</body>
+</html>

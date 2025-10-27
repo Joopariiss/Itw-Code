@@ -60,15 +60,16 @@ main {
 .trip-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
-  justify-content: center;
+  gap: 10px;
+  justify-content: flex-start;
 }
 
+/* Carpetas */
 .trip {
-  width: 150px;
-  height: 120px;
-  background: #e7f0ff;
-  border-radius: 12px;
+  width: 100px;
+  height: 80px;
+  background: #ffffff;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -79,7 +80,6 @@ main {
 }
 
 .trip:hover {
-  background: #d0e0ff;
   transform: scale(1.03);
 }
 
@@ -142,18 +142,26 @@ main {
   color: white;
 }
 
-
-.menu-toggle {
+/* Contenedor de botones del menú */
+.menu-container {
   position: fixed;
   top: 20px;
   right: 25px;
-  font-size: 28px;
+  display: flex;
+  flex-direction: column; /* los coloca uno debajo del otro */
+  gap: 10px; /* separación entre ellos */
+  z-index: 110;
+}
+
+/* Estilo general de los botones */
+.menu-toggle {
+  font-size: 18px;
   color: white;
   cursor: pointer;
-  z-index: 110;
   background-color: rgba(0, 0, 0, 0.4);
   border-radius: 6px;
-  padding: 6px 10px;
+  padding: 8px 12px;
+  text-align: center;
   transition: background 0.3s ease;
 }
 
@@ -161,3 +169,74 @@ main {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
+.trip:hover {
+  transform: scale(1.03);
+}
+
+.trip:active {
+  transform: scale(0.98);
+}
+
+body[data-mode="eliminar"] .trip:hover {
+  background: #ffb3b3;
+}
+
+body[data-mode="modificar"] .trip:hover {
+  background-color: #ffe08a;
+}
+
+body[data-mode="eliminar"] .trip:hover {
+  background-color: #ffb3b3;
+}
+
+.folder-container {
+  width: 95%;
+  max-width: 700px;
+  margin: 120px auto 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* separación entre cuadros */
+}
+
+/* Cuadro de carpetas */
+.folders-box {
+  background: #e7f0ff;
+  border-radius: 12px;
+  padding: 20px;
+  min-height: 250px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Botones horizontales */
+.folder-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* Botones individuales */
+.folder-buttons .menu-toggle {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 1rem;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: white;
+  transition: 0.3s;
+}
+
+.folder-buttons .menu-toggle:hover {
+  background-color: #0056b3;
+}
+
+/* Cuadro de botones */
+.buttons-box {
+  background: #d0e0ff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
