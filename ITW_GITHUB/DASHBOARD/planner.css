@@ -30,7 +30,6 @@ body {
 }
 
 
-
 /*HEADER (TITULO DE LA PAGINA)*/
 /*
 header {
@@ -231,4 +230,19 @@ input, textarea {
 #calendar-section h2::before {
   content: "📅";
   font-size: 1.3rem;
+}
+#planner {
+  display: flex;
+  gap: 2rem;           /* espacio entre calendario y actividades */
+  padding: 2rem;       /* opcional, para separar del borde de la pantalla */
+}
+
+#calendar-section {
+  flex: 2;             /* ocupa más espacio que itinerario */
+  min-width: 300px;    /* para no colapsar */
+}
+
+#itinerary-section {
+  flex: 1;             /* lado derecho, menos ancho */
+  min-width: 250px;
 }

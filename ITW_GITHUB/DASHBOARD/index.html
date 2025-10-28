@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Organizador de Viajes</title>
 
-  <!-- 🔹 CSS de cada módulo -->
+  <!--  CSS de cada módulo -->
   <link rel="stylesheet" href="planner.css">
   <link rel="stylesheet" href="inventory.css">
 
   <style>
-    /* 🔹 Estilos globales para tabs */
+    /*  Estilos globales para tabs */
     body {
       font-family: 'Poppins', sans-serif;
       margin: 0;
@@ -53,7 +53,7 @@
 
 <body>
 
-  <!-- 🔹 Encabezado -->
+  <!--  Encabezado -->
   <!--
     <header style="text-align:center; padding:1rem; background:#333; color:#fff;">
       <h1>Organizador de Viajes</h1>
@@ -66,17 +66,19 @@
     </div>
   </header>
 
-  <!-- 🔹 Tabs -->
+  <!--  Tabs -->
   <div class="tabs">
     <button class="tab-btn active" data-tab="planner">Calendario + Itinerario</button>
     <button class="tab-btn" data-tab="inventory">Inventario</button>
   </div>
 
-  <!-- 🔹 Secciones -->
+
+  <!--  SECCIONES -->
+  <!--CALENDARIO + ITINERARIO-->
+
   <section id="planner" class="tab-content active">
     <!-- AQUÍ pega TODO tu HTML actual del calendario + itinerario -->
      
-  <main class="container">
     <!-- Sección de fechas del viaje -->
     <!--
     <section id="calendar-section" class="card">
@@ -95,7 +97,6 @@
     <section id="itinerary-section">
       <!-- Los días se añadirán dinámicamente aquí -->
     </section>
-  </main>
 
   <!-- Modal para agregar/editar actividad -->
   <div id="activity-modal" class="modal hidden">
@@ -111,10 +112,10 @@
   </div>
   </section>
 
-  <section id="inventory" class="tab-content">
-    <!-- AQUÍ pega TODO tu HTML actual del inventario -->
-       <div id="app">
-    <!-- Budget modal/screen (shown initially if budget not set) -->
+  <!--INVENTARIO-->
+<section id="inventory" class="tab-content">
+  <div id="app">
+    <!-- Budget modal/screen -->
     <div id="budget-screen" class="fullscreen-center">
       <div class="card card-shadow small-card" role="dialog" aria-labelledby="budget-title">
         <header class="card-header">
@@ -133,23 +134,7 @@
     </div>
 
     <!-- Main app -->
-    <main class="container">
-      <!--
-      <header class="header">
-        <h1 class="headline">Mi Inventario</h1>
-        <p class="muted">Tu planificador de inventario de viaje.</p>
-      </header>      
-      -->
-
-      <!--
-      <header class="hero-header">
-        <div class="overlay">
-          <h1>Mi Inventario</h1>
-          <p>Into The World</p>
-        </div>
-      </header>      
-      -->
-
+    <main class="inventory-container">
       <!-- Budget cards -->
       <section class="mb">
         <div class="grid-3 gap">
@@ -160,7 +145,6 @@
             </div>
             <div class="card-content big-value" id="initial-budget">$0</div>
           </div>
-
           <div class="card">
             <div class="card-header spaced">
               <div class="card-title-sm">Total Gastado</div>
@@ -168,7 +152,6 @@
             </div>
             <div class="card-content big-value" id="total-spent">$0</div>
           </div>
-
           <div class="card" id="remaining-card">
             <div class="card-header spaced">
               <div class="card-title-sm">Restante</div>
@@ -180,7 +163,7 @@
       </section>
 
       <div class="grid-main">
-        <!-- Left column: form + suggestions -->
+        <!-- Left column -->
         <aside class="left-col">
           <div class="card">
             <div class="card-header">
@@ -191,11 +174,9 @@
                 <label class="label">Nombre Articulo
                   <input id="item-name" type="text" placeholder="e.g., Tent" required />
                 </label>
-
                 <label class="label">Costo
                   <input id="item-cost" type="number" step="0.01" placeholder="e.g., 50" min="0" />
                 </label>
-
                 <button type="submit" class="btn btn-accent full">
                   <span class="btn-icon">➕</span> Agregar Item
                 </button>
@@ -208,31 +189,28 @@
               <div class="card-title">¡Sugerencias!</div>
             </div>
             <div class="card-content">
-              <div id="suggestions" class="suggestions-grid">
-                <!-- suggestions are added dynamically -->
-              </div>
+              <div id="suggestions" class="suggestions-grid"></div>
               <p class="hint">"Haz clic en una sugerencia para autocompletar el nombre del artículo y colocar el costo en el campo correspondiente."</p>
             </div>
           </div>
         </aside>
 
-        <!-- Right column: item list -->
+        <!-- Right column -->
         <section class="right-col">
           <div class="card full-height">
             <div class="card-header">
               <div class="card-title">Checklist de Viaje</div>
             </div>
-            <div class="card-content scroll" id="items-container">
-              <!-- empty state / list rendered here -->
-            </div>
+            <div class="card-content scroll" id="items-container"></div>
           </div>
         </section>
       </div>
     </main>
   </div>
-  </section>
+</section>
 
-  <!-- 🔹 Scripts -->
+
+  <!--  SCRIPT -->
   <script src="planner.js" type="module"></script>
   <script src="inventory.js" type="module"></script>
   <script src="tabs.js"></script>
