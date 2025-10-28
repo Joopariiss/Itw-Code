@@ -12,8 +12,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const contactForm = document.getElementById("contactForm");
   contactForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    alert("✅ ¡Gracias por tu mensaje! Nos pondremos en contacto pronto.");
-    contactForm.reset();
+    alert("✅ ¡Gracias! Tu mensaje fue enviado.");
+  });
+
+});
+
+const form = document.getElementById("contactForm");
+
+form.addEventListener("submit", function(event) {
+  event.preventDefault();
+  const data = new FormData(form);
+  fetch(form.action, {
+    method: form.method,
+    body: data,
+    headers: {
+      'Accept': 'application/json'
+    }
+  }).then(response => {
+    alert("Mensaje enviado. Pronto nos pondremos en contacto contigo!");
+    form.reset();
+  }).catch(error => {
+    alert("Ups! Algo salió mal. Intenta nuevamente.");
   });
 });
