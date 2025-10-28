@@ -20,12 +20,16 @@
   --ring: hsl(151, 27%, 30%);
   --radius: 0.5rem;
 }
+
 body {
+  background-color: var(--background);
+  color: var(--foreground);
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background: #f7f7f7;
 }
+
+
 
 /*HEADER (TITULO DE LA PAGINA)*/
 /*
@@ -62,38 +66,27 @@ header {
   margin-top: 0.5rem;
 }
 
-/*STYLE QUE DIO EL GPT PARA LAS TABS (CAMBIO DE FUNCION DINAMICA)*/
-.tabs {
+
+
+.container {
   display: flex;
-  justify-content: center;
-  margin-top: 1rem;
-}
-.tab-button {
-  padding: 0.5rem 1rem;
-  margin: 0 0.5rem;
-  border: none;
-  background: #e0e0e0;
-  cursor: pointer;
-  border-radius: 4px;
-}
-.tab-button.active {
-  background: #1d4ed8;
-  color: white;
-}
-.tab-content {
-  display: none;
-  max-width: 800px;
-  margin: 2rem auto;
-  background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-}
-.tab-content.active {
-  display: block;
+  justify-content: center; /* centra horizontalmente todo el contenido */
+  align-items: flex-start; /* alinea los elementos arriba */
+  gap: 2rem; /* espacio razonable entre ambos paneles */
+  padding: 2rem;
+  max-width: 1200px; /* limita el ancho máximo */
+  margin: 0 auto; /* centra el contenedor en la página */
 }
 
-/*ITINERARIO MIO (NO UTILIZAR POR AHORA. NO NECESARIO)*/
-/*
+#calendar-section {
+  flex: 1; /* ocupa la mitad del espacio */
+  max-width: 50%;
+  background-color: var(--card);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
 #itinerary-section {
   flex: 1;
   max-width: 50%;
@@ -102,9 +95,7 @@ header {
   border-radius: var(--radius);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
-*/
 
-/*ESTO DIVIDE LAS COSAS, PONE UN RECUADRO DEBAJO DEL CALENDARIO E ITINERARIO*/
 .card {
   background-color: var(--card);
   color: var(--card-foreground);
@@ -113,7 +104,6 @@ header {
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   flex: 1 1 300px;
 }
-
 
 button {
   background-color: var(--primary);
@@ -138,7 +128,6 @@ input, textarea {
   color: var(--foreground);
 }
 
-
 .activity-item {
   display: flex;
   justify-content: space-between;
@@ -147,7 +136,6 @@ input, textarea {
   margin-bottom: 0.5rem;
   border-radius: var(--radius);
 }
-
 
 .modal {
   position: fixed;
@@ -179,48 +167,68 @@ input, textarea {
   margin-top: 0.5rem;
 }
 
-
-
-
-
-/*style itinerario que dio el gpt*/
-/*
-.itinerary-day {
-  margin-bottom: 1rem;
-  padding-left: 1rem;
-  border-left: 3px solid #1d4ed8;
+/* ==== CALENDARIO ESTILO ==== */
+.flatpickr-calendar {
+  font-family: 'Inter', Arial, sans-serif;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+  overflow: hidden;
 }
-.itinerary-item {
-  margin: 0.5rem 0;
-}
-*/
 
-/*style del inventario que dio el gpt (CREO QUE NO LO USAREMOS)*/
-/*
-.packing-category {
-  margin-bottom: 1rem;
+.flatpickr-months {
+  background-color: var(--card);
+  color: var(--foreground);
+  font-weight: bold;
+  border-bottom: 1px solid var(--border);
 }
-.packing-item {
+
+.flatpickr-day {
+  border-radius: 8px !important;
+  transition: all 0.2s ease;
+}
+
+.flatpickr-day:hover {
+  background-color: var(--muted);
+  color: var(--foreground);
+}
+
+.flatpickr-day.inRange {
+  background-color: var(--accent);
+  color: white;
+  opacity: 0.9;
+}
+
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+}
+
+.flatpickr-weekday {
+  color: var(--muted-foreground);
+  font-weight: 600;
+}
+
+.flatpickr-current-month input.cur-year {
+  font-weight: bold;
+  color: var(--foreground);
+}
+
+.flatpickr-next-month,
+.flatpickr-prev-month {
+  color: var(--foreground);
+  fill: var(--foreground);
+}
+
+#calendar-section h2 {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-size: 1.25rem;
 }
-.packing-item input[type="checkbox"]:checked + label {
-  text-decoration: line-through;
-  color: #888;
-}
-.progress-bar {
-  background: #e0e0e0;
-  height: 10px;
-  border-radius: 5px;
-  overflow: hidden;
-  margin-bottom: 1rem;
-}
-.progress-fill {
-  height: 100%;
-  background: #1d4ed8;
-  width: 0%;
-  transition: width 0.3s;
-}
-*/
 
+#calendar-section h2::before {
+  content: "📅";
+  font-size: 1.3rem;
+}

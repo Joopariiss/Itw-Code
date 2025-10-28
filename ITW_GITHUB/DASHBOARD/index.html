@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organizador de Viajes</title>
+
+  <!-- 🔹 CSS de cada módulo -->
+  <link rel="stylesheet" href="planner.css">
+  <link rel="stylesheet" href="inventory.css">
+
+  <style>
+    /* 🔹 Estilos globales para tabs */
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background-color: #f5f5f5;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      background: hsl(207 86% 68%);
+    }
+
+    .tab-btn {
+      color: #fff;
+      background: none;
+      border: none;
+      padding: 1rem 2rem;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s;
+    }
+
+    .tab-btn.active {
+      background: #b6b6b6;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 20px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+
+    <!-- Flatpickr CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+
+<body>
+
+  <!-- 🔹 Encabezado -->
+  <!--
+    <header style="text-align:center; padding:1rem; background:#333; color:#fff;">
+      <h1>Organizador de Viajes</h1>
+    </header>
+  -->
+    <header class="hero-header">
+    <div class="overlay">
+      <h1>Planificador de Viaje</h1>
+      <p>Into The World</p>
+    </div>
+  </header>
+
+  <!-- 🔹 Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="planner">Calendario + Itinerario</button>
+    <button class="tab-btn" data-tab="inventory">Inventario</button>
+  </div>
+
+  <!-- 🔹 Secciones -->
+  <section id="planner" class="tab-content active">
+    <!-- AQUÍ pega TODO tu HTML actual del calendario + itinerario -->
+     
+  <main class="container">
+    <!-- Sección de fechas del viaje -->
+    <!--
+    <section id="calendar-section" class="card">
+      <h2>Trip Dates</h2>
+      <label>Start Date: <input type="date" id="start-date"></label>
+      <label>End Date: <input type="date" id="end-date"></label>
+      <button id="generate-days-btn">Generate Days</button>
+    </section>
+    -->
+    <section id="calendar-section" class="card">
+      <h2>Fechas del Viaje</h2>
+      <div id="trip-calendar"></div>
+    </section>
+
+    <!-- Sección del itinerario -->
+    <section id="itinerary-section">
+      <!-- Los días se añadirán dinámicamente aquí -->
+    </section>
+  </main>
+
+  <!-- Modal para agregar/editar actividad -->
+  <div id="activity-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3 id="modal-title">Add Activity</h3>
+      <label>Time: <input type="time" id="activity-time" value="12:00"></label>
+      <label>Description: <textarea id="activity-desc" rows="3"></textarea></label>
+      <div class="modal-buttons">
+        <button id="save-activity-btn">Save</button>
+        <button id="cancel-activity-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <section id="inventory" class="tab-content">
+    <!-- AQUÍ pega TODO tu HTML actual del inventario -->
+       <div id="app">
+    <!-- Budget modal/screen (shown initially if budget not set) -->
+    <div id="budget-screen" class="fullscreen-center">
+      <div class="card card-shadow small-card" role="dialog" aria-labelledby="budget-title">
+        <header class="card-header">
+          <h2 id="budget-title" class="card-title">Ingresa Presupuesto de Viaje</h2>
+        </header>
+        <div class="card-content">
+          <form id="budget-form" class="space-y">
+            <div class="input-with-prefix">
+              <span class="prefix">$</span>
+              <input id="budget-input" type="number" min="0" step="0.01" value="1000" required />
+            </div>
+            <button type="submit" class="btn btn-primary full">Start Planning</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main app -->
+    <main class="container">
+      <!--
+      <header class="header">
+        <h1 class="headline">Mi Inventario</h1>
+        <p class="muted">Tu planificador de inventario de viaje.</p>
+      </header>      
+      -->
+
+      <!--
+      <header class="hero-header">
+        <div class="overlay">
+          <h1>Mi Inventario</h1>
+          <p>Into The World</p>
+        </div>
+      </header>      
+      -->
+
+      <!-- Budget cards -->
+      <section class="mb">
+        <div class="grid-3 gap">
+          <div class="card">
+            <div class="card-header spaced">
+              <div class="card-title-sm">Presupuesto Inicial</div>
+              <div class="icon" aria-hidden="true" title="Wallet">💼</div>
+            </div>
+            <div class="card-content big-value" id="initial-budget">$0</div>
+          </div>
+
+          <div class="card">
+            <div class="card-header spaced">
+              <div class="card-title-sm">Total Gastado</div>
+              <div class="icon" aria-hidden="true" title="Cart">🛒</div>
+            </div>
+            <div class="card-content big-value" id="total-spent">$0</div>
+          </div>
+
+          <div class="card" id="remaining-card">
+            <div class="card-header spaced">
+              <div class="card-title-sm">Restante</div>
+              <div class="icon" aria-hidden="true" title="Remaining">📉</div>
+            </div>
+            <div class="card-content big-value" id="remaining-budget">$0</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid-main">
+        <!-- Left column: form + suggestions -->
+        <aside class="left-col">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Agregar Nuevo Item</div>
+            </div>
+            <div class="card-content">
+              <form id="add-item-form" class="form-vertical">
+                <label class="label">Nombre Articulo
+                  <input id="item-name" type="text" placeholder="e.g., Tent" required />
+                </label>
+
+                <label class="label">Costo
+                  <input id="item-cost" type="number" step="0.01" placeholder="e.g., 50" min="0" />
+                </label>
+
+                <button type="submit" class="btn btn-accent full">
+                  <span class="btn-icon">➕</span> Agregar Item
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">¡Sugerencias!</div>
+            </div>
+            <div class="card-content">
+              <div id="suggestions" class="suggestions-grid">
+                <!-- suggestions are added dynamically -->
+              </div>
+              <p class="hint">"Haz clic en una sugerencia para autocompletar el nombre del artículo y colocar el costo en el campo correspondiente."</p>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Right column: item list -->
+        <section class="right-col">
+          <div class="card full-height">
+            <div class="card-header">
+              <div class="card-title">Checklist de Viaje</div>
+            </div>
+            <div class="card-content scroll" id="items-container">
+              <!-- empty state / list rendered here -->
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+  </section>
+
+  <!-- 🔹 Scripts -->
+  <script src="planner.js" type="module"></script>
+  <script src="inventory.js" type="module"></script>
+  <script src="tabs.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+</body>
+</html>
