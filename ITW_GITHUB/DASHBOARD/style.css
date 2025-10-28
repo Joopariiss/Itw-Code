@@ -1,0 +1,226 @@
+:root {
+  --background: hsl(0, 0%, 94.1%);
+  --foreground: hsl(0, 0%, 3.9%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(0, 0%, 3.9%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(0, 0%, 3.9%);
+  --primary: hsl(151, 27%, 30%);
+  --primary-foreground: hsl(151, 15%, 95%);
+  --secondary: hsl(0, 0%, 96.1%);
+  --secondary-foreground: hsl(0, 0%, 9%);
+  --muted: hsl(0, 0%, 96.1%);
+  --muted-foreground: hsl(0, 0%, 45.1%);
+  --accent: hsl(43, 24%, 30%);
+  --accent-foreground: hsl(43, 15%, 95%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --border: hsl(0, 0%, 89.8%);
+  --input: hsl(0, 0%, 89.8%);
+  --ring: hsl(151, 27%, 30%);
+  --radius: 0.5rem;
+}
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f7f7f7;
+}
+
+/*HEADER (TITULO DE LA PAGINA)*/
+/*
+header {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  padding: 1rem;
+  text-align: center;
+}
+*/
+.hero-header {
+  position: relative;
+  height: 200px; /* puedes ajustar la altura */
+  background-image: url('../IMAGES/image3.jpg'); /* tu imagen */
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+.hero-header .overlay {
+  background-color: rgba(0, 0, 0, 0.4); /* overlay oscuro para que el texto destaque */
+  padding: 2rem;
+  border-radius: 1rem;
+  text-align: center;
+}
+.hero-header h1 {
+  font-size: 3rem;
+  margin: 0;
+}
+.hero-header p {
+  font-size: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+/*STYLE QUE DIO EL GPT PARA LAS TABS (CAMBIO DE FUNCION DINAMICA)*/
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+.tab-button {
+  padding: 0.5rem 1rem;
+  margin: 0 0.5rem;
+  border: none;
+  background: #e0e0e0;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.tab-button.active {
+  background: #1d4ed8;
+  color: white;
+}
+.tab-content {
+  display: none;
+  max-width: 800px;
+  margin: 2rem auto;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+.tab-content.active {
+  display: block;
+}
+
+/*ITINERARIO MIO (NO UTILIZAR POR AHORA. NO NECESARIO)*/
+/*
+#itinerary-section {
+  flex: 1;
+  max-width: 50%;
+  background-color: var(--card);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+*/
+
+/*ESTO DIVIDE LAS COSAS, PONE UN RECUADRO DEBAJO DEL CALENDARIO E ITINERARIO*/
+.card {
+  background-color: var(--card);
+  color: var(--card-foreground);
+  padding: 1rem;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  flex: 1 1 300px;
+}
+
+
+button {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+input, textarea {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: var(--input);
+  color: var(--foreground);
+}
+
+
+.activity-item {
+  display: flex;
+  justify-content: space-between;
+  background: var(--secondary);
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: var(--radius);
+}
+
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: var(--card);
+  padding: 1rem;
+  border-radius: var(--radius);
+  width: 300px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+
+
+
+
+/*style itinerario que dio el gpt*/
+/*
+.itinerary-day {
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+  border-left: 3px solid #1d4ed8;
+}
+.itinerary-item {
+  margin: 0.5rem 0;
+}
+*/
+
+/*style del inventario que dio el gpt (CREO QUE NO LO USAREMOS)*/
+/*
+.packing-category {
+  margin-bottom: 1rem;
+}
+.packing-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.packing-item input[type="checkbox"]:checked + label {
+  text-decoration: line-through;
+  color: #888;
+}
+.progress-bar {
+  background: #e0e0e0;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+.progress-fill {
+  height: 100%;
+  background: #1d4ed8;
+  width: 0%;
+  transition: width 0.3s;
+}
+*/
+
