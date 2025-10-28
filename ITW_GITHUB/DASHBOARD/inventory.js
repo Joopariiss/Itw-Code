@@ -62,8 +62,8 @@ function renderEmptyState() {
   const empty = document.createElement('div');
   empty.className = 'empty-state';
   empty.innerHTML = `
-    <p>No items added yet.</p>
-    <p class="muted">Use the form to start packing!</p>
+    <p>No hay artículos añadidos todavía.</p>
+    <p class="muted">¡Utilice el formulario para comenzar!</p>
   `;
   itemsContainer.appendChild(empty);
 }
