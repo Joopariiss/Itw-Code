@@ -34,7 +34,7 @@ document.querySelector("form").addEventListener("submit", function (e) {
     .then((userCredential) => {
       // Login exitoso
       console.log("Login correcto:", userCredential.user);
-      window.location.href = "../PERFIL/perfil.html"; // Redirigir
+      window.location.href = "../CARPETAS/carpetas.html"; // Redirigir
     })
     .catch((error) => {
       console.error("Error en login:", error);
