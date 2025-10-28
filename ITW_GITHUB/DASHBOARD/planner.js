@@ -32,6 +32,7 @@ function renderItinerary() {
   }
 
   tripDays.forEach(day => {
+    // Contenedor de día
     const dayCard = document.createElement('div');
     dayCard.className = 'day-card';
     dayCard.style.border = '1px solid var(--border)';
@@ -40,61 +41,107 @@ function renderItinerary() {
     dayCard.style.marginBottom = '0.75rem';
     dayCard.style.background = 'var(--card)';
 
-    const dayTitle = document.createElement('h3');
-    dayTitle.textContent = day.date;
-    dayTitle.style.margin = '0 0 0.5rem 0';
-    dayCard.appendChild(dayTitle);
+    // Trigger (encabezado)
+    const trigger = document.createElement('div');
+    trigger.className = 'day-trigger';
+    trigger.style.display = 'flex';
+    trigger.style.justifyContent = 'space-between';
+    trigger.style.alignItems = 'center';
+    trigger.style.cursor = 'pointer';
+    trigger.style.marginBottom = '0.5rem';
 
-    // Activities
-    const activitiesList = document.createElement('ul');
-    activitiesList.style.listStyle = 'none';
-    activitiesList.style.padding = '0';
-    activitiesList.style.margin = '0 0 0.5rem 0';
+    // Span para la fecha
+    const dateSpan = document.createElement('span');
+    dateSpan.textContent = formatDateHuman(day.date);
+    dateSpan.style.fontWeight = '700';
 
-    day.activities.forEach(act => {
-      const li = document.createElement('li');
-      li.className = 'activity-item';
-      li.style.display = 'flex';
-      li.style.justifyContent = 'space-between';
-      li.style.alignItems = 'center';
-      li.style.padding = '0.4rem';
-      li.style.marginBottom = '0.4rem';
-      li.style.borderRadius = 'var(--radius)';
-      li.style.background = 'var(--secondary)';
-
-      const text = document.createElement('span');
-      text.textContent = `${act.time} - ${act.description}`;
-      li.appendChild(text);
-
-      const btns = document.createElement('div');
-
-      const editBtn = document.createElement('button');
-      editBtn.textContent = '✏️';
-      editBtn.style.marginRight = '0.4rem';
-      editBtn.addEventListener('click', () => openModal(day, act));
-
-      const deleteBtn = document.createElement('button');
-      deleteBtn.textContent = '🗑️';
-      deleteBtn.addEventListener('click', () => {
-        day.activities = day.activities.filter(a => a.id !== act.id);
-        renderItinerary();
-      });
-
-      btns.appendChild(editBtn);
-      btns.appendChild(deleteBtn);
-      li.appendChild(btns);
-      activitiesList.appendChild(li);
+    // Botón Add Activity
+    const addBtn = document.createElement('button');
+    addBtn.className = 'add-activity-btn';
+    addBtn.textContent = 'Add Activity';
+    addBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      openModal(day);
     });
 
-    dayCard.appendChild(activitiesList);
+    trigger.appendChild(dateSpan);
+    trigger.appendChild(addBtn);
 
-    // Add activity button
-    const addActBtn = document.createElement('button');
-    addActBtn.textContent = 'Add Activity';
-    addActBtn.addEventListener('click', () => openModal(day));
-    dayCard.appendChild(addActBtn);
+    // Body (lista de actividades)
+    const body = document.createElement('div');
+    body.className = 'day-body';
+    body.style.display = 'none'; // oculto inicialmente
+
+    const activitiesContainer = document.createElement('div');
+    activitiesContainer.className = 'activities';
+
+    if (day.activities.length) {
+      day.activities.forEach(act => {
+        const actDiv = document.createElement('div');
+        actDiv.className = 'activity';
+        actDiv.style.display = 'flex';
+        actDiv.style.justifyContent = 'space-between';
+        actDiv.style.alignItems = 'center';
+        actDiv.style.padding = '0.4rem';
+        actDiv.style.marginBottom = '0.4rem';
+        actDiv.style.borderRadius = 'var(--radius)';
+        actDiv.style.background = 'var(--secondary)';
+
+        const descSpan = document.createElement('span');
+        descSpan.className = 'desc';
+        descSpan.textContent = `${act.time} - ${act.description}`;
+        actDiv.appendChild(descSpan);
+
+        const btnsDiv = document.createElement('div');
+
+        const editBtn = document.createElement('button');
+        editBtn.textContent = '✏️';
+        editBtn.style.marginRight = '0.3rem';
+        editBtn.addEventListener('click', () => openModal(day, act));
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '🗑️';
+        deleteBtn.addEventListener('click', () => {
+          day.activities = day.activities.filter(a => a.id !== act.id);
+          renderItinerary();
+        });
+
+        btnsDiv.appendChild(editBtn);
+        btnsDiv.appendChild(deleteBtn);
+        actDiv.appendChild(btnsDiv);
+
+        activitiesContainer.appendChild(actDiv);
+      });
+    } else {
+      const emptyMsg = document.createElement('p');
+      emptyMsg.textContent = 'No activities planned.';
+      emptyMsg.style.color = 'var(--muted-foreground)';
+      activitiesContainer.appendChild(emptyMsg);
+    }
+
+    body.appendChild(activitiesContainer);
+    dayCard.appendChild(trigger);
+    dayCard.appendChild(body);
+
+    // Toggle body on header click
+    trigger.addEventListener('click', () => {
+      body.style.display = body.style.display === 'none' ? 'block' : 'none';
+    });
 
     itinerarySection.appendChild(dayCard);
+  });
+}
+
+/* ------------------------
+   Formato de fecha humano
+   ------------------------ */
+function formatDateHuman(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('es-ES', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   });
 }
 
@@ -174,7 +221,6 @@ if (typeof flatpickr === 'function') {
   });
 } else {
   console.warn('flatpickr no está cargado. Asegúrate de incluir <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> antes de script.js');
-  // Si flatpickr no existe, mostramos mensaje en interfaz
   if (itinerarySection) itinerarySection.innerHTML = '<p style="color:var(--muted-foreground)">El calendario no está disponible (flatpickr no cargado).</p>';
 }
 

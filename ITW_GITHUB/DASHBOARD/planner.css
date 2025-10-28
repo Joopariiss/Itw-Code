@@ -80,7 +80,7 @@ header {
 
 #calendar-section {
   flex: 1; /* ocupa la mitad del espacio */
-  max-width: 50%;
+  /*max-width: 50%;*/
   background-color: var(--card);
   padding: 1.5rem;
   border-radius: var(--radius);
@@ -89,7 +89,7 @@ header {
 
 #itinerary-section {
   flex: 1;
-  max-width: 50%;
+  /*max-width: 50%;*/
   background-color: var(--card);
   padding: 1.5rem;
   border-radius: var(--radius);
@@ -137,6 +137,7 @@ input, textarea {
   border-radius: var(--radius);
 }
 
+/*MODAL*/
 .modal {
   position: fixed;
   top: 0;
@@ -231,4 +232,114 @@ input, textarea {
 #calendar-section h2::before {
   content: "📅";
   font-size: 1.3rem;
+}
+
+
+/*ITINERARIO*/
+
+/* ==========================
+   Estilos para itinerario moderno
+   ========================== */
+
+.day-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  margin-bottom: 1rem;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.day-trigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--card);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.day-trigger:hover {
+  background: var(--muted);
+}
+
+.day-body {
+  display: none; /* inicialmente colapsado */
+  padding: 1rem;
+  background: linear-gradient(180deg, rgba(0,0,0,0.02), transparent);
+}
+
+.activities {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.activity {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  background: var(--secondary);
+}
+
+.activity .desc {
+  flex: 1;
+  margin-left: 0.5rem;
+}
+
+.activity button {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.activity button:hover {
+  opacity: 0.85;
+}
+
+.add-activity-btn {
+  margin-top: 0.5rem;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.add-activity-btn:hover {
+  opacity: 0.9;
+}
+
+/* itinerario poner paralelo por gpt (yo agregue el "-iti")*/
+.planner-container {
+  display: flex;
+  gap: 1.5rem; /* espacio entre columnas */
+  align-items: flex-start;
+  margin: 2rem 0;
+}
+
+.left-col-iti {
+  flex: 1; /* calendario más pequeño */
+}
+
+.right-col-iti {
+  flex: 10; /* itinerario más ancho */
+}
+
+
+/* Opcional: que el itinerario haga scroll si hay muchas actividades */
+#itinerary-section {
+  max-height: 600px; /* ajusta según prefieras */
+  overflow-y: auto;
 }

@@ -76,27 +76,25 @@
   <!--  SECCIONES -->
   <!--CALENDARIO + ITINERARIO-->
 
-  <section id="planner" class="tab-content active">
-    <!-- AQUÍ pega TODO tu HTML actual del calendario + itinerario -->
-     
-    <!-- Sección de fechas del viaje -->
-    <!--
-    <section id="calendar-section" class="card">
-      <h2>Trip Dates</h2>
-      <label>Start Date: <input type="date" id="start-date"></label>
-      <label>End Date: <input type="date" id="end-date"></label>
-      <button id="generate-days-btn">Generate Days</button>
-    </section>
-    -->
-    <section id="calendar-section" class="card">
-      <h2>Fechas del Viaje</h2>
-      <div id="trip-calendar"></div>
-    </section>
+<section id="planner" class="tab-content active">
+  <div class="planner-container" style="display: flex; gap: 1rem;">
+    
+    <!-- Columna izquierda: Calendario -->
+    <div class="left-col-iti" style="flex: 1;">
+      <section id="calendar-section" class="card">
+        <h2>Fechas del Viaje</h2>
+        <div id="trip-calendar"></div>
+      </section>
+    </div>
 
-    <!-- Sección del itinerario -->
-    <section id="itinerary-section">
-      <!-- Los días se añadirán dinámicamente aquí -->
-    </section>
+    <!-- Columna derecha: Itinerario -->
+    <div class="right-col-iti" style="flex: 1;">
+      <section id="itinerary-section">
+        <!-- Los días se añadirán dinámicamente aquí -->
+      </section>
+    </div>
+
+  </div>
 
   <!-- Modal para agregar/editar actividad -->
   <div id="activity-modal" class="modal hidden">
@@ -110,7 +108,8 @@
       </div>
     </div>
   </div>
-  </section>
+</section>
+
 
   <!--INVENTARIO-->
 <section id="inventory" class="tab-content">
