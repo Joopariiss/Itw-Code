@@ -100,6 +100,7 @@ function renderItems() {
       <div class="col-name">${escapeHtml(it.name)}</div>
       <div class="col-cost">${formatCurrency(Number(it.cost || 0))}</div>
       <div class="col-action">
+        <button class="icon-btn edit-btn" data-id="${it.id}" aria-label="Editar ${escapeHtml(it.name)}">✏️</button>
         <button class="icon-btn delete-btn" data-id="${it.id}" aria-label="Eliminar ${escapeHtml(it.name)}">🗑</button>
       </div>
     `;
@@ -128,11 +129,100 @@ function addItem(name, cost) {
   updateBudgetDisplay();
 }
 
+//funcion eliminar item
 function deleteItemById(id) {
   items = items.filter(i => i.id !== id);
   renderItems();
   updateBudgetDisplay();
 }
+
+//funcion editar items
+function editItemById(id) {
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+
+  const newName = prompt("Editar nombre del item:", item.name);
+  if (newName === null) return; // cancelado
+
+  const newCost = prompt("Editar costo del item:", item.cost);
+  if (newCost === null) return; // cancelado
+
+  item.name = newName.trim();
+  item.cost = parseFloat(newCost) || 0;
+
+  renderItems();
+  updateBudgetDisplay();
+}
+
+function showEditPopup(id) {
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+
+  // Si ya hay un popup de edición, lo eliminamos
+  const existingPopup = document.querySelector('.edit-popup');
+  if (existingPopup) existingPopup.remove();
+
+  // Crear popup
+  const popup = document.createElement('div');
+  popup.className = 'edit-popup';
+  popup.innerHTML = `
+    <p>Editar item</p>
+    <input type="text" class="edit-name" value="${escapeHtml(item.name)}" placeholder="Nombre del item" />
+    <input type="number" class="edit-cost" value="${item.cost}" placeholder="Costo" />
+    <div class="popup-buttons">
+      <button class="edit-accept">Aceptar</button>
+      <button class="edit-cancel">Cancelar</button>
+    </div>
+  `;
+
+  // Posicionar cerca del botón (como el popup de eliminar)
+  const btn = document.querySelector(`.edit-btn[data-id="${id}"]`);
+  const rect = btn.getBoundingClientRect();
+  const popupWidth = 220;
+  const spaceRight = window.innerWidth - rect.right;
+  const spaceLeft = rect.left;
+
+  popup.style.position = 'absolute';
+  popup.style.top = `${rect.top + window.scrollY - 10}px`;
+
+  if (spaceRight > popupWidth + 20) {
+    popup.style.left = `${rect.right + 10}px`;
+  } else if (spaceLeft > popupWidth + 20) {
+    popup.style.left = `${rect.left - popupWidth - 10}px`;
+  } else {
+    popup.style.left = `${rect.left - popupWidth / 2 + rect.width / 2}px`;
+  }
+
+  document.body.appendChild(popup);
+
+  const nameInput = popup.querySelector('.edit-name');
+  const costInput = popup.querySelector('.edit-cost');
+  nameInput.focus();
+  nameInput.select();
+
+  // Aceptar
+  popup.querySelector('.edit-accept').addEventListener('click', () => {
+    item.name = nameInput.value.trim() || item.name;
+    item.cost = parseFloat(costInput.value) || item.cost;
+    renderItems();
+    updateBudgetDisplay();
+    popup.remove();
+  });
+
+  // Cancelar
+  popup.querySelector('.edit-cancel').addEventListener('click', () => popup.remove());
+
+  // Cerrar si se hace clic fuera
+  setTimeout(() => {
+    document.addEventListener('click', function handler(e) {
+      if (!popup.contains(e.target) && e.target !== btn) {
+        popup.remove();
+        document.removeEventListener('click', handler);
+      }
+    });
+  }, 50);
+}
+
 
 // ---------- Sugerencias (similar a utilizar IA) ----------
 const SUGGESTIONS = [
@@ -210,16 +300,23 @@ if (addItemForm) {
 // Delegación para eliminar (lista estática dentro de itemsContainer)
 if (itemsContainer) {
   itemsContainer.addEventListener('click', (ev) => {
-    const btn = ev.target.closest && ev.target.closest('.delete-btn');
-    if (btn) {
-      const id = btn.dataset.id;
+    // --- Botón EDITAR ---
+    const editBtn = ev.target.closest('.edit-btn');
+    if (editBtn) {
+      const id = editBtn.dataset.id;
+      if (id) showEditPopup(id);
+      return;
+    }
+
+    // --- Botón ELIMINAR ---
+    const deleteBtn = ev.target.closest('.delete-btn');
+    if (deleteBtn) {
+      const id = deleteBtn.dataset.id;
       if (!id) return;
 
-      // Si ya hay un popup abierto, lo quitamos
       const existingPopup = document.querySelector('.confirm-popup');
       if (existingPopup) existingPopup.remove();
 
-      // Crear popup de confirmación
       const popup = document.createElement('div');
       popup.className = 'confirm-popup';
       popup.innerHTML = `
@@ -230,42 +327,34 @@ if (itemsContainer) {
         </div>
       `;
 
-      // Posicionar el popup al lado del botón
-      // Posicionar el popup de forma inteligente
-      const rect = btn.getBoundingClientRect();
-      const popupWidth = 220; // ancho estimado del popup
+      const rect = deleteBtn.getBoundingClientRect();
+      const popupWidth = 220;
       const spaceRight = window.innerWidth - rect.right;
       const spaceLeft = rect.left;
 
       popup.style.position = 'absolute';
       popup.style.top = `${rect.top + window.scrollY - 10}px`;
 
-      // Si hay espacio a la derecha, mostrar ahí. Si no, a la izquierda
       if (spaceRight > popupWidth + 20) {
         popup.style.left = `${rect.right + 10}px`;
       } else if (spaceLeft > popupWidth + 20) {
         popup.style.left = `${rect.left - popupWidth - 10}px`;
       } else {
-        // Centrado sobre el botón si no hay espacio a los lados
         popup.style.left = `${rect.left - popupWidth / 2 + rect.width / 2}px`;
       }
 
-
       document.body.appendChild(popup);
 
-      // Evento confirmar
       popup.querySelector('.confirm-yes').addEventListener('click', () => {
         deleteItemById(id);
         popup.remove();
       });
 
-      // Evento cancelar
       popup.querySelector('.confirm-no').addEventListener('click', () => popup.remove());
 
-      // Cerrar si se hace clic fuera
       setTimeout(() => {
         document.addEventListener('click', function handler(e) {
-          if (!popup.contains(e.target) && e.target !== btn) {
+          if (!popup.contains(e.target) && e.target !== deleteBtn) {
             popup.remove();
             document.removeEventListener('click', handler);
           }
@@ -274,6 +363,7 @@ if (itemsContainer) {
     }
   });
 }
+
 
 
 // Inicialización
