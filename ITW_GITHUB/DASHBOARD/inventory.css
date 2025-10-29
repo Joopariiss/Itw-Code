@@ -28,35 +28,6 @@ body{
 }
 
 
-.hero-header {
-  position: relative;
-  height: 200px; /* puedes ajustar la altura */
-  background-image: url('../IMAGES/image3.jpg'); /* tu imagen */
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
-
-.hero-header .overlay {
-  background-color: rgba(0, 0, 0, 0.4); /* overlay oscuro para que el texto destaque */
-  padding: 2rem;
-  border-radius: 1rem;
-  text-align: center;
-}
-
-.hero-header h1 {
-  font-size: 3rem;
-  margin: 0;
-}
-
-.hero-header p {
-  font-size: 1.25rem;
-  margin-top: 0.5rem;
-}
-
 /* Layout helpers */
 .container{
   max-width:var(--container-width);
@@ -148,10 +119,89 @@ body{
 .item-row .meta .cost{ color:var(--muted-foreground); font-size:14px }
 
 /* icon button delete */
-.icon-btn{
-  background:transparent; border:1px solid transparent; padding:6px; border-radius:8px; cursor:pointer;
+/* 🔴 Botón eliminar — estilo personalizado */
+.delete-btn {
+  color: red !important;       /* siempre rojo */
+  font-size: 1.6rem;           /* más grande */
+  background: transparent;
+  border: none;
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  line-height: 1;
 }
-.icon-btn:hover{ color:var(--destructive); transform:translateY(-2px) }
+
+/* efecto hover para feedback visual */
+.delete-btn:hover {
+  transform: scale(1.2);
+  opacity: 0.8;
+}
+
+/* ===== Encabezado del checklist ===== */
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  color: var(--muted-foreground);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 6px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 8px;
+  
+  position: sticky;
+  top: 0;           /* Se queda pegado arriba */
+  z-index: 10;      /* Para que siempre quede encima de las filas */
+}
+
+
+.col-number {
+  width: 40px;         /* ancho fijo */
+  text-align: left;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  flex: 0;             /* para que no intente crecer */
+}
+/* ===== Filas ===== */
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 8px;
+  transition: transform 0.15s ease;
+}
+
+.item-row:hover {
+  transform: translateY(-2px);
+}
+
+.item-header > div,
+.item-row > div {
+  flex: 1;
+}
+
+.col-name {
+  flex: 2;
+}
+
+.col-cost {
+  flex: 1;
+  text-align: center;
+}
+
+.col-action {
+  flex: 0.5;
+  text-align: right;
+}
+.item-header {
+  background: var(--card);
+}
+
+
 
 /* big numbers */
 .big-value{ font-size:28px; font-weight:800; padding:10px 6px }
@@ -180,4 +230,52 @@ body{
   .grid-main{ grid-template-columns: 1fr; }
   .grid-3{ flex-direction:column; }
   .container{ padding:12px }
+}
+
+/*pop up de pregunta si se quiere eliminar el item*/
+.confirm-popup {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  font-size: 0.9rem;
+  z-index: 999;
+  animation: fadeIn 0.15s ease-in-out;
+  max-width: 240px;
+  word-wrap: break-word;
+}
+
+.confirm-popup p {
+  margin: 0 0 8px 0;
+  color: #333;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.confirm-popup button {
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.confirm-popup .confirm-yes {
+  background-color: #d9534f;
+  color: #fff;
+}
+
+.confirm-popup .confirm-no {
+  background-color: #ccc;
+  color: #333;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }

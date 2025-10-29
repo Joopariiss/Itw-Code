@@ -76,21 +76,31 @@ function renderItems() {
     return;
   }
 
+  // Crear encabezado
+  const header = document.createElement('div');
+  header.className = 'item-header';
+  header.innerHTML = `
+    <div class="col-number">Nro</div>
+    <div class="col-name">Item</div>
+    <div class="col-cost">Costo</div>
+    <div class="col-action">Acción</div>
+  `;
+  itemsContainer.appendChild(header);
+
   // Crear lista
   const fragment = document.createDocumentFragment();
 
-  items.forEach((it) => {
+  items.forEach((it, index) => {
     const row = document.createElement('div');
     row.className = 'item-row';
     row.dataset.id = it.id;
 
     row.innerHTML = `
-      <div class="meta">
-        <div class="name">${escapeHtml(it.name)}</div>
-        <div class="cost">${formatCurrency(Number(it.cost || 0))}</div>
-      </div>
-      <div>
-        <button class="icon-btn delete-btn" data-id="${it.id}" aria-label="Delete ${escapeHtml(it.name)}">🗑</button>
+      <div class="col-number">${index + 1}</div>
+      <div class="col-name">${escapeHtml(it.name)}</div>
+      <div class="col-cost">${formatCurrency(Number(it.cost || 0))}</div>
+      <div class="col-action">
+        <button class="icon-btn delete-btn" data-id="${it.id}" aria-label="Eliminar ${escapeHtml(it.name)}">🗑</button>
       </div>
     `;
 
@@ -99,6 +109,8 @@ function renderItems() {
 
   itemsContainer.appendChild(fragment);
 }
+
+
 
 // simple escape to avoid injection if nombres raros
 function escapeHtml(str) {
@@ -201,10 +213,68 @@ if (itemsContainer) {
     const btn = ev.target.closest && ev.target.closest('.delete-btn');
     if (btn) {
       const id = btn.dataset.id;
-      if (id) deleteItemById(id);
+      if (!id) return;
+
+      // Si ya hay un popup abierto, lo quitamos
+      const existingPopup = document.querySelector('.confirm-popup');
+      if (existingPopup) existingPopup.remove();
+
+      // Crear popup de confirmación
+      const popup = document.createElement('div');
+      popup.className = 'confirm-popup';
+      popup.innerHTML = `
+        <p>¿Seguro que quieres eliminar este item?</p>
+        <div class="popup-buttons">
+          <button class="confirm-yes">Sí</button>
+          <button class="confirm-no">No</button>
+        </div>
+      `;
+
+      // Posicionar el popup al lado del botón
+      // Posicionar el popup de forma inteligente
+      const rect = btn.getBoundingClientRect();
+      const popupWidth = 220; // ancho estimado del popup
+      const spaceRight = window.innerWidth - rect.right;
+      const spaceLeft = rect.left;
+
+      popup.style.position = 'absolute';
+      popup.style.top = `${rect.top + window.scrollY - 10}px`;
+
+      // Si hay espacio a la derecha, mostrar ahí. Si no, a la izquierda
+      if (spaceRight > popupWidth + 20) {
+        popup.style.left = `${rect.right + 10}px`;
+      } else if (spaceLeft > popupWidth + 20) {
+        popup.style.left = `${rect.left - popupWidth - 10}px`;
+      } else {
+        // Centrado sobre el botón si no hay espacio a los lados
+        popup.style.left = `${rect.left - popupWidth / 2 + rect.width / 2}px`;
+      }
+
+
+      document.body.appendChild(popup);
+
+      // Evento confirmar
+      popup.querySelector('.confirm-yes').addEventListener('click', () => {
+        deleteItemById(id);
+        popup.remove();
+      });
+
+      // Evento cancelar
+      popup.querySelector('.confirm-no').addEventListener('click', () => popup.remove());
+
+      // Cerrar si se hace clic fuera
+      setTimeout(() => {
+        document.addEventListener('click', function handler(e) {
+          if (!popup.contains(e.target) && e.target !== btn) {
+            popup.remove();
+            document.removeEventListener('click', handler);
+          }
+        });
+      }, 50);
     }
   });
 }
+
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
