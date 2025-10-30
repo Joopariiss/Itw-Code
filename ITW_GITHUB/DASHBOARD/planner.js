@@ -262,18 +262,23 @@ function generateDaysBetween(startDate, endDate) {
    Bloquear/Desbloquear Calendario
    ------------------------ */
 lockBtn.addEventListener("click", () => {
+  if (tripDays.length === 0) {
+    showPopup("⚠️ No puedes establecer fechas sin haber seleccionado un rango en el calendario.", "error");
+    return;
+  }
+
   calendarLocked = true;
   lockBtn.style.display = "none";
   unlockBtn.style.display = "block";
 
-  // 🔒 Desactiva clics en el calendario
   const calendarElement = document.querySelector(".flatpickr-calendar");
   if (calendarElement) {
     calendarElement.classList.add("calendar-locked");
   }
 
-  alert("Fechas bloqueadas ✅");
+  showPopup("✅ Fechas establecidas correctamente.", "success");
 });
+
 
 unlockBtn.addEventListener("click", () => {
   showConfirm("¿Deseas cambiar las fechas del viaje?", (ok) => {
@@ -292,6 +297,42 @@ unlockBtn.addEventListener("click", () => {
     }
   });
 });
+
+// 🔔 Popup simple y elegante
+function showPopup(message, type = "info") {
+  const existing = document.querySelector(".popup-alert");
+  if (existing) existing.remove();
+
+  const popup = document.createElement("div");
+  popup.className = "popup-alert";
+  popup.textContent = message;
+  document.body.appendChild(popup);
+
+  popup.style.position = "fixed";
+  popup.style.top = "20px";
+  popup.style.left = "50%";
+  popup.style.transform = "translateX(-50%)";
+  popup.style.padding = "10px 20px";
+  popup.style.borderRadius = "10px";
+  popup.style.color = "white";
+  popup.style.fontWeight = "500";
+  popup.style.zIndex = "9999";
+  popup.style.boxShadow = "0 4px 10px rgba(0,0,0,0.2)";
+  popup.style.transition = "opacity 0.4s ease";
+  popup.style.opacity = "1";
+  popup.style.background =
+    type === "error"
+      ? "#d32f2f"
+      : type === "success"
+      ? "#2e7d32"
+      : "#333";
+
+  // Se desvanece automáticamente
+  setTimeout(() => {
+    popup.style.opacity = "0";
+    setTimeout(() => popup.remove(), 500);
+  }, 2500);
+}
 
 
 renderItinerary();

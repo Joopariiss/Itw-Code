@@ -394,5 +394,5 @@ input, textarea {
 .calendar-locked {
   pointer-events: none;
   opacity: 0.6; /* opcional: da un efecto visual de “bloqueado” */
-  filter: grayscale(0.3);
+  filter: grayscale(0.5);
 }
