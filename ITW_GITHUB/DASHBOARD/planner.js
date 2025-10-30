@@ -1,230 +1,297 @@
 /* ============================
-   Travel Planner - script.js
+   Travel Planner - planner.js
    ============================ */
 
 let tripDays = [];
 let editingActivity = null;
 let editingDay = null;
+let calendarLocked = false;
 
-/* ------------------------
-   Elementos del DOM
-   ------------------------ */
+// Elementos del DOM
 const itinerarySection = document.getElementById('itinerary-section');
-
-// Modal & botones (comprobamos que existan)
 const activityModal = document.getElementById('activity-modal');
 const activityTimeInput = document.getElementById('activity-time');
 const activityDescInput = document.getElementById('activity-desc');
 const saveActivityBtn = document.getElementById('save-activity-btn');
 const cancelActivityBtn = document.getElementById('cancel-activity-btn');
 const modalTitle = document.getElementById('modal-title');
+const calendarSection = document.getElementById('calendar-section');
+
+// Crear contenedor de botones al lado del calendario
+const calendarActions = document.createElement('div');
+calendarActions.style.display = "flex";
+calendarActions.style.flexDirection = "column";
+calendarActions.style.gap = "0.5rem";
+calendarActions.style.marginTop = "1rem";
+calendarActions.innerHTML = `
+  <button id="lock-calendar-btn" class="btn btn-primary">🔒 Establecer fechas</button>
+  <button id="unlock-calendar-btn" class="btn btn-secondary" style="display:none;">✏️ Editar fechas</button>
+`;
+calendarSection.appendChild(calendarActions);
+
+const lockBtn = document.getElementById("lock-calendar-btn");
+const unlockBtn = document.getElementById("unlock-calendar-btn");
+
+// Modal de confirmación
+const confirmModal = document.createElement("div");
+confirmModal.className = "modal hidden";
+confirmModal.innerHTML = `
+  <div class="modal-content">
+    <h3 id="confirm-message"></h3>
+    <div class="modal-buttons">
+      <button id="confirm-yes">Aceptar</button>
+      <button id="confirm-no">Cancelar</button>
+    </div>
+  </div>
+`;
+document.body.appendChild(confirmModal);
+
+const confirmMessage = document.getElementById("confirm-message");
+const confirmYes = document.getElementById("confirm-yes");
+const confirmNo = document.getElementById("confirm-no");
+
+// Función para mostrar modal de confirmación
+function showConfirm(message, callback) {
+  confirmMessage.textContent = message;
+  confirmModal.classList.remove("hidden");
+
+  confirmYes.onclick = () => {
+    callback(true);
+    confirmModal.classList.add("hidden");
+  };
+  confirmNo.onclick = () => {
+    callback(false);
+    confirmModal.classList.add("hidden");
+  };
+}
 
 /* ------------------------
-   Funciones de itinerario
+   Renderizar Itinerario
    ------------------------ */
 function renderItinerary() {
-  if (!itinerarySection) return;
+  // Reiniciar el contenido
   itinerarySection.innerHTML = '';
 
+  // 🏷️ Agregar título fijo
+  const title = document.createElement('h2');
+  title.textContent = "Itinerario del Viaje";
+  title.style.marginTop = "0";
+  title.style.marginBottom = "1rem";
+  title.style.textAlign = "center";
+  title.style.color = "#2e2e2e";
+  title.style.fontWeight = "600";
+  itinerarySection.appendChild(title);
+
+  // Si no hay días seleccionados
   if (!tripDays.length) {
-    itinerarySection.innerHTML = '<p style="color:var(--muted-foreground)">Selecciona un rango en el calendario para generar el itinerario.</p>';
+    const msg = document.createElement('p');
+    msg.style.color = 'var(--muted-foreground)';
+    msg.style.textAlign = 'center';
+    msg.textContent = 'Selecciona un rango en el calendario para generar el itinerario.';
+    itinerarySection.appendChild(msg);
     return;
   }
 
-  tripDays.forEach(day => {
-    // Contenedor de día
+  // Renderizar los días
+  tripDays.forEach((day) => {
     const dayCard = document.createElement('div');
     dayCard.className = 'day-card';
-    dayCard.style.border = '1px solid var(--border)';
-    dayCard.style.borderRadius = 'var(--radius)';
-    dayCard.style.padding = '0.75rem';
-    dayCard.style.marginBottom = '0.75rem';
-    dayCard.style.background = 'var(--card)';
 
-    // Trigger (encabezado)
     const trigger = document.createElement('div');
     trigger.className = 'day-trigger';
-    trigger.style.display = 'flex';
-    trigger.style.justifyContent = 'space-between';
-    trigger.style.alignItems = 'center';
-    trigger.style.cursor = 'pointer';
-    trigger.style.marginBottom = '0.5rem';
+    trigger.innerHTML = `
+      <div>
+        <h3 style="margin:0">${getWeekday(day.date)}</h3>
+        <small>${formatDate(day.date)}</small>
+      </div>
+      <button class="add-activity-btn">Agregar actividad</button>
+    `;
 
-    // Span para la fecha
-    const dateSpan = document.createElement('span');
-    dateSpan.textContent = formatDateHuman(day.date);
-    dateSpan.style.fontWeight = '700';
-
-    // Botón Add Activity
-    const addBtn = document.createElement('button');
-    addBtn.className = 'add-activity-btn';
-    addBtn.textContent = 'Add Activity';
-    addBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      openModal(day);
-    });
-
-    trigger.appendChild(dateSpan);
-    trigger.appendChild(addBtn);
-
-    // Body (lista de actividades)
     const body = document.createElement('div');
     body.className = 'day-body';
-    body.style.display = 'none'; // oculto inicialmente
-
     const activitiesContainer = document.createElement('div');
     activitiesContainer.className = 'activities';
 
-    if (day.activities.length) {
-      day.activities.forEach(act => {
-        const actDiv = document.createElement('div');
-        actDiv.className = 'activity';
-        actDiv.style.display = 'flex';
-        actDiv.style.justifyContent = 'space-between';
-        actDiv.style.alignItems = 'center';
-        actDiv.style.padding = '0.4rem';
-        actDiv.style.marginBottom = '0.4rem';
-        actDiv.style.borderRadius = 'var(--radius)';
-        actDiv.style.background = 'var(--secondary)';
+    if (day.activities.length > 0) {
+      day.activities.forEach((act) => {
+        const activityDiv = document.createElement('div');
+        activityDiv.className = 'activity';
+        activityDiv.innerHTML = `
+          <span class="desc">${act.time} - ${act.description}</span>
+          <div>
+            <button class="edit-btn">✏️</button>
+            <button class="delete-btn">🗑️</button>
+          </div>
+        `;
 
-        const descSpan = document.createElement('span');
-        descSpan.className = 'desc';
-        descSpan.textContent = `${act.time} - ${act.description}`;
-        actDiv.appendChild(descSpan);
-
-        const btnsDiv = document.createElement('div');
-
-        const editBtn = document.createElement('button');
-        editBtn.textContent = '✏️';
-        editBtn.style.marginRight = '0.3rem';
-        editBtn.addEventListener('click', () => openModal(day, act));
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = '🗑️';
-        deleteBtn.addEventListener('click', () => {
-          day.activities = day.activities.filter(a => a.id !== act.id);
-          renderItinerary();
+        // Editar
+        activityDiv.querySelector('.edit-btn').addEventListener('click', () => {
+          showConfirm("¿Deseas editar esta actividad?", (ok) => {
+            if (ok) openModal(day, act);
+          });
         });
 
-        btnsDiv.appendChild(editBtn);
-        btnsDiv.appendChild(deleteBtn);
-        actDiv.appendChild(btnsDiv);
+        // Eliminar
+        activityDiv.querySelector('.delete-btn').addEventListener('click', () => {
+          showConfirm("¿Seguro que quieres eliminar esta actividad?", (ok) => {
+            if (ok) {
+              day.activities = day.activities.filter((a) => a.id !== act.id);
+              renderItinerary();
+            }
+          });
+        });
 
-        activitiesContainer.appendChild(actDiv);
+        activitiesContainer.appendChild(activityDiv);
       });
     } else {
-      const emptyMsg = document.createElement('p');
-      emptyMsg.textContent = 'No activities planned.';
-      emptyMsg.style.color = 'var(--muted-foreground)';
-      activitiesContainer.appendChild(emptyMsg);
+      const empty = document.createElement('p');
+      empty.textContent = 'No hay actividades.';
+      empty.style.color = 'var(--muted-foreground)';
+      activitiesContainer.appendChild(empty);
     }
 
     body.appendChild(activitiesContainer);
     dayCard.appendChild(trigger);
     dayCard.appendChild(body);
+    itinerarySection.appendChild(dayCard);
 
-    // Toggle body on header click
-    trigger.addEventListener('click', () => {
-      body.style.display = body.style.display === 'none' ? 'block' : 'none';
+    // Toggle
+    trigger.addEventListener('click', (e) => {
+      if (e.target.classList.contains('add-activity-btn')) return;
+      body.style.display = body.style.display === 'block' ? 'none' : 'block';
     });
 
-    itinerarySection.appendChild(dayCard);
+    // Abrir modal
+    trigger.querySelector('.add-activity-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openModal(day);
+    });
   });
 }
 
-/* ------------------------
-   Formato de fecha humano
-   ------------------------ */
-function formatDateHuman(iso) {
-  const d = new Date(iso);
-  return d.toLocaleDateString('es-ES', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-}
 
 /* ------------------------
-   Modal (abrir/guardar/cancelar)
+   Modal Actividad
    ------------------------ */
 function openModal(day, activity = null) {
   editingDay = day;
   editingActivity = activity;
-
-  if (modalTitle) modalTitle.textContent = activity ? 'Edit Activity' : 'Add Activity';
-  if (activityTimeInput) activityTimeInput.value = activity ? activity.time : '12:00';
-  if (activityDescInput) activityDescInput.value = activity ? activity.description : '';
-  if (activityModal) activityModal.classList.remove('hidden');
+  modalTitle.textContent = activity ? 'Editar Actividad' : 'Agregar Actividad';
+  activityTimeInput.value = activity ? activity.time : '12:00';
+  activityDescInput.value = activity ? activity.description : '';
+  activityModal.classList.remove('hidden');
 }
 
-if (saveActivityBtn) {
-  saveActivityBtn.addEventListener('click', () => {
-    const desc = activityDescInput ? activityDescInput.value.trim() : '';
-    const time = activityTimeInput ? activityTimeInput.value : '12:00';
-    if (!desc) return alert('Description required');
+saveActivityBtn.addEventListener('click', () => {
+  const desc = activityDescInput.value.trim();
+  const time = activityTimeInput.value;
 
-    if (editingActivity) {
-      editingActivity.time = time;
-      editingActivity.description = desc;
-    } else if (editingDay) {
-      editingDay.activities.push({ id: Date.now(), time, description: desc });
+  if (!desc) return alert('Por favor ingresa una descripción.');
+
+  if (editingActivity) {
+    // Si está editando una existente
+    editingActivity.time = time;
+    editingActivity.description = desc;
+  } else if (editingDay) {
+    // Si está agregando una nueva
+    editingDay.activities.push({ id: Date.now(), time, description: desc });
+  }
+
+  // ✅ Ordenar actividades por hora (HH:mm)
+  editingDay.activities.sort((a, b) => a.time.localeCompare(b.time));
+
+  // ✅ Mostrar siempre el día abierto después de agregar
+  activityModal.classList.add('hidden');
+  renderItinerary();
+
+  // Expandir automáticamente el día editado
+  const dayCards = document.querySelectorAll('.day-card');
+  dayCards.forEach(card => {
+    const dayTitle = card.querySelector('small');
+    if (dayTitle && dayTitle.textContent.includes(formatDate(editingDay.date))) {
+      const body = card.querySelector('.day-body');
+      if (body) body.style.display = 'block';
     }
-
-    if (activityModal) activityModal.classList.add('hidden');
-    renderItinerary();
   });
+});
+
+
+cancelActivityBtn.addEventListener('click', () => {
+  activityModal.classList.add('hidden');
+});
+
+/* ------------------------
+   Utilidades
+   ------------------------ */
+function formatDate(dateStr) {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('es-ES', { month: 'long', day: 'numeric', year: 'numeric' });
 }
-
-if (cancelActivityBtn) {
-  cancelActivityBtn.addEventListener('click', () => {
-    if (activityModal) activityModal.classList.add('hidden');
-  });
+function getWeekday(dateStr) {
+  return new Date(dateStr).toLocaleDateString('es-ES', { weekday: 'long' });
 }
 
 /* ------------------------
-   Util: genera array de días entre dos fechas
+   Rango de fechas
    ------------------------ */
+const calendarPicker = flatpickr('#trip-calendar', {
+  mode: 'range',
+  dateFormat: 'Y-m-d',
+  inline: true,
+  locale: { firstDayOfWeek: 1 },
+  onChange: (selectedDates) => {
+    if (calendarLocked) return;
+    if (selectedDates.length === 2) {
+      tripDays = generateDaysBetween(selectedDates[0], selectedDates[1]);
+    } else {
+      tripDays = [];
+    }
+    renderItinerary();
+  },
+});
+
 function generateDaysBetween(startDate, endDate) {
   const arr = [];
   for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-    const iso = new Date(d).toISOString().split('T')[0];
-    arr.push({ date: iso, activities: [] });
+    arr.push({ date: new Date(d).toISOString().split('T')[0], activities: [] });
   }
   return arr;
 }
 
 /* ------------------------
-   Inicializar Flatpickr y ligar con el itinerario
+   Bloquear/Desbloquear Calendario
    ------------------------ */
-if (typeof flatpickr === 'function') {
-  flatpickr("#trip-calendar", {
-    mode: "range",
-    dateFormat: "Y-m-d",
-    inline: true,
-    defaultDate: [],
-    locale: {
-      firstDayOfWeek: 1
-    },
-    onChange: function(selectedDates) {
-      if (selectedDates.length === 2) {
-        const start = selectedDates[0];
-        const end = selectedDates[1];
-        tripDays = generateDaysBetween(start, end);
-        renderItinerary();
-      } else {
-        // si limpiaron la selección, reseteamos
-        tripDays = [];
-        renderItinerary();
+lockBtn.addEventListener("click", () => {
+  calendarLocked = true;
+  lockBtn.style.display = "none";
+  unlockBtn.style.display = "block";
+
+  // 🔒 Desactiva clics en el calendario
+  const calendarElement = document.querySelector(".flatpickr-calendar");
+  if (calendarElement) {
+    calendarElement.classList.add("calendar-locked");
+  }
+
+  alert("Fechas bloqueadas ✅");
+});
+
+unlockBtn.addEventListener("click", () => {
+  showConfirm("¿Deseas cambiar las fechas del viaje?", (ok) => {
+    if (ok) {
+      calendarLocked = false;
+      lockBtn.style.display = "block";
+      unlockBtn.style.display = "none";
+
+      // ✏️ Reactiva clics en el calendario
+      const calendarElement = document.querySelector(".flatpickr-calendar");
+      if (calendarElement) {
+        calendarElement.classList.remove("calendar-locked");
       }
+
+      alert("Ahora puedes editar las fechas 🗓️");
     }
   });
-} else {
-  console.warn('flatpickr no está cargado. Asegúrate de incluir <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> antes de script.js');
-  if (itinerarySection) itinerarySection.innerHTML = '<p style="color:var(--muted-foreground)">El calendario no está disponible (flatpickr no cargado).</p>';
-}
+});
 
-/* ------------------------
-   Render inicial (sin días)
-   ------------------------ */
+
 renderItinerary();

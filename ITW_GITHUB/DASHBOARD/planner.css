@@ -96,6 +96,14 @@ header {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
+#itinerary-section h2 {
+  font-size: 1.5rem;
+  color: #2b6a2b;
+  border-bottom: 2px solid #cfe3cf;
+  padding-bottom: 0.5rem;
+}
+
+
 .card {
   background-color: var(--card);
   color: var(--card-foreground);
@@ -321,25 +329,70 @@ input, textarea {
   opacity: 0.9;
 }
 
-/* itinerario poner paralelo por gpt (yo agregue el "-iti")*/
+/* ==== DISTRIBUCIÓN GENERAL DEL PLANNER ==== */
 .planner-container {
-  display: flex;
-  gap: 1.5rem; /* espacio entre columnas */
+  display: grid;
+  grid-template-columns: 0.8fr 2.2fr; /* calendario más pequeño, itinerario más ancho */
+  gap: 2rem;
   align-items: flex-start;
-  margin: 2rem 0;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
 }
 
+/* ==== COLUMNA IZQUIERDA (CALENDARIO) ==== */
 .left-col-iti {
-  flex: 1; /* calendario más pequeño */
+  display: left;
+  justify-content: center; /* centra horizontalmente el calendario */
 }
 
+#calendar-section {
+  width: 100%;
+  max-width: 500px; /* tamaño razonable */
+  background-color: var(--card);
+  padding: 1.3rem;
+  border-radius: var(--radius);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+/* ==== COLUMNA DERECHA (ITINERARIO) ==== */
 .right-col-iti {
-  flex: 10; /* itinerario más ancho */
+  width: 100%;
+}
+
+#itinerary-section {
+  background-color: var(--card);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  overflow-y: auto;
+  max-height: 75vh; /* para que tenga scroll si hay muchas actividades */
+}
+
+/* ==== TITULO CALENDARIO ==== */
+#calendar-section h2 {
+  text-align: center;
+  font-size: 1.25rem;
+  color: var(--foreground);
+  margin-bottom: 1rem;
+}
+
+/* ==== ADAPTACIÓN A PANTALLAS PEQUEÑAS ==== */
+@media (max-width: 768px) {
+  .planner-container {
+    grid-template-columns: 1fr;
+  }
+
+  #calendar-section {
+    max-width: 100%;
+  }
 }
 
 
-/* Opcional: que el itinerario haga scroll si hay muchas actividades */
-#itinerary-section {
-  max-height: 600px; /* ajusta según prefieras */
-  overflow-y: auto;
+/*bloquear calendario*/
+.calendar-locked {
+  pointer-events: none;
+  opacity: 0.6; /* opcional: da un efecto visual de “bloqueado” */
+  filter: grayscale(0.3);
 }
