@@ -96,7 +96,7 @@ function renderFolder(folder) {
     }
     else {
       // 🚀 Redirige a otra página si no hay modo activo
-      window.location.href = `carpeta.html?id=${folder.id}`;
+      window.location.href = `../DASHBOARD/index.html?id=${folder.id}`;
     }
   });
 
