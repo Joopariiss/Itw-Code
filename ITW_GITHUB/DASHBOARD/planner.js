@@ -2,6 +2,19 @@
    Travel Planner - planner.js
    ============================ */
 
+
+//FIRESTORE DATABASE:
+import { db } from "../firebase.js";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+
+
 let tripDays = [];
 let editingActivity = null;
 let editingDay = null;

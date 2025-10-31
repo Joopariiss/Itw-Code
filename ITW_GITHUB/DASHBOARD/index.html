@@ -212,7 +212,23 @@
 </section>
 
 
+
   <!--  SCRIPT -->
+  <script>
+    // Extraer el id de la carpeta desde la URL
+    const params = new URLSearchParams(window.location.search);
+    const folderId = params.get('id');
+
+    if (!folderId) {
+      alert("No se encontró la carpeta. Volviendo a la lista...");
+      window.location.href = "../CARPETAS/carpetas.html";
+    } else {
+      // Guardamos el id globalmente para usarlo en otros scripts
+      window.folderId = folderId;
+      console.log("📂 Carpeta activa:", folderId);
+    }
+  </script>
+
   <script src="planner.js" type="module"></script>
   <script src="inventory.js" type="module"></script>
   <script src="tabs.js"></script>

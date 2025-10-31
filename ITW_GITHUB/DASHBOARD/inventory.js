@@ -1,9 +1,46 @@
 // script.js
 // Trip Wallet — JS puro adaptado al HTML/CSS que compartiste
 
+
+
+// --- Importar Firebase ---
+import { db } from "../firebase.js";
+import {
+  collection,
+  doc,
+  addDoc,
+  getDocs,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// --- Obtener el ID de la carpeta activa desde index.html ---
+const folderId = window.folderId;
+
 // ---------- Estado ----------
 let items = [];
 let initialBudget = 0;
+
+async function loadInitialBudget() {
+  if (!folderId) return;
+  const folderRef = doc(db, "carpetas", folderId);
+  const folderSnap = await getDoc(folderRef);
+  if (folderSnap.exists()) {
+    const data = folderSnap.data();
+    initialBudget = data.initialBudget || 0;
+    updateBudgetDisplay();
+  }
+}
+
+async function saveInitialBudget() {
+  if (!folderId) return;
+  const folderRef = doc(db, "carpetas", folderId);
+  await updateDoc(folderRef, { presupuestoInicial: initialBudget });
+  console.log("✅ Presupuesto inicial guardado correctamente en Firestore");
+}
+
 
 // ---------- Referencias DOM ----------
 const budgetScreen = document.getElementById('budget-screen');
@@ -121,18 +158,40 @@ function escapeHtml(str) {
 }
 
 // ---------- Operaciones ----------
-function addItem(name, cost, quantity) {
+async function addItem(name, cost, quantity) {
   const id = (crypto && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36);
-  items.unshift({ id, name: String(name).trim(), cost: Number(cost || 0), quantity: Number(quantity || 1) });
+  const newItem = {
+    id,
+    name: String(name).trim(),
+    cost: Number(cost || 0),
+    quantity: Number(quantity || 1)
+  };
+
+  items.unshift(newItem);
   renderItems();
   updateBudgetDisplay();
+
+  // 🔥 Guardar en Firestore (subcolección de la carpeta)
+  if (folderId) {
+    const inventoryRef = collection(db, "carpetas", folderId, "inventario");
+    await setDoc(doc(inventoryRef, id), newItem);
+    console.log("🟢 Item guardado en Firestore:", newItem);
+  }
 }
 
-function deleteItemById(id) {
+
+async function deleteItemById(id) {
   items = items.filter(i => i.id !== id);
   renderItems();
   updateBudgetDisplay();
+
+  if (folderId) {
+    const itemRef = doc(db, "carpetas", folderId, "inventario", id);
+    await deleteDoc(itemRef);
+    console.log("🗑️ Item eliminado de Firestore:", id);
+  }
 }
+
 
 function showEditPopup(id) {
   const item = items.find(i => i.id === id);
@@ -226,17 +285,19 @@ function renderSuggestions() {
 
 // ---------- Eventos ----------
 if (budgetForm) {
-  budgetForm.addEventListener('submit', (ev) => {
+  budgetForm.addEventListener('submit', async (ev) => {
     ev.preventDefault();
     const val = parseFloat(budgetInput.value);
     if (!isNaN(val) && val >= 0) {
       initialBudget = val;
+      await saveInitialBudget(); // 🔥 Guarda en Firestore
       if (budgetScreen) budgetScreen.style.display = 'none';
       updateBudgetDisplay();
       renderItems();
     } else budgetInput.focus();
   });
 }
+
 
 if (addItemForm) {
   addItemForm.addEventListener('submit', (ev) => {
@@ -313,8 +374,21 @@ if (itemsContainer) {
   });
 }
 
+async function loadItems() {
+  if (!folderId) return;
+  const inventoryRef = collection(db, "carpetas", folderId, "inventario");
+  const snapshot = await getDocs(inventoryRef);
+  items = snapshot.docs.map(doc => doc.data());
+  renderItems();
+  updateBudgetDisplay();
+  console.log("📦 Inventario cargado:", items);
+}
+
+
 // Inicialización
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   renderSuggestions();
   updateBudgetDisplay();
+  await loadInitialBudget();
+  await loadItems();
 });
