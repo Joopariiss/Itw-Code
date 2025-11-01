@@ -23,18 +23,33 @@ const folderId = window.folderId;
 let items = [];
 let initialBudget = 0;
 
-async function loadInitialBudget() {
+async function cargarPresupuestoInicial() {
   if (!folderId) return;
+
   const folderRef = doc(db, "carpetas", folderId);
   const folderSnap = await getDoc(folderRef);
+
   if (folderSnap.exists()) {
     const data = folderSnap.data();
-    initialBudget = data.initialBudget || 0;
+    initialBudget = data.presupuestoInicial || 0;
+
+    if (initialBudget > 0) {
+      if (budgetScreen) budgetScreen.classList.remove('visible');
+    } else {
+      if (budgetScreen) budgetScreen.classList.add('visible');
+    }
+
+
     updateBudgetDisplay();
+  } else {
+    console.warn("⚠️ No se encontró la carpeta o no tiene presupuesto.");
+    // Si la carpeta no existe (raro), mostramos el popup por seguridad
+    if (budgetScreen) budgetScreen.classList.add('visible');
   }
 }
 
-async function saveInitialBudget() {
+
+async function guardarPresupuestoInicial() {
   if (!folderId) return;
   const folderRef = doc(db, "carpetas", folderId);
   await updateDoc(folderRef, { presupuestoInicial: initialBudget });
@@ -237,14 +252,26 @@ function showEditPopup(id) {
   nameInput.focus();
   nameInput.select();
 
-  popup.querySelector('.edit-accept').addEventListener('click', () => {
+  popup.querySelector('.edit-accept').addEventListener('click', async () => {
     item.name = nameInput.value.trim() || item.name;
     item.cost = parseFloat(costInput.value) || item.cost;
     item.quantity = parseInt(quantityInput.value) || item.quantity;
     renderItems();
     updateBudgetDisplay();
     popup.remove();
+
+    // 🔥 Guardar cambios en Firestore
+    if (folderId && item.id) {
+      const itemRef = doc(db, "carpetas", folderId, "inventario", item.id);
+      await updateDoc(itemRef, {
+        name: item.name,
+        cost: item.cost,
+        quantity: item.quantity
+      });
+      console.log("✏️ Item actualizado en Firestore:", item);
+    }
   });
+
 
   popup.querySelector('.edit-cancel').addEventListener('click', () => popup.remove());
 
@@ -290,8 +317,8 @@ if (budgetForm) {
     const val = parseFloat(budgetInput.value);
     if (!isNaN(val) && val >= 0) {
       initialBudget = val;
-      await saveInitialBudget(); // 🔥 Guarda en Firestore
-      if (budgetScreen) budgetScreen.style.display = 'none';
+      await guardarPresupuestoInicial(); // 🔥 Guarda en Firestore
+      if (budgetScreen) budgetScreen.classList.remove('visible');
       updateBudgetDisplay();
       renderItems();
     } else budgetInput.focus();
@@ -384,11 +411,72 @@ async function loadItems() {
   console.log("📦 Inventario cargado:", items);
 }
 
+const editBudgetBtn = document.getElementById('edit-budget-btn');
+
+if (editBudgetBtn) {
+  editBudgetBtn.addEventListener('click', () => {
+    // Crear el popup flotante
+    const popup = document.createElement('div');
+    popup.className = 'edit-popup';
+    popup.innerHTML = `
+      <div class="popup-inner">
+        <p><strong>Editar presupuesto inicial</strong></p>
+        <input type="number" id="new-budget-input" value="${initialBudget}" min="0" />
+        <div class="popup-buttons">
+          <button id="save-budget" class="btn btn-primary">Guardar</button>
+          <button id="cancel-budget" class="btn btn-secondary">Cancelar</button>
+        </div>
+      </div>
+    `;
+
+    // Estilo básico para el popup (centrado)
+    Object.assign(popup.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      width: '100%',
+      height: '100%',
+      background: 'rgba(0,0,0,0.4)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: '9999'
+    });
+
+    const inner = popup.querySelector('.popup-inner');
+    Object.assign(inner.style, {
+      background: '#fff',
+      padding: '1.5rem',
+      borderRadius: '10px',
+      width: '280px',
+      textAlign: 'center',
+      boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
+    });
+
+    document.body.appendChild(popup);
+
+    // Eventos del popup
+    document.getElementById('save-budget').addEventListener('click', async () => {
+      const newVal = parseFloat(document.getElementById('new-budget-input').value);
+      if (!isNaN(newVal) && newVal >= 0) {
+        initialBudget = newVal;
+        await guardarPresupuestoInicial(); // 🔥 Guarda en Firestore
+        updateBudgetDisplay();
+        popup.remove();
+        console.log("💰 Presupuesto inicial editado y guardado:", newVal);
+      }
+    });
+
+    document.getElementById('cancel-budget').addEventListener('click', () => popup.remove());
+  });
+}
+
+
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', async () => {
   renderSuggestions();
   updateBudgetDisplay();
-  await loadInitialBudget();
+  await cargarPresupuestoInicial();
   await loadItems();
 });
