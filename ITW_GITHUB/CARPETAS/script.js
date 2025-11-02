@@ -10,10 +10,25 @@ const addTripBtn = document.getElementById('addTripBtn');
 const cancelBtn = document.getElementById('cancelBtn');
 const tripNameInput = document.getElementById('tripName');
 
+// 🔹 Popup
+const popup = document.getElementById("popup");
+const popupMessage = document.getElementById("popup-message");
+const popupClose = document.getElementById("popup-close");
+
+// Funciones del popup
+function showPopup(message) {
+  popupMessage.textContent = message;
+  popup.style.display = "flex";
+}
+popupClose.addEventListener("click", () => popup.style.display = "none");
+window.addEventListener("click", e => {
+  if (e.target === popup) popup.style.display = "none";
+});
+
 let userId = null;
 let selectedFolderId = null;
 let selectedFolderDiv = null;
-let currentMode = null; // "agregar", "modificar", "eliminar" o null
+let currentMode = null;
 
 // ---------- MODO ----------
 function setMode(mode) {
@@ -33,12 +48,12 @@ addFolderBtn.addEventListener('click', () => {
 
 editFolderBtn.addEventListener('click', () => {
   setMode("modificar");
-  alert("Selecciona una carpeta para modificar");
+  showPopup("Selecciona una carpeta para modificar");
 });
 
 deleteFolderBtn.addEventListener('click', () => {
   setMode("eliminar");
-  alert("Selecciona una carpeta para eliminar");
+  showPopup("Selecciona una carpeta para eliminar");
 });
 
 cancelBtn.addEventListener('click', () => closeModal());
@@ -56,7 +71,6 @@ function closeModal() {
 auth.onAuthStateChanged(async (user) => {
   if (!user) return;
   userId = user.uid;
-  console.log("Usuario logueado:", userId);
   await cargarCarpetas();
 });
 
@@ -64,7 +78,6 @@ auth.onAuthStateChanged(async (user) => {
 async function cargarCarpetas() {
   tripList.innerHTML = "";
   const folders = await getUserFolders(userId);
-
   folders.forEach(folder => renderFolder(folder));
 }
 
@@ -75,7 +88,6 @@ function renderFolder(folder) {
   div.textContent = folder.name;
   div.dataset.id = folder.id;
 
-  // Clic en carpeta según el modo
   div.addEventListener('click', async () => {
     if (currentMode === "modificar") {
       selectedFolderId = folder.id;
@@ -85,17 +97,32 @@ function renderFolder(folder) {
       addTripBtn.textContent = "Guardar cambios";
     }
     else if (currentMode === "eliminar") {
-      const currentName = div.textContent;
-      const confirmar = confirm(`¿Eliminar carpeta "${currentName}"?`);
-      if (confirmar) {
+      const confirmDiv = document.createElement("div");
+      confirmDiv.innerHTML = `
+        <div class="popup-content">
+          <p>¿Eliminar carpeta "${folder.name}"?</p>
+          <div style="display:flex; justify-content:space-around; margin-top:15px;">
+            <button id="confirmDelete" style="background:#d9534f; color:white; border:none; padding:8px 16px; border-radius:8px;">Eliminar</button>
+            <button id="cancelDelete" style="background:#ccc; border:none; padding:8px 16px; border-radius:8px;">Cancelar</button>
+          </div>
+        </div>
+      `;
+      popup.innerHTML = confirmDiv.innerHTML;
+      popup.style.display = "flex";
+
+      document.getElementById("confirmDelete").onclick = async () => {
         await deleteFolder(folder.id);
         div.remove();
-        alert(`Carpeta "${currentName}" eliminada correctamente`);
-      }
-      setMode(null);
+        popup.style.display = "none";
+        showPopup(`Carpeta "${folder.name}" eliminada correctamente`);
+        setMode(null);
+      };
+      document.getElementById("cancelDelete").onclick = () => {
+        popup.style.display = "none";
+        setMode(null);
+      };
     }
     else {
-      // 🚀 Redirige a otra página si no hay modo activo
       window.location.href = `../DASHBOARD/index.html?id=${folder.id}`;
     }
   });
@@ -106,17 +133,17 @@ function renderFolder(folder) {
 // ---------- AGREGAR o MODIFICAR ----------
 addTripBtn.addEventListener('click', async () => {
   const name = tripNameInput.value.trim();
-  if (!name) return alert('Ingresa un nombre');
+  if (!name) return showPopup('Ingresa un nombre');
 
   if (currentMode === "modificar" && selectedFolderId) {
     await updateFolder(selectedFolderId, name);
     selectedFolderDiv.textContent = name;
-    alert("Carpeta modificada correctamente");
+    showPopup("Carpeta modificada correctamente");
   } 
   else if (currentMode === "agregar") {
     const folder = await createFolder(name, userId);
-    renderFolder(folder); // 👈 importante: usamos la misma función
-    alert("Carpeta creada correctamente");
+    renderFolder(folder);
+    showPopup("Carpeta creada correctamente");
   }
 
   closeModal();

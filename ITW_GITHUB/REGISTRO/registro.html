@@ -3,35 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro estilo GitHub</title>
+  <title>Registro - Into the World</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="back-button" id="backToHome">← Volver al inicio</div>
+  <!-- Video de fondo a pantalla completa -->
+  <video autoplay muted loop class="video-bg">
+    <source src="../VIDEOS/forest.mp4" type="video/mp4">
+    Tu navegador no soporta el video.
+  </video>
+
   <div class="container">
-    <!-- Parte izquierda: ilustración -->
+    <!-- Lado izquierdo con caja de texto -->
     <div class="left-panel">
-      <video autoplay muted loop class="video-bg">
-        <source src="../VIDEOS/forest.mp4" type="video/mp4">
-        Tu navegador no soporta el video.
-      </video>
+      <div class="text-box">
+        <h1>Explora el mundo</h1>
+        <p>
+          Descubre lugares únicos, conecta con otros viajeros y comparte tus experiencias.  
+          Cada historia comienza con un primer paso.
+        </p>
+      </div>
     </div>
 
-    <!-- Parte derecha: formulario -->
+    <!-- Lado derecho con formulario -->
     <div class="right-panel">
       <form id="registerForm">
         <h1>Crear tu cuenta</h1>
 
-        <!--
-        <div class="social-buttons">
-          <button class="google">Continuar con Google</button>
-          <button class="apple">Continuar con Apple</button>
-        </div>
-        <div class="divider">o</div>
-        -->
-
         <input type="text" id="nombre" placeholder="Nombre" required>
         <input type="text" id="apellido" placeholder="Apellido" required>
-        <input type="text" id="pais" placeholder="Pais" required>
+        <select id="pais" name="pais" required>
+          <option value="">Selecciona tu país</option>
+        </select>
         <input type="date" id="fechaNacimiento" required>
         <input type="email" id="email" placeholder="Correo electrónico" required>
         <input type="password" id="password" placeholder="Contraseña" required>
@@ -41,9 +45,23 @@
 
         <p class="login-link">¿Ya tienes una cuenta? <a href="../CARPETAS/carpetas.html">Inicia sesión</a></p>
       </form>
-      
-      <script type="module" src="script.js" defer></script>
     </div>
   </div>
+
+  <!-- POP-UP DE MENSAJE -->
+  <div id="popup-overlay"></div>
+  <div id="popup-message">
+    <h3 id="popup-title"></h3>
+    <p id="popup-text"></p>
+    <button id="popup-close">Cerrar</button>
+  </div>
+
+  <script type="module" src="script.js" defer></script>
+  <script>
+    document.getElementById("backToHome").addEventListener("click", () => {
+      window.location.href = "../INDEX/index.html";
+    });
+  </script>
+
 </body>
 </html>

@@ -1,131 +1,251 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 
-body, html {
+* {
   margin: 0;
   padding: 0;
-  height: 100%;
+  box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
 }
 
+body, html {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* === Video de fondo === */
+.video-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+/* === Contenedor principal === */
 .container {
   display: flex;
   height: 100vh;
 }
 
-
+/* === Panel izquierdo === */
 .left-panel {
   flex: 1;
-  position: relative;   /* necesario para posicionar el video dentro */
-  overflow: hidden;     /* para que no se salga del panel */
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(180deg, #0d0d0d, #1a1a1a); /* opcional si el video tiene transparencias */
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+  color: white;
+  text-align: center;
 }
 
-.left-panel .video-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* asegura que el video llene todo el panel sin deformarse */
-  z-index: 0;        /* para que quede detrás de cualquier contenido que quieras poner encima */
-}
-
-
-/* Panel izquierdo */
-.left-panel {
-  flex: 1;
-  background: linear-gradient(180deg, #0d0d0d, #1a1a1a);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.left-panel .illustration {
-  width: 60%;
+/* === Caja de texto translúcida === */
+.text-box {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  padding: 40px;
   max-width: 400px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Panel derecho */
+.text-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 40px rgba(255, 255, 255, 0.15);
+}
+
+.text-box h1 {
+  font-size: 42px;
+  margin-bottom: 15px;
+  text-shadow: 0 0 15px rgba(0,0,0,0.6);
+}
+
+.text-box p {
+  font-size: 18px;
+  line-height: 1.6;
+  text-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+/* === Panel derecho === */
 .right-panel {
   flex: 1;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #f8f8f8;
+  justify-content: flex-end;
+  align-items: stretch;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-form {
-  width: 80%;
-  max-width: 400px;
+/* === Formulario === */
+.right-panel form {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  padding: 60px 120px;
+  background: transparent;
+  color: #ffffff;
 }
 
 h1 {
+  font-size: 36px;
   text-align: center;
+  color: #fff;
   margin-bottom: 20px;
 }
 
-input {
+input, select {
   padding: 12px 15px;
   margin: 8px 0;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+  border-radius: 40px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: #fff;
   font-size: 16px;
+  outline: none;
 }
 
-.btn {
-  background-color: #24292f;
-  color: white;
-  border: none;
-  padding: 12px;
-  margin-top: 15px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
+input::placeholder {
+  color: #ffffff;
 }
 
-.btn:hover {
-  background-color: #444c56;
+input:focus, select:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.7);
 }
 
-.social-buttons button {
-  width: 100%;
-  margin: 5px 0;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  cursor: pointer;
-}
-
-.social-buttons .google {
-  background-color: #fff;
-}
-
-.social-buttons .apple {
-  background-color: #000;
+select option {
+  background-color: #1a1a1a;
   color: #fff;
 }
 
-.divider {
-  text-align: center;
-  margin: 15px 0;
-  color: #666;
+.btn {
+  width: 100%;
+  height: 45px;
+  background: #fff;
+  border: none;
+  outline: none;
+  border-radius: 40px;
+  box-shadow: 0 0 10px rgba(8, 8, 8, 0.3);
+  cursor: pointer;
+  font-size: 16px;
+  color: #333;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #f2f2f2;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+  transform: scale(1.02);
 }
 
 .login-link {
   text-align: center;
-  margin-top: 15px;
+  margin-top: 35px;
+  font-size: 15px;
+  color: #ffffff;
+  opacity: 0.9;
 }
 
 .login-link a {
-  color: #0366d6;
+  color: #ffffff;
   text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
 }
 
 .login-link a:hover {
   text-decoration: underline;
+  color: #4CAF50;
+}
+
+/* === POP-UP MENSAJE === */
+#popup-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+}
+
+#popup-message {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.97);
+  color: #111;
+  padding: 40px 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  z-index: 2100;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  animation: popupFadeIn 0.3s ease;
+}
+
+#popup-message h3 {
+  margin-bottom: 10px;
+  color: #007acc;
+}
+
+#popup-message p {
+  font-size: 1rem;
+  margin-bottom: 25px;
+}
+
+#popup-message button {
+  background-color: #007acc;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-top: 10px;
+}
+
+#popup-message button:hover {
+  background-color: #005fa3;
+  transform: scale(1.05);
+}
+
+@keyframes popupFadeIn {
+  from { opacity: 0; transform: translate(-50%, -45%); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+.back-button {
+  position: fixed;
+  top: 20px;
+  left: 25px;
+  font-size: 18px;
+  color: white;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 6px;
+  padding: 8px 12px;
+  text-align: center;
+  transition: background 0.3s ease;
+  z-index: 120;
+}
+
+.back-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }
