@@ -9,6 +9,10 @@
 <body>
 
   <header class="hero-header">
+    <div class="back-button" onclick="window.location.href='../PERFIL/perfil.html'">
+      ← Volver al Perfil
+    </div>
+
     <div class="overlay">
       <h1>Mis Carpetas</h1>
       <p>Into The World</p>
@@ -54,6 +58,15 @@
       </div>
     </div>
   </div>
+
+  <!-- Popup de notificación -->
+  <div id="popup" class="popup">
+    <div class="popup-content">
+      <p id="popup-message"></p>
+      <button id="popup-close">Cerrar</button>
+    </div>
+  </div>
+
 
   <script type="module" src="script.js"></script>
 </body>

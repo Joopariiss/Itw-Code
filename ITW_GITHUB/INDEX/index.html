@@ -36,19 +36,52 @@
     <!-- FUNCIONES -->
     <section id="funciones" class="section-split">
       <div class="text-side">
-        <h2>Funciones Principales</h2>
-        <p>
+        <h2 class="title">Funciones Principales</h2>
+        <p class="intro">
           Con <strong>Into The World</strong> puedes crear itinerarios personalizados, compartirlos con amigos y descubrir
           nuevos destinos según tus intereses. Organiza tus vuelos, estadías y actividades desde un solo lugar.
         </p>
-        <ul>
-          <li>📅 Planificación inteligente y colaborativa</li>
-          <li>🌍 Exploración de destinos recomendados</li>
-          <li>💬 Interacción entre viajeros</li>
+        <ul class="funciones-list">
+          <li class="funcion-item">
+            <span class="emoji">📅</span>
+            <div class="funcion-text">
+              <strong>Planificación inteligente y colaborativa</strong>: Crea itinerarios personalizados y coordina actividades con amigos o familiares en tiempo real. ¡Olvídate de los malentendidos o la desorganización!
+            </div>
+          </li>
+          <li class="funcion-item">
+            <span class="emoji">🌍</span>
+            <div class="funcion-text">
+              <strong>Exploración de destinos recomendados</strong>: Si no sabes por dónde empezar, Into The World te sugiere destinos basados en tus intereses, ya sea aventura, cultura, descanso o gastronomía.
+            </div>
+          </li>
+          <li class="funcion-item">
+            <span class="emoji">💬</span>
+            <div class="funcion-text">
+              <strong>Interacción entre viajeros</strong>: Comparte tu progreso, tus planes y tus ideas con otros usuarios, y colabora en la organización de viajes grupales sin estrés.
+            </div>
+          </li>
+          <li class="funcion-item">
+            <span class="emoji">💸</span>
+            <div class="funcion-text">
+              <strong>Gestión eficiente de presupuestos</strong>: Lleva un control detallado de tus gastos durante la planificación y el viaje, ajustando tu presupuesto en tiempo real a medida que añades actividades o compras.
+            </div>
+          </li>
+          <li class="funcion-item">
+            <span class="emoji">📂</span>
+            <div class="funcion-text">
+              <strong>Organización de inventarios y recursos</strong>: Gestiona tu equipaje, los documentos de viaje y todo lo necesario para que no olvides nada importante. Puedes tener tu lista de cosas por hacer y por llevar, todo en un solo lugar.
+            </div>
+          </li>
+          <li class="funcion-item">
+            <span class="emoji">📑</span>
+            <div class="funcion-text">
+              <strong>Exportación y respaldo</strong>: ¿Necesitas llevar todo a la mano? Exporta tu itinerario, inventario y presupuesto en formatos PDF o Excel para tenerlos siempre disponibles sin conexión.
+            </div>
+          </li>
         </ul>
       </div>
       <div class="image-side">
-        <img src="../IMAGES/image1.jpeg" alt="Funciones principales" />
+        <img src="../IMAGES/image1.jpeg" alt="Funciones principales" class="funciones-image" />
       </div>
     </section>
 
@@ -71,6 +104,14 @@
           "Pude compartir itinerarios con mis amigos, todo desde el mismo lugar."
           <footer>- Andrés Romero, México</footer>
         </blockquote>
+        <blockquote>
+          "Gracias a esta app, pude descubrir destinos increíbles que no conocía. ¡Es como tener un guía personal!"
+          <footer>- Laura Martínez, España</footer>
+        </blockquote>
+        <blockquote>
+          "Una experiencia increíble. Me ayudó a organizar todo mi viaje a Europa sin estrés."
+          <footer>- Pedro Ruiz, Argentina</footer>
+        </blockquote>
       </div>
     </section>
 
@@ -88,6 +129,14 @@
 
       <p class="contact-info">📧 intotheworlditw@gmail.com | ☎️ +56 9 1234 5678</p>
     </section>
+    <!-- Pop-up de confirmación -->
+    <div id="popup-overlay"></div>
+    <div id="popup-message">
+      <h3>✅ ¡Gracias por tu mensaje!</h3>
+      <p>Nos pondremos en contacto contigo pronto.</p>
+      <button id="popup-close">Cerrar</button>
+    </div>
+
 
     <script src="script.js" defer></script>
   </body>

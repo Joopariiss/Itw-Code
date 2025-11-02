@@ -1,7 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   const loginBtn = document.getElementById("loginBtn");
   const registerBtn = document.getElementById("registerBtn");
+  const contactForm = document.getElementById("contactForm");
 
+  // Botones de navegación
   loginBtn.addEventListener("click", () => {
     window.location.href = "../LOGIN/login.html";
   });
@@ -10,28 +12,46 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "../REGISTRO/registro.html";
   });
 
-  const contactForm = document.getElementById("contactForm");
-  contactForm.addEventListener("submit", (e) => {
-    alert("✅ ¡Gracias! Tu mensaje fue enviado.");
-  });
+  // Pop-up elementos
+  const popupOverlay = document.getElementById("popup-overlay");
+  const popupMessage = document.getElementById("popup-message");
+  const popupClose = document.getElementById("popup-close");
 
-});
+  // Función para mostrar el pop-up
+  function showPopup() {
+    popupOverlay.style.display = "block";
+    popupMessage.style.display = "block";
+  }
 
-const form = document.getElementById("contactForm");
+  // Función para cerrar el pop-up
+  function closePopup() {
+    popupOverlay.style.display = "none";
+    popupMessage.style.display = "none";
+  }
 
-form.addEventListener("submit", function(event) {
-  event.preventDefault();
-  const data = new FormData(form);
-  fetch(form.action, {
-    method: form.method,
-    body: data,
-    headers: {
-      'Accept': 'application/json'
-    }
-  }).then(response => {
-    alert("Mensaje enviado. Pronto nos pondremos en contacto contigo!");
-    form.reset();
-  }).catch(error => {
-    alert("Ups! Algo salió mal. Intenta nuevamente.");
+  popupClose.addEventListener("click", closePopup);
+  popupOverlay.addEventListener("click", closePopup);
+
+  // Envío del formulario
+  contactForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+    const data = new FormData(contactForm);
+
+    fetch(contactForm.action, {
+      method: contactForm.method,
+      body: data,
+      headers: { "Accept": "application/json" },
+    })
+      .then((response) => {
+        if (response.ok) {
+          showPopup(); // Muestra el pop-up centrado
+          contactForm.reset();
+        } else {
+          alert("❌ Ups! Algo salió mal. Intenta nuevamente.");
+        }
+      })
+      .catch(() => {
+        alert("❌ Error de conexión. Intenta nuevamente.");
+      });
   });
 });

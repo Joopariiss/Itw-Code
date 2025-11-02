@@ -52,6 +52,7 @@
 </head>
 
 <body>
+  <div class="back-button" id="backToHome">← Volver a carpetas</div>
 
   <!--  Encabezado -->
   <!--
@@ -61,7 +62,7 @@
   -->
   <header class="hero-header">
     <div class="overlay">
-      <h1>Planificador de Viaje</h1>
+      <h1 id="destino">Destino: ...</h1>
       <p id="current-folder-name" class="folder-name"></p> <!-- 👈 nuevo -->
     </div>
   </header>
@@ -263,6 +264,10 @@
   <script src="inventory.js" type="module"></script>
   <script src="tabs.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
+  <script>
+    document.getElementById("backToHome").addEventListener("click", () => {
+      window.location.href = "../CARPETAS/carpetas.html";
+    });
+  </script>
 </body>
 </html>
