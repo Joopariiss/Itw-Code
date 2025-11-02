@@ -44,7 +44,12 @@ async function loadItineraryFromFirestore() {
     if (!window.folderId) return;
     const folderRef = doc(db, "carpetas", window.folderId);
     const snap = await getDoc(folderRef);
-    if (!snap.exists()) return;
+
+    if (!snap.exists()) {
+      // 🔹 No hay datos en Firestore, solo mostramos mensaje
+      renderItinerary();
+      return;
+    }
 
     const data = snap.data();
     if (data.calendario && data.calendario.fechaInicio && data.calendario.fechaFin) {
@@ -57,20 +62,23 @@ async function loadItineraryFromFirestore() {
       if (Array.isArray(data.itinerario)) {
         for (let i = 0; i < tripDays.length; i++) {
           const savedDay = data.itinerario.find(d => d.date === tripDays[i].date);
-          if (savedDay) tripDays[i].activities = savedDay.activities || [];
+          tripDays[i].activities = savedDay?.activities || [];
         }
       }
 
       calendarLocked = true;
       lockBtn.style.display = "none";
       unlockBtn.style.display = "block";
-      renderItinerary();
-      console.log("📅 Itinerario cargado desde Firestore");
     }
+
+    // 🔹 Renderizar siempre después de cargar Firestore
+    renderItinerary();
+    console.log("📅 Itinerario cargado desde Firestore");
   } catch (err) {
     console.error("Error cargando itinerario:", err);
   }
 }
+
 
 
 let tripDays = [];
@@ -143,7 +151,7 @@ function renderItinerary() {
   // Reiniciar el contenido
   itinerarySection.innerHTML = '';
 
-  // 🏷️ Agregar título fijo
+  // 🏷️ Agregar título fijo **siempre**
   const title = document.createElement('h2');
   title.textContent = "Itinerario del Viaje";
   title.style.marginTop = "0";
@@ -153,17 +161,17 @@ function renderItinerary() {
   title.style.fontWeight = "600";
   itinerarySection.appendChild(title);
 
-  // Si no hay días seleccionados
+  // Si no hay días seleccionados, mostrar mensaje
   if (!tripDays.length) {
     const msg = document.createElement('p');
     msg.style.color = 'var(--muted-foreground)';
     msg.style.textAlign = 'center';
     msg.textContent = 'Selecciona un rango en el calendario para generar el itinerario.';
     itinerarySection.appendChild(msg);
-    return;
+    // No retornamos, así el título siempre se queda
   }
 
-  // Renderizar los días
+  // Renderizar los días (si existen)
   tripDays.forEach((day) => {
     const dayCard = document.createElement('div');
     dayCard.className = 'day-card';
@@ -183,8 +191,11 @@ function renderItinerary() {
     const activitiesContainer = document.createElement('div');
     activitiesContainer.className = 'activities';
 
-    if (day.activities.length > 0) {
-      day.activities.forEach((act) => {
+    // Asegurarnos que day.activities siempre sea un array
+    const activities = Array.isArray(day.activities) ? day.activities : [];
+
+    if (activities.length > 0) {
+      activities.forEach((act) => {
         const activityDiv = document.createElement('div');
         activityDiv.className = 'activity';
         activityDiv.innerHTML = `
@@ -227,19 +238,20 @@ function renderItinerary() {
     dayCard.appendChild(body);
     itinerarySection.appendChild(dayCard);
 
-    // Toggle
+    // Toggle del día
     trigger.addEventListener('click', (e) => {
       if (e.target.classList.contains('add-activity-btn')) return;
       body.style.display = body.style.display === 'block' ? 'none' : 'block';
     });
 
-    // Abrir modal
+    // Abrir modal al agregar actividad
     trigger.querySelector('.add-activity-btn').addEventListener('click', (e) => {
       e.stopPropagation();
       openModal(day);
     });
   });
 }
+
 
 
 /* ------------------------
@@ -412,6 +424,9 @@ function showPopup(message, type = "info") {
 
 //renderItinerary();
 document.addEventListener("DOMContentLoaded", () => {
+  // 1️⃣ Mostrar título fijo de inmediato
+  renderItinerary();
+
+  // 2️⃣ Luego cargar datos desde Firestore (si existen)
   loadItineraryFromFirestore();
 });
-
