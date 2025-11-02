@@ -17,7 +17,10 @@ import {
 
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+
+
 // Mostrar país en el header como "Destino: País"
+/* ESTO ERA DEL BASTI ES LO QUE NO FUNCIONA, SORRY BASTI
 onAuthStateChanged(getAuth(), async (user) => {
   if (!user) return;
 
@@ -33,7 +36,7 @@ onAuthStateChanged(getAuth(), async (user) => {
     console.error("Error obteniendo país del usuario:", err);
   }
 });
-
+*/
 
 // === NUEVAS FUNCIONES PARA FIRESTORE ===
 
