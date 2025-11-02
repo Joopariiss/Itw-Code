@@ -82,6 +82,7 @@ async function cargarCarpetas() {
 }
 
 // ---------- RENDERIZAR UNA CARPETA ----------
+// ---------- RENDERIZAR UNA CARPETA ----------
 function renderFolder(folder) {
   const div = document.createElement('div');
   div.classList.add('trip');
@@ -96,10 +97,14 @@ function renderFolder(folder) {
       tripNameInput.value = folder.name;
       addTripBtn.textContent = "Guardar cambios";
     }
+
     else if (currentMode === "eliminar") {
-      const confirmDiv = document.createElement("div");
-      confirmDiv.innerHTML = `
-        <div class="popup-content">
+      // Crear popup temporal para confirmar eliminación
+      const confirmOverlay = document.createElement("div");
+      confirmOverlay.classList.add("popup");
+      confirmOverlay.style.display = "flex";
+      confirmOverlay.innerHTML = `
+        <div class="popup-content" style="background:white; padding:20px; border-radius:10px; text-align:center;">
           <p>¿Eliminar carpeta "${folder.name}"?</p>
           <div style="display:flex; justify-content:space-around; margin-top:15px;">
             <button id="confirmDelete" style="background:#d9534f; color:white; border:none; padding:8px 16px; border-radius:8px;">Eliminar</button>
@@ -107,22 +112,28 @@ function renderFolder(folder) {
           </div>
         </div>
       `;
-      popup.innerHTML = confirmDiv.innerHTML;
-      popup.style.display = "flex";
 
-      document.getElementById("confirmDelete").onclick = async () => {
+      // Agregar al body
+      document.body.appendChild(confirmOverlay);
+
+      // Confirmar eliminación
+      confirmOverlay.querySelector("#confirmDelete").onclick = async () => {
         await deleteFolder(folder.id);
         div.remove();
-        popup.style.display = "none";
+        document.body.removeChild(confirmOverlay);
         showPopup(`Carpeta "${folder.name}" eliminada correctamente`);
         setMode(null);
       };
-      document.getElementById("cancelDelete").onclick = () => {
-        popup.style.display = "none";
+
+      // Cancelar eliminación
+      confirmOverlay.querySelector("#cancelDelete").onclick = () => {
+        document.body.removeChild(confirmOverlay);
         setMode(null);
       };
     }
+
     else {
+      // Redirigir al dashboard si no hay modo activo
       window.location.href = `../DASHBOARD/index.html?id=${folder.id}`;
     }
   });
