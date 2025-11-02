@@ -10,9 +10,67 @@ import {
   addDoc,
   getDocs,
   deleteDoc,
-  doc
+  doc,
+  updateDoc,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+
+// === NUEVAS FUNCIONES PARA FIRESTORE ===
+
+// Guardar calendario + itinerario en Firestore
+async function saveItineraryToFirestore() {
+  try {
+    if (!window.folderId) return console.warn("❌ No hay folderId activo");
+    const folderRef = doc(db, "carpetas", window.folderId);
+
+    const start = tripDays.length ? tripDays[0].date : null;
+    const end = tripDays.length ? tripDays[tripDays.length - 1].date : null;
+
+    await updateDoc(folderRef, {
+      calendario: { fechaInicio: start, fechaFin: end },
+      itinerario: tripDays
+    });
+
+    console.log("✅ Itinerario guardado en Firestore");
+  } catch (err) {
+    console.error("Error guardando itinerario:", err);
+  }
+}
+
+// Cargar itinerario desde Firestore
+async function loadItineraryFromFirestore() {
+  try {
+    if (!window.folderId) return;
+    const folderRef = doc(db, "carpetas", window.folderId);
+    const snap = await getDoc(folderRef);
+    if (!snap.exists()) return;
+
+    const data = snap.data();
+    if (data.calendario && data.calendario.fechaInicio && data.calendario.fechaFin) {
+      tripDays = generateDaysBetween(
+        new Date(data.calendario.fechaInicio),
+        new Date(data.calendario.fechaFin)
+      );
+
+      // Insertar actividades previas si existen
+      if (Array.isArray(data.itinerario)) {
+        for (let i = 0; i < tripDays.length; i++) {
+          const savedDay = data.itinerario.find(d => d.date === tripDays[i].date);
+          if (savedDay) tripDays[i].activities = savedDay.activities || [];
+        }
+      }
+
+      calendarLocked = true;
+      lockBtn.style.display = "none";
+      unlockBtn.style.display = "block";
+      renderItinerary();
+      console.log("📅 Itinerario cargado desde Firestore");
+    }
+  } catch (err) {
+    console.error("Error cargando itinerario:", err);
+  }
+}
 
 
 let tripDays = [];
@@ -150,6 +208,7 @@ function renderItinerary() {
             if (ok) {
               day.activities = day.activities.filter((a) => a.id !== act.id);
               renderItinerary();
+              saveItineraryToFirestore();
             }
           });
         });
@@ -216,6 +275,8 @@ saveActivityBtn.addEventListener('click', () => {
   // ✅ Mostrar siempre el día abierto después de agregar
   activityModal.classList.add('hidden');
   renderItinerary();
+  saveItineraryToFirestore();
+
 
   // Expandir automáticamente el día editado
   const dayCards = document.querySelectorAll('.day-card');
@@ -290,6 +351,7 @@ lockBtn.addEventListener("click", () => {
   }
 
   showPopup("✅ Fechas establecidas correctamente.", "success");
+  saveItineraryToFirestore();
 });
 
 
@@ -348,4 +410,8 @@ function showPopup(message, type = "info") {
 }
 
 
-renderItinerary();
+//renderItinerary();
+document.addEventListener("DOMContentLoaded", () => {
+  loadItineraryFromFirestore();
+});
+

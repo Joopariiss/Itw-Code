@@ -59,10 +59,10 @@
       <h1>Organizador de Viajes</h1>
     </header>
   -->
-    <header class="hero-header">
+  <header class="hero-header">
     <div class="overlay">
       <h1>Planificador de Viaje</h1>
-      <p>Into The World</p>
+      <p id="current-folder-name" class="folder-name"></p> <!-- 👈 nuevo -->
     </div>
   </header>
 
@@ -233,6 +233,31 @@
       console.log("📂 Carpeta activa:", folderId);
     }
   </script>
+  <script type="module">
+    import { db } from "../firebase.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const folderNameEl = document.getElementById("current-folder-name");
+      if (!window.folderId || !folderNameEl) return;
+
+      try {
+        const folderRef = doc(db, "carpetas", window.folderId);
+        const folderSnap = await getDoc(folderRef);
+
+        if (folderSnap.exists()) {
+          const data = folderSnap.data();
+          folderNameEl.textContent = `Carpeta: ${data.name || "Sin nombre"}`;
+        } else {
+          folderNameEl.textContent = "Carpeta no encontrada";
+        }
+      } catch (error) {
+        console.error("Error al cargar nombre de carpeta:", error);
+        folderNameEl.textContent = "Error al cargar carpeta";
+      }
+    });
+  </script>
+
 
   <script src="planner.js" type="module"></script>
   <script src="inventory.js" type="module"></script>
