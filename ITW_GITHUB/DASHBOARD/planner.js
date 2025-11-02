@@ -11,12 +11,13 @@ import {
   deleteDoc,
   doc,
   updateDoc,
-  getDoc
+  getDoc,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // === NUEVAS FUNCIONES PARA FIRESTORE ===
 
-// Guardar calendario + itinerario en Firestore
+// Guardar calendario + itinerario en subcolecciones
 async function saveItineraryToFirestore() {
   try {
     if (!window.folderId) return console.warn("❌ No hay folderId activo");
@@ -25,62 +26,74 @@ async function saveItineraryToFirestore() {
     const start = tripDays.length ? tripDays[0].date : null;
     const end = tripDays.length ? tripDays[tripDays.length - 1].date : null;
 
-    await updateDoc(folderRef, {
-      calendario: { fechaInicio: start, fechaFin: end },
-      itinerario: tripDays
+    // 🔹 Guardar calendario en subcolección
+    const calendarioRef = doc(collection(folderRef, "calendario"), "info");
+    await setDoc(calendarioRef, {
+      fechaInicio: start,
+      fechaFin: end
     });
 
-    console.log("✅ Itinerario guardado en Firestore");
+    // 🔹 Guardar cada día del itinerario como documento en subcolección
+    const itinerarioRef = collection(folderRef, "itinerario");
+    for (const day of tripDays) {
+      const dayDoc = doc(itinerarioRef, day.date);
+      await setDoc(dayDoc, { date: day.date, activities: day.activities || [] });
+    }
+
+    console.log("✅ Itinerario y calendario guardados en subcolecciones Firestore");
   } catch (err) {
     console.error("Error guardando itinerario:", err);
   }
 }
-
 // Cargar itinerario desde Firestore
-// Cargar itinerario desde Firestore
+// Cargar calendario + itinerario desde subcolecciones
 async function loadItineraryFromFirestore() {
   try {
     if (!window.folderId) return;
     const folderRef = doc(db, "carpetas", window.folderId);
-    const snap = await getDoc(folderRef);
 
-    if (!snap.exists()) {
+    // 🔹 Cargar calendario
+    const calendarioRef = doc(collection(folderRef, "calendario"), "info");
+    const calSnap = await getDoc(calendarioRef);
+
+    if (!calSnap.exists()) {
       renderItinerary();
       return;
     }
 
-    const data = snap.data();
-    if (data.calendario && data.calendario.fechaInicio && data.calendario.fechaFin) {
-      const startDateString = data.calendario.fechaInicio + "T12:00:00";
-      const endDateString = data.calendario.fechaFin + "T12:00:00";
+    const calendarioData = calSnap.data();
+    const startDateString = calendarioData.fechaInicio + "T12:00:00";
+    const endDateString = calendarioData.fechaFin + "T12:00:00";
 
-      tripDays = generateDaysBetween(new Date(startDateString), new Date(endDateString));
+    tripDays = generateDaysBetween(new Date(startDateString), new Date(endDateString));
 
-      // Insertar actividades previas si existen
-      if (Array.isArray(data.itinerario)) {
-        for (let i = 0; i < tripDays.length; i++) {
-          const savedDay = data.itinerario.find(d => d.date === tripDays[i].date);
-          tripDays[i].activities = savedDay?.activities || [];
-        }
-      }
+    // 🔹 Cargar itinerario (cada día desde subcolección)
+    const itinerarioRef = collection(folderRef, "itinerario");
+    const daysSnap = await getDocs(itinerarioRef);
 
-      // 🔹 Bloquear calendario al cargar desde Firestore
-      calendarLocked = true;
-      lockBtn.style.display = "none";
-      unlockBtn.style.display = "block";
+    daysSnap.forEach(docSnap => {
+      const dayData = docSnap.data();
+      const day = tripDays.find(d => d.date === dayData.date);
+      if (day) day.activities = dayData.activities || [];
+    });
 
-      if (calendarPicker) {
-        calendarPicker.setDate([data.calendario.fechaInicio, data.calendario.fechaFin], true);
+    // 🔹 Bloquear calendario al cargar
+    calendarLocked = true;
+    lockBtn.style.display = "none";
+    unlockBtn.style.display = "block";
 
-        // 🔹 Deshabilitar interacción de Flatpickr
-        calendarPicker.input.disabled = true;
-        const calendarElement = document.querySelector(".flatpickr-calendar");
-        if (calendarElement) calendarElement.classList.add("calendar-locked");
-      }
+    if (calendarPicker) {
+      calendarPicker.setDate(
+        [calendarioData.fechaInicio, calendarioData.fechaFin],
+        true
+      );
+      calendarPicker.input.disabled = true;
+      const calendarElement = document.querySelector(".flatpickr-calendar");
+      if (calendarElement) calendarElement.classList.add("calendar-locked");
     }
 
     renderItinerary();
-    console.log("📅 Itinerario cargado desde Firestore");
+    console.log("📅 Itinerario cargado desde subcolecciones Firestore");
   } catch (err) {
     console.error("Error cargando itinerario:", err);
   }
