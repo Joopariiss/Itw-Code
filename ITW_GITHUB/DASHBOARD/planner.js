@@ -15,28 +15,6 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-
-
-// Mostrar país en el header como "Destino: País"
-/* ESTO ERA DEL BASTI ES LO QUE NO FUNCIONA, SORRY BASTI
-onAuthStateChanged(getAuth(), async (user) => {
-  if (!user) return;
-
-  try {
-    const userDoc = await getDoc(doc(db, "usuarios", user.uid));
-    if (userDoc.exists()) {
-      const data = userDoc.data();
-      const pais = data.pais || "No especificado";
-      const headerTitle = document.querySelector(".hero-header h1");
-      if (headerTitle) headerTitle.textContent = `Destino: ${pais}`;
-    }
-  } catch (err) {
-    console.error("Error obteniendo país del usuario:", err);
-  }
-});
-*/
 
 // === NUEVAS FUNCIONES PARA FIRESTORE ===
 

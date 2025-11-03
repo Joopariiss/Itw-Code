@@ -397,21 +397,3 @@ input, textarea {
   filter: grayscale(0.5);
 }
 
-.back-button {
-  position: fixed;
-  top: 20px;
-  left: 25px;
-  font-size: 18px;
-  color: white;
-  cursor: pointer;
-  background-color: rgba(0, 0, 0, 0.4);
-  border-radius: 6px;
-  padding: 8px 12px;
-  text-align: center;
-  transition: background 0.3s ease;
-  z-index: 120;
-}
-
-.back-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
