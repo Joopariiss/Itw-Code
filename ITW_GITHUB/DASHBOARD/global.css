@@ -50,12 +50,12 @@ body {
   transition: background 0.3s ease;
   z-index: 120;
 }
-
 .back-button:hover {
   background-color: rgba(255, 255, 255, 0.2);
 }
+/*BOTON DE VOLVER ATRAS DEL BASTI*/
 
-
+/*BOTON DE INVITAR JORDI*/
 #invite-btn {
   position: absolute;
   top: 1rem;
