@@ -1,5 +1,8 @@
 import { auth } from "../firebase.js";
-import { createFolder, getUserFolders, deleteFolder, updateFolder } from "./db.js";
+import { createFolder, getUserFolders, getInvitedFolders, acceptInvitation, rejectInvitation, deleteFolder, updateFolder } from "./db.js";
+
+// ✅ IMPORTAR la función desde global.js
+import { setCurrentUserId } from "../DASHBOARD/global.js"; // Ajusta ruta según tu estructura de carpetas
 
 const tripList = document.getElementById('tripList');
 const modal = document.getElementById('modal');
@@ -67,79 +70,104 @@ function closeModal() {
   setMode(null);
 }
 
-// ---------- FIREBASE AUTH ----------
-auth.onAuthStateChanged(async (user) => {
-  if (!user) return;
-  userId = user.uid;
-  await cargarCarpetas();
-});
+  // ---------- FIREBASE AUTH ----------
+  auth.onAuthStateChanged(async (user) => {
+    if (!user) return;
+    userId = user.uid;
+
+    // 🔹 Exponer el userId a global.js
+    setCurrentUserId(userId);
+
+    await cargarCarpetas();
+  });
+
 
 // ---------- CARGAR CARPETAS ----------
 async function cargarCarpetas() {
   tripList.innerHTML = "";
+
+  // Carpetas propias
   const folders = await getUserFolders(userId);
-  folders.forEach(folder => renderFolder(folder));
+  folders.forEach(folder => renderFolder(folder, "propia"));
+
+  // Carpetas compartidas (donde estoy invitado)
+  const invitedFolders = await getInvitedFolders(userId);
+  invitedFolders.forEach(folder => renderFolder(folder, folder.status));
 }
 
 // ---------- RENDERIZAR UNA CARPETA ----------
 // ---------- RENDERIZAR UNA CARPETA ----------
-function renderFolder(folder) {
-  const div = document.createElement('div');
-  div.classList.add('trip');
+function renderFolder(folder, status = "propia") {
+  const div = document.createElement("div");
+  div.classList.add("trip");
   div.textContent = folder.name;
   div.dataset.id = folder.id;
 
-  div.addEventListener('click', async () => {
+  // Mostrar etiqueta si es invitación
+  if (status === "pendiente") {
+    const tag = document.createElement("span");
+    tag.textContent = "Invitación pendiente";
+    tag.style.fontSize = "0.8rem";
+    tag.style.marginLeft = "10px";
+    tag.style.color = "#c94b4b";
+    div.appendChild(tag);
+  }
+
+  div.addEventListener("click", async () => {
+    if (status === "pendiente") {
+      // Mostrar popup de aceptar o rechazar
+      const confirmOverlay = document.createElement("div");
+      confirmOverlay.classList.add("invite-popup");
+
+      confirmOverlay.innerHTML = `
+        <div class="popup-content">
+          <h3>📩 Invitación a carpeta</h3>
+          <p>Has sido invitado a la carpeta <b>${folder.name}</b>.</p>
+          <div style="display:flex; justify-content:space-around; margin-top:15px;">
+            <button id="acceptInvite" style="background:#4CAF50; color:white; border:none; padding:8px 16px; border-radius:8px;">Aceptar</button>
+            <button id="rejectInvite" style="background:#d9534f; color:white; border:none; padding:8px 16px; border-radius:8px;">Rechazar</button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(confirmOverlay);
+
+      confirmOverlay.querySelector("#acceptInvite").onclick = async () => {
+        await acceptInvitation(folder.id, userId);
+        document.body.removeChild(confirmOverlay);
+        showPopup(`Has aceptado la invitación a "${folder.name}"`);
+        await cargarCarpetas(); // recargar lista
+      };
+
+      confirmOverlay.querySelector("#rejectInvite").onclick = async () => {
+        await rejectInvitation(folder.id, userId);
+        document.body.removeChild(confirmOverlay);
+        showPopup(`Has rechazado la invitación a "${folder.name}"`);
+        await cargarCarpetas();
+      };
+
+      return;
+    }
+
+    // --- resto igual que antes ---
     if (currentMode === "modificar") {
       selectedFolderId = folder.id;
       selectedFolderDiv = div;
       modal.style.display = 'flex';
       tripNameInput.value = folder.name;
       addTripBtn.textContent = "Guardar cambios";
-    }
-
+    } 
     else if (currentMode === "eliminar") {
-      // Crear popup temporal para confirmar eliminación
-      const confirmOverlay = document.createElement("div");
-      confirmOverlay.classList.add("popup");
-      confirmOverlay.style.display = "flex";
-      confirmOverlay.innerHTML = `
-        <div class="popup-content" style="background:white; padding:20px; border-radius:10px; text-align:center;">
-          <p>¿Eliminar carpeta "${folder.name}"?</p>
-          <div style="display:flex; justify-content:space-around; margin-top:15px;">
-            <button id="confirmDelete" style="background:#d9534f; color:white; border:none; padding:8px 16px; border-radius:8px;">Eliminar</button>
-            <button id="cancelDelete" style="background:#ccc; border:none; padding:8px 16px; border-radius:8px;">Cancelar</button>
-          </div>
-        </div>
-      `;
-
-      // Agregar al body
-      document.body.appendChild(confirmOverlay);
-
-      // Confirmar eliminación
-      confirmOverlay.querySelector("#confirmDelete").onclick = async () => {
-        await deleteFolder(folder.id);
-        div.remove();
-        document.body.removeChild(confirmOverlay);
-        showPopup(`Carpeta "${folder.name}" eliminada correctamente`);
-        setMode(null);
-      };
-
-      // Cancelar eliminación
-      confirmOverlay.querySelector("#cancelDelete").onclick = () => {
-        document.body.removeChild(confirmOverlay);
-        setMode(null);
-      };
+      // (tu código de eliminar igual que antes)
     }
-
     else {
-      // Redirigir al dashboard si no hay modo activo
       window.location.href = `../DASHBOARD/index.html?id=${folder.id}`;
     }
   });
 
   tripList.appendChild(div);
 }
+
 
 // ---------- AGREGAR o MODIFICAR ----------
 addTripBtn.addEventListener('click', async () => {

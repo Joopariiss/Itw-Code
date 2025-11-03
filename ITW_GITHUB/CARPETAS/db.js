@@ -8,7 +8,9 @@ import {
   where,
   deleteDoc,
   doc,
-  updateDoc
+  updateDoc,  
+  arrayUnion,
+  arrayRemove      // <- AGREGAR ESTO
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 /* ==========================================================
@@ -26,6 +28,7 @@ export async function createFolder(name, userId) {
     console.error("❌ Error creando carpeta:", error);
   }
 }
+
 
 /* ==========================================================
    OBTENER CARPETAS DEL USUARIO
@@ -83,4 +86,35 @@ export async function updateFolder(folderId, newName) {
   } catch (error) {
     console.error("❌ Error actualizando carpeta:", error);
   }
+}
+
+/* ==========================================================
+   OBTENER CARPETAS DONDE EL USUARIO ESTÁ INVITADO
+   ========================================================== */
+export async function getInvitedFolders(userId) {
+  const invited = query(collection(db, "carpetas"), where("invitadosPendientes", "array-contains", userId));
+  const accepted = query(collection(db, "carpetas"), where("invitadosAceptados", "array-contains", userId));
+
+  const [snapInvited, snapAccepted] = await Promise.all([getDocs(invited), getDocs(accepted)]);
+  const folders = [
+    ...snapInvited.docs.map((d) => ({ id: d.id, status: "pendiente", ...d.data() })),
+    ...snapAccepted.docs.map((d) => ({ id: d.id, status: "aceptado", ...d.data() }))
+  ];
+
+  return folders;
+}
+
+export async function acceptInvitation(folderId, userId) {
+  const ref = doc(db, "carpetas", folderId);
+  await updateDoc(ref, {
+    invitadosPendientes: arrayRemove(userId),
+    invitadosAceptados: arrayUnion(userId)
+  });
+}
+
+export async function rejectInvitation(folderId, userId) {
+  const ref = doc(db, "carpetas", folderId);
+  await updateDoc(ref, {
+    invitadosPendientes: arrayRemove(userId)
+  });
 }
