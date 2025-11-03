@@ -74,10 +74,8 @@ function closeModal() {
   auth.onAuthStateChanged(async (user) => {
     if (!user) return;
     userId = user.uid;
-
-    // 🔹 Exponer el userId a global.js
     setCurrentUserId(userId);
-
+    localStorage.setItem("currentUserId", userId); // 🔹 persistir para otras páginas
     await cargarCarpetas();
   });
 
