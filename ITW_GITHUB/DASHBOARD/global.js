@@ -3,7 +3,7 @@ const tabButtons = document.querySelectorAll('.tab-btn');
 const tabContents = document.querySelectorAll('.tab-content');
 
 
-let currentUserId = null;
+let currentUserId = localStorage.getItem("currentUserId") || null;
 
 export function setCurrentUserId(uid) {
   currentUserId = uid;
@@ -72,6 +72,13 @@ sendInviteBtn?.addEventListener("click", async () => {
   }
 
   try {
+    // 🔹 Esperar que currentUserId esté definido
+    if (!currentUserId) {
+      inviteStatus.textContent = "Error: usuario no autenticado aún.";
+      inviteStatus.style.color = "red";
+      return;
+    }
+
     // Buscar usuario por email
     const usersRef = collection(db, "usuarios");
     const q = query(usersRef, where("email", "==", email));
@@ -86,24 +93,15 @@ sendInviteBtn?.addEventListener("click", async () => {
     const invitedDoc = querySnap.docs[0];
     const invitedUid = invitedDoc.id;
 
-    // Validar que no sea el usuario logueado
+    // 🔹 Bloquear autoinvitación
     if (invitedUid === currentUserId) {
       inviteStatus.textContent = "No puedes invitarte a ti mismo.";
       inviteStatus.style.color = "red";
       return;
     }
 
-
-
-
     const folderRef = doc(db, "carpetas", window.folderId);
-    
-    // Obtener el documento de la carpeta para revisar invitados actuales
-    const folderSnap = await getDocs(collection(db, "carpetas"));
-    // Nota: aquí podrías traer sólo la carpeta actual si quieres más eficiencia
-    // const folderDoc = await getDoc(folderRef);
 
-    // Agregar al array "invitadosPendientes" sólo si no está ya invitado o aceptado
     await updateDoc(folderRef, {
       invitadosPendientes: arrayUnion(invitedUid)
     });
@@ -111,7 +109,6 @@ sendInviteBtn?.addEventListener("click", async () => {
     inviteStatus.textContent = `✅ Invitación enviada a ${email}`;
     inviteStatus.style.color = "green";
 
-    // Cerrar modal luego de 1.5s
     setTimeout(() => {
       inviteModal.classList.add("hidden");
     }, 1500);
