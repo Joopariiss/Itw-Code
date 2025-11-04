@@ -98,37 +98,57 @@ downloadBtn?.addEventListener("click", async () => {
     // Inventario
     let totalGasto = 0;
     const invClean = (inventario || []).map(item => {
-      const precio = Number(item.price) || 0;
-      totalGasto += precio;
+      const costo = Number(item.cost) || 0;
+      totalGasto += costo;
       return {
         Nombre: item.name || "",
         Categoría: item.category || "",
         Cantidad: item.quantity || "",
-        Precio: precio.toLocaleString("es-CL", { style: "currency", currency: "CLP" }),
-        Notas: item.notes || ""
+        Costo: costo.toLocaleString("es-CL", { style: "currency", currency: "CLP" }),
       };
     });
-    invClean.push({}, { Nombre: "TOTAL", Precio: totalGasto.toLocaleString("es-CL", { style: "currency", currency: "CLP" }) });
+    invClean.push({}, { Nombre: "TOTAL", Costo: totalGasto.toLocaleString("es-CL", { style: "currency", currency: "CLP" }) });
+
     const invSheet = XLSX.utils.json_to_sheet(invClean);
     invSheet["!cols"] = Object.keys(invClean[0] || {}).map(key => ({ wch: Math.max(key.length, ...invClean.map(r => (r[key] ? String(r[key]).length : 0))) + 2 }));
     XLSX.utils.book_append_sheet(wb, invSheet, "Inventario");
 
     // Itinerario
-    const dias = (plannerData.dias || []).map(d => {
-      const actsText = (d.activities || []).map(a => `${a.time || ""} ${a.description || ""}`.trim()).join(" | ");
-      return { Fecha: d.date, Día: new Date(d.date + "T12:00:00").toLocaleDateString("es-ES", { weekday: "long" }), Actividades: actsText };
+    const plannerRows = [];
+
+    if (plannerData.calendario?.fechaInicio) {
+      plannerRows.push(
+        { "Inicio Viaje": plannerData.calendario.fechaInicio, "Fin Viaje": plannerData.calendario.fechaFin },
+        {}
+      );
+    }
+
+    (plannerData.dias || []).forEach(d => {
+      const day = new Date(d.date + "T12:00:00");
+      const weekday = day.toLocaleDateString("es-ES", { weekday: "long" });
+
+      if (!d.activities || d.activities.length === 0) {
+        plannerRows.push({ Fecha: d.date, Día: weekday, Hora: "", Actividad: "" });
+        return;
+      }
+
+      d.activities.forEach(a => {
+        plannerRows.push({
+          Fecha: d.date,
+          Día: weekday,
+          Hora: a.time || "",
+          Actividad: a.description || ""
+        });
+      });
     });
 
-    const plannerRows = [];
-    if (plannerData.calendario?.fechaInicio) {
-      plannerRows.push({ "Inicio Viaje": plannerData.calendario.fechaInicio, "Fin Viaje": plannerData.calendario.fechaFin }, {});
-    }
-    plannerRows.push(...dias);
-
     const plannerSheet = XLSX.utils.json_to_sheet(plannerRows);
-    plannerSheet["!cols"] = Object.keys(plannerRows[0] || {}).map(key => ({ wch: Math.max(key.length, ...plannerRows.map(r => (r[key] ? String(r[key]).length : 0))) + 2 }));
+    plannerSheet["!cols"] = Object.keys(plannerRows[0] || {}).map(key => ({
+      wch: Math.max(key.length, ...plannerRows.map(r => (r[key] ? String(r[key]).length : 0))) + 2
+    }));
     XLSX.utils.book_append_sheet(wb, plannerSheet, "Itinerario_Calendario");
 
+    // Generar el archivo Excel
     const folderLabel = document.getElementById("current-folder-name")?.textContent?.replace(/\s+/g, "_") || "viaje";
     XLSX.writeFile(wb, `${folderLabel}_viaje_completo.xlsx`);
 
