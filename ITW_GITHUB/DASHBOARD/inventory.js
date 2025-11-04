@@ -1,8 +1,6 @@
 // script.js
 // Trip Wallet — JS puro adaptado al HTML/CSS que compartiste
 
-
-
 // --- Importar Firebase ---
 import { db } from "../firebase.js";
 import {
@@ -13,7 +11,8 @@ import {
   getDoc,
   setDoc,
   updateDoc,
-  deleteDoc
+  deleteDoc,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // --- Obtener el ID de la carpeta activa desde index.html ---
@@ -428,15 +427,20 @@ if (itemsContainer) {
   });
 }
 
-async function loadItems() {
+//cambio acá para que se vean los cambios en tiempo real
+function listenInventory() {
   if (!folderId) return;
+
   const inventoryRef = collection(db, "carpetas", folderId, "inventario");
-  const snapshot = await getDocs(inventoryRef);
-  items = snapshot.docs.map(doc => doc.data());
-  renderItems();
-  updateBudgetDisplay();
-  console.log("📦 Inventario cargado:", items);
+
+  onSnapshot(inventoryRef, (snapshot) => {
+    items = snapshot.docs.map(doc => doc.data());
+    renderItems();
+    updateBudgetDisplay();
+    console.log("📦 Inventario actualizado:", items);
+  });
 }
+
 
 const editBudgetBtn = document.getElementById('edit-budget-btn');
 
@@ -505,7 +509,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderSuggestions();
   updateBudgetDisplay();
   await cargarPresupuestoInicial();
-  await loadItems();
+  listenInventory(); // 🔥 ahora se actualiza en tiempo real
 });
 
 
