@@ -69,6 +69,7 @@ const remainingCard = document.getElementById('remaining-card');
 
 const addItemForm = document.getElementById('add-item-form');
 const itemNameInput = document.getElementById('item-name');
+const itemCategorySelect = document.getElementById('item-category'); // NUEVO
 const itemCostInput = document.getElementById('item-cost');
 const itemQuantityInput = document.getElementById('item-quantity'); // NUEVO
 
@@ -133,6 +134,7 @@ function renderItems() {
   header.innerHTML = `
     <div class="col-number">Nro</div>
     <div class="col-name">Item</div>
+    <div class="col-category">Categoría</div>
     <div class="col-cost">Costo</div>
     <div class="col-quantity">Cantidad</div>
     <div class="col-total">Costo Total</div>
@@ -151,6 +153,7 @@ function renderItems() {
     row.innerHTML = `
       <div class="col-number">${index + 1}</div>
       <div class="col-name">${escapeHtml(it.name)}</div>
+      <div class="col-category">${escapeHtml(it.category || "Otros")}</div>
       <div class="col-cost">${formatCurrency(it.cost)}</div>
       <div class="col-quantity">${it.quantity}</div>
       <div class="col-total">${formatCurrency(totalCost)}</div>
@@ -173,11 +176,12 @@ function escapeHtml(str) {
 }
 
 // ---------- Operaciones ----------
-async function addItem(name, cost, quantity) {
+async function addItem(name, cost, quantity, category) {
   const id = (crypto && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36);
   const newItem = {
     id,
     name: String(name).trim(),
+    category: category || "Otros",
     cost: Number(cost || 0),
     quantity: Number(quantity || 1)
   };
@@ -186,13 +190,13 @@ async function addItem(name, cost, quantity) {
   renderItems();
   updateBudgetDisplay();
 
-  // 🔥 Guardar en Firestore (subcolección de la carpeta)
   if (folderId) {
     const inventoryRef = collection(db, "carpetas", folderId, "inventario");
     await setDoc(doc(inventoryRef, id), newItem);
     console.log("🟢 Item guardado en Firestore:", newItem);
   }
 }
+
 
 
 async function deleteItemById(id) {
@@ -222,18 +226,29 @@ function showEditPopup(id) {
     <input type="text" class="edit-name" value="${escapeHtml(item.name)}" placeholder="Nombre del item" />
     <input type="number" class="edit-cost" value="${item.cost}" placeholder="Costo" />
     <input type="number" class="edit-quantity" value="${item.quantity}" placeholder="Cantidad" />
+    <select class="edit-category">
+      <option value="">Selecciona categoría</option>
+      <option value="Comida">Comida</option>
+      <option value="Transporte">Transporte</option>
+      <option value="Alojamiento">Alojamiento</option>
+      <option value="Entretenimiento">Entretenimiento</option>
+      <option value="Salud">Salud</option>
+      <option value="Equipamiento">Equipamiento</option>
+      <option value="Higiene">Higiene</option>
+      <option value="Otros">Otros</option>
+    </select>
     <div class="popup-buttons">
       <button class="edit-accept">Aceptar</button>
       <button class="edit-cancel">Cancelar</button>
     </div>
   `;
 
+  // Posicionamiento
   const btn = document.querySelector(`.edit-btn[data-id="${id}"]`);
   const rect = btn.getBoundingClientRect();
   const popupWidth = 220;
   const spaceRight = window.innerWidth - rect.right;
   const spaceLeft = rect.left;
-
   popup.style.position = 'absolute';
   popup.style.top = `${rect.top + window.scrollY - 10}px`;
   if (spaceRight > popupWidth + 20) {
@@ -246,6 +261,10 @@ function showEditPopup(id) {
 
   document.body.appendChild(popup);
 
+  // Seleccionar categoría actual
+  const categorySelect = popup.querySelector('.edit-category');
+  categorySelect.value = item.category || "Otros";
+
   const nameInput = popup.querySelector('.edit-name');
   const costInput = popup.querySelector('.edit-cost');
   const quantityInput = popup.querySelector('.edit-quantity');
@@ -256,6 +275,7 @@ function showEditPopup(id) {
     item.name = nameInput.value.trim() || item.name;
     item.cost = parseFloat(costInput.value) || item.cost;
     item.quantity = parseInt(quantityInput.value) || item.quantity;
+    item.category = categorySelect.value || item.category;
     renderItems();
     updateBudgetDisplay();
     popup.remove();
@@ -266,12 +286,12 @@ function showEditPopup(id) {
       await updateDoc(itemRef, {
         name: item.name,
         cost: item.cost,
-        quantity: item.quantity
+        quantity: item.quantity,
+        category: item.category
       });
       console.log("✏️ Item actualizado en Firestore:", item);
     }
   });
-
 
   popup.querySelector('.edit-cancel').addEventListener('click', () => popup.remove());
 
@@ -284,6 +304,7 @@ function showEditPopup(id) {
     });
   }, 50);
 }
+
 
 // ---------- Sugerencias ----------
 const SUGGESTIONS = [
@@ -329,18 +350,23 @@ if (budgetForm) {
 if (addItemForm) {
   addItemForm.addEventListener('submit', (ev) => {
     ev.preventDefault();
+
     const name = itemNameInput.value.trim();
+    const category = itemCategorySelect.value;
     const cost = parseFloat(itemCostInput.value) || 0;
     const quantity = parseInt(itemQuantityInput.value) || 1;
 
-    if (!name) return itemNameInput.focus();
-    if (cost < 0 || quantity < 1) return;
+    if (!name) return alert("Ingresa un nombre");
+    if (cost < 0 || quantity < 1) return alert("Valores inválidos");
+    if (!category) return alert("Selecciona una categoría");
 
-    addItem(name, cost, quantity);
+    addItem(name, cost, quantity, category);
+
     addItemForm.reset();
     itemNameInput.focus();
   });
 }
+
 
 // Delegación de botones
 if (itemsContainer) {

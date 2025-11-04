@@ -398,3 +398,30 @@ body{
 .back-button:hover {
   background-color: rgba(255, 255, 255, 0.2);
 }
+
+/* === Select igual a input === */
+.label select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  font-size: 14px;
+  color: var(--foreground);
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%23666' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+}
+
+/* al pasar el mouse */
+.label select:hover {
+  border-color: var(--primary);
+}
+
+/* para que el texto de la opción seleccionada no se vea gris */
+.label select:focus {
+  outline: none;
+  border-color: var(--primary);
+}

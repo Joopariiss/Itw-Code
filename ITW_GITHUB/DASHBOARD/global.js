@@ -126,6 +126,8 @@ sendInviteBtn?.addEventListener("click", async () => {
   }
 });
 
+
+
 // === DESCARGAR TODO (Inventario + Itinerario/Calendario) ===
 const downloadBtn = document.getElementById("download-btn");
 
@@ -139,7 +141,41 @@ downloadBtn?.addEventListener("click", async () => {
     const wb = XLSX.utils.book_new();
 
     // === Hoja 1: Inventario ===
-    const invSheet = XLSX.utils.json_to_sheet(inventario || []);
+    let totalGasto = 0;
+
+    // Limpiar datos y calcular total
+    const invClean = (inventario || []).map(item => {
+      const precio = Number(item.price) || 0;
+      totalGasto += precio;
+      return {
+        Nombre: item.name || "",
+        Categoría: item.category || "",
+        Cantidad: item.quantity || "",
+        Precio: precio.toLocaleString("es-CL", { style: "currency", currency: "CLP" }),
+        Notas: item.notes || ""
+      };
+    });
+
+    // Agregar fila vacía + total
+    invClean.push({});
+    invClean.push({
+      Nombre: "TOTAL",
+      Precio: totalGasto.toLocaleString("es-CL", { style: "currency", currency: "CLP" })
+    });
+
+    const invSheet = XLSX.utils.json_to_sheet(invClean);
+
+    // Ajustar ancho de columnas
+    const colWidthsInv = [];
+    Object.keys(invClean[0] || {}).forEach(key => {
+      const maxLen = Math.max(
+        key.length,
+        ...invClean.map(r => (r[key] ? String(r[key]).length : 0))
+      );
+      colWidthsInv.push({ wch: maxLen + 2 });
+    });
+    invSheet["!cols"] = colWidthsInv;
+
     XLSX.utils.book_append_sheet(wb, invSheet, "Inventario");
 
     // === Hoja 2: Itinerario + Calendario ===
@@ -162,7 +198,7 @@ downloadBtn?.addEventListener("click", async () => {
         "Inicio Viaje": plannerData.calendario.fechaInicio,
         "Fin Viaje": plannerData.calendario.fechaFin
       });
-      plannerRows.push({}); // fila vacía de separación
+      plannerRows.push({});
     }
 
     // 🔹 Agregar los días del itinerario
@@ -171,7 +207,7 @@ downloadBtn?.addEventListener("click", async () => {
     // 🔹 Crear hoja de itinerario
     const plannerSheet = XLSX.utils.json_to_sheet(plannerRows);
 
-    // === Ajustar ancho de columnas automáticamente ===
+    // Ajustar ancho de columnas automáticamente
     const allRows = plannerRows;
     const colWidths = [];
     Object.keys(allRows[0] || {}).forEach(key => {
