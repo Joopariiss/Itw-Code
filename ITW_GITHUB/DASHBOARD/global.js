@@ -42,11 +42,12 @@ import {
   where
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+/* REVISAR PORQUE PROVOCA ERROR EN "CARPETAS"
 // importar funciones que acabamos de exportar
 import { getInventoryData } from "../DASHBOARD/inventory.js";
 import { getPlannerData }   from "../DASHBOARD/planner.js";
 import * as XLSX from "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/+esm";
-
+*/
 
 // Referencias al DOM
 const inviteBtn = document.getElementById("invite-btn");
@@ -127,7 +128,7 @@ sendInviteBtn?.addEventListener("click", async () => {
 });
 
 
-
+/* REVISAR PORQUE PROVOCA ERROR EN "CARPETAS"
 // === DESCARGAR TODO (Inventario + Itinerario/Calendario) ===
 const downloadBtn = document.getElementById("download-btn");
 
@@ -234,3 +235,4 @@ downloadBtn?.addEventListener("click", async () => {
     alert("Error al generar el archivo Excel. Revisa la consola.");
   }
 });
+*/

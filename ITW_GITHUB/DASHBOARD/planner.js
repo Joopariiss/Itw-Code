@@ -54,7 +54,6 @@ async function saveItineraryToFirestore() {
     console.error("Error guardando itinerario:", err);
   }
 }
-
 // Cargar itinerario desde Firestore
 // Cargar calendario + itinerario desde subcolecciones
 async function loadItineraryFromFirestore() {
@@ -462,25 +461,3 @@ document.addEventListener("DOMContentLoaded", () => {
   renderItinerary();
   loadItineraryFromFirestore();
 });
-
-// === EXPORT PARA DESCARGAS (ITINERARIO + CALENDARIO) ===
-export async function getPlannerData() {
-  if (!window.folderId) return { calendario: null, dias: [] };
-
-  const folderRef = doc(db, "carpetas", window.folderId);
-
-  // cargar calendario info
-  const calendarioRef = doc(collection(folderRef, "calendario"), "info");
-  const calSnap = await getDoc(calendarioRef);
-  const calendario = calSnap.exists() ? calSnap.data() : null;
-
-  // cargar dias del itinerario
-  const itinerarioRef = collection(folderRef, "itinerario");
-  const daysSnap = await getDocs(itinerarioRef);
-  const dias = daysSnap.docs
-    .map(d => d.data())
-    .sort((a, b) => (a.date > b.date ? 1 : a.date < b.date ? -1 : 0));
-
-  // devolver estructura simple
-  return { calendario, dias };
-}
