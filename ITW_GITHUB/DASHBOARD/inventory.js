@@ -507,6 +507,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadItems();
 });
 
+
+
+//QUITAR ESTO SI HAY ERRROR EN CARPETAS
+
 // === EXPORT PARA DESCARGAS (INVENTARIO) ===
 export async function getInventoryData() {
   if (!folderId) return [];

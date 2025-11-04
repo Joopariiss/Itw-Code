@@ -15,9 +15,7 @@ import {
   setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-
 // === NUEVAS FUNCIONES PARA FIRESTORE ===
-
 // Guardar calendario + itinerario en subcolecciones
 // Guardar calendario + itinerario en subcolecciones
 async function saveItineraryToFirestore() {
@@ -425,7 +423,6 @@ unlockBtn.addEventListener("click", () => {
   });
 });
 
-
 // Popup simple
 function showPopup(message, type = "info") {
   const existing = document.querySelector(".popup-alert");
@@ -457,7 +454,32 @@ function showPopup(message, type = "info") {
   }, 2500);
 }
 
+
 document.addEventListener("DOMContentLoaded", () => {
   renderItinerary();
   loadItineraryFromFirestore();
 });
+
+//QUITAR ESTO SI HAY ERRROR EN CARPETAS
+
+// === EXPORT PARA DESCARGAS (ITINERARIO + CALENDARIO) ===
+export async function getPlannerData() {
+  if (!window.folderId) return { calendario: null, dias: [] };
+
+  const folderRef = doc(db, "carpetas", window.folderId);
+
+  // cargar calendario info
+  const calendarioRef = doc(collection(folderRef, "calendario"), "info");
+  const calSnap = await getDoc(calendarioRef);
+  const calendario = calSnap.exists() ? calSnap.data() : null;
+
+  // cargar dias del itinerario
+  const itinerarioRef = collection(folderRef, "itinerario");
+  const daysSnap = await getDocs(itinerarioRef);
+  const dias = daysSnap.docs
+    .map(d => d.data())
+    .sort((a, b) => (a.date > b.date ? 1 : a.date < b.date ? -1 : 0));
+
+  // devolver estructura simple
+  return { calendario, dias };
+}
