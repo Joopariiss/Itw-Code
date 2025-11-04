@@ -231,8 +231,8 @@ function renderItinerary() {
         activityDiv.innerHTML = `
           <span class="desc">${act.time} - ${act.description}</span>
           <div>
-            <button class="edit-btn">✏️</button>
-            <button class="delete-btn">🗑️</button>
+            <button class="edit-btn">🖊️</button>
+            <button class="delete-btn">🗑</button>
           </div>
         `;
 
