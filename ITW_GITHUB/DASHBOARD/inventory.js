@@ -519,3 +519,67 @@ export async function getInventoryData() {
   // devolver array plano con campos útiles
   return snapshot.docs.map(d => d.data());
 }
+
+// ---------- BARRA DE BÚSQUEDA ----------
+const searchInput = document.getElementById('search-input');
+
+if (searchInput) {
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.trim().toLowerCase();
+
+    const filteredItems = items.filter(it => {
+      return it.name.toLowerCase().includes(query) ||
+             (it.category && it.category.toLowerCase().includes(query));
+    });
+
+    renderFilteredItems(filteredItems);
+  });
+}
+
+// Función para renderizar items filtrados
+function renderFilteredItems(filtered) {
+  itemsContainer.innerHTML = '';
+
+  if (!filtered.length) {
+    renderEmptyState();
+    return;
+  }
+
+  const header = document.createElement('div');
+  header.className = 'item-header';
+  header.innerHTML = `
+    <div class="col-number">Nro</div>
+    <div class="col-name">Item</div>
+    <div class="col-category">Categoría</div>
+    <div class="col-cost">Costo</div>
+    <div class="col-quantity">Cantidad</div>
+    <div class="col-total">Costo Total</div>
+    <div class="col-action">Acción</div>
+  `;
+  itemsContainer.appendChild(header);
+
+  const fragment = document.createDocumentFragment();
+  filtered.forEach((it, index) => {
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.dataset.id = it.id;
+
+    const totalCost = it.cost * it.quantity;
+
+    row.innerHTML = `
+      <div class="col-number">${index + 1}</div>
+      <div class="col-name">${escapeHtml(it.name)}</div>
+      <div class="col-category">${escapeHtml(it.category || "Otros")}</div>
+      <div class="col-cost">${formatCurrency(it.cost)}</div>
+      <div class="col-quantity">${it.quantity}</div>
+      <div class="col-total">${formatCurrency(totalCost)}</div>
+      <div class="col-action">
+        <button class="icon-btn edit-btn" data-id="${it.id}" aria-label="Editar ${escapeHtml(it.name)}">✏️</button>
+        <button class="icon-btn delete-btn" data-id="${it.id}" aria-label="Eliminar ${escapeHtml(it.name)}">🗑</button>
+      </div>
+    `;
+    fragment.appendChild(row);
+  });
+
+  itemsContainer.appendChild(fragment);
+}
