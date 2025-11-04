@@ -1,134 +1,41 @@
-:root {
-  --background: hsl(0, 0%, 94.1%);
-  --foreground: hsl(0, 0%, 3.9%);
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(0, 0%, 3.9%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(0, 0%, 3.9%);
-  --primary: hsl(151, 27%, 30%);
-  --primary-foreground: hsl(151, 15%, 95%);
-  --secondary: hsl(0, 0%, 96.1%);
-  --secondary-foreground: hsl(0, 0%, 9%);
-  --muted: hsl(0, 0%, 96.1%);
-  --muted-foreground: hsl(0, 0%, 45.1%);
-  --accent: hsl(43, 24%, 30%);
-  --accent-foreground: hsl(43, 15%, 95%);
-  --destructive: hsl(0, 84.2%, 60.2%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --border: hsl(0, 0%, 89.8%);
-  --input: hsl(0, 0%, 89.8%);
-  --ring: hsl(151, 27%, 30%);
-  --radius: 0.5rem;
-}
-
-/* ====== GLOBAL RESET ====== */
-* { box-sizing: border-box; }
-html, body { height: 100%; margin: 0; padding: 0; }
+/*  Estilos globales para tabs */
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: 'Inter', Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    background-color: #f5f5f5;
 }
 
-/* ====== GENERIC ELEMENTS ====== */
-button {
-  background: var(--primary);
-  color: var(--primary-foreground);
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius);
-  cursor: pointer;
-  font-weight: 600;
-}
-button:hover { opacity: 0.9; }
-
-input, textarea {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.5rem;
-  width: 100%;
-  background-color: var(--input);
-  color: var(--foreground);
-  box-sizing: border-box;
-}
-
-/* ====== CARD ====== */
-.card {
-  background: var(--card);
-  color: var(--card-foreground);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  padding: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-/* ====== MODALS ====== */
-.modal {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,0,0.5);
-  z-index: 1000;
-}
-.modal.hidden { display: none; }
-.modal-content {
-  background: var(--card);
-  padding: 1rem;
-  border-radius: var(--radius);
-  width: 320px;
-}
-.modal-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-/* ====== HEADER ====== */
-.hero-header {
-  position: relative;
-  height: 200px;
-  background-image: url('../IMAGES/image3.jpg');
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
-.hero-header .overlay {
-  background-color: rgba(0, 0, 0, 0.4);
-  padding: 2rem;
-  border-radius: 1rem;
-  text-align: center;
-}
-.hero-header h1 { font-size: 3rem; margin: 0; }
-.hero-header p { font-size: 1.25rem; margin-top: 0.5rem; }
-
-/* ====== TABS ====== */
 .tabs {
-  display: flex;
-  justify-content: center;
-  background: hsl(111, 42%, 23%);
+    display: flex;
+    justify-content: center;
+    background: hsl(111, 42%, 23%);
 }
-.tab-btn {
-  color: #fff;
-  background: none;
-  border: none;
-  padding: 1rem 2rem;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background 0.3s;
-}
-.tab-btn.active { background: #387e36; }
-.tab-content { display: none; padding: 20px; }
-.tab-content.active { display: block; }
 
-/* ====== BACK BUTTON ====== */
+.tab-btn {
+    color: #fff;
+    background: none;
+    border: none;
+    padding: 1rem 2rem;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s;
+}
+
+.tab-btn.active {
+    background: #387e36;
+}
+
+.tab-content {
+    display: none;
+    padding: 20px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+
+/*BOTON DE VOLVER ATRAS DEL BASTI*/
 .back-button {
   position: fixed;
   top: 20px;
@@ -139,14 +46,16 @@ input, textarea {
   background-color: rgba(0, 0, 0, 0.4);
   border-radius: 6px;
   padding: 8px 12px;
+  text-align: center;
   transition: background 0.3s ease;
   z-index: 120;
 }
 .back-button:hover {
   background-color: rgba(255, 255, 255, 0.2);
 }
+/*BOTON DE VOLVER ATRAS DEL BASTI*/
 
-/* ====== INVITE BUTTON ====== */
+/*BOTON DE INVITAR JORDI*/
 #invite-btn {
   position: absolute;
   top: 1rem;
@@ -158,6 +67,29 @@ input, textarea {
   border: none;
   cursor: pointer;
   font-weight: 600;
-  z-index: 10;
+  z-index: 10; /* que esté sobre el overlay */
 }
-#invite-btn:hover { opacity: 0.9; }
+
+#invite-btn:hover {
+  opacity: 0.9;
+}
+
+/*boton de descatga*/
+#download-btn {
+  position: fixed;
+  top: 85px;
+  right: 25px;
+  background-color: #2c7a7b;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  z-index: 9999;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+#download-btn:hover {
+  background-color: #256b6b;
+}

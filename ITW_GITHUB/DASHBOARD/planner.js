@@ -19,6 +19,7 @@ import {
 // === NUEVAS FUNCIONES PARA FIRESTORE ===
 
 // Guardar calendario + itinerario en subcolecciones
+// Guardar calendario + itinerario en subcolecciones
 async function saveItineraryToFirestore() {
   try {
     if (!window.folderId) return console.warn("❌ No hay folderId activo");
@@ -34,18 +35,26 @@ async function saveItineraryToFirestore() {
       fechaFin: end
     });
 
-    // 🔹 Guardar cada día del itinerario como documento en subcolección
+    // 🔹 Reemplazar itinerario completo (borrar el anterior)
     const itinerarioRef = collection(folderRef, "itinerario");
+    const oldDays = await getDocs(itinerarioRef);
+
+    // Borrar todos los documentos viejos
+    const deleteOps = oldDays.docs.map(d => deleteDoc(d.ref));
+    await Promise.all(deleteOps);
+
+    // Crear los nuevos días
     for (const day of tripDays) {
       const dayDoc = doc(itinerarioRef, day.date);
       await setDoc(dayDoc, { date: day.date, activities: day.activities || [] });
     }
 
-    console.log("✅ Itinerario y calendario guardados en subcolecciones Firestore");
+    console.log("✅ Itinerario y calendario reemplazados en Firestore");
   } catch (err) {
     console.error("Error guardando itinerario:", err);
   }
 }
+
 // Cargar itinerario desde Firestore
 // Cargar calendario + itinerario desde subcolecciones
 async function loadItineraryFromFirestore() {
@@ -453,3 +462,25 @@ document.addEventListener("DOMContentLoaded", () => {
   renderItinerary();
   loadItineraryFromFirestore();
 });
+
+// === EXPORT PARA DESCARGAS (ITINERARIO + CALENDARIO) ===
+export async function getPlannerData() {
+  if (!window.folderId) return { calendario: null, dias: [] };
+
+  const folderRef = doc(db, "carpetas", window.folderId);
+
+  // cargar calendario info
+  const calendarioRef = doc(collection(folderRef, "calendario"), "info");
+  const calSnap = await getDoc(calendarioRef);
+  const calendario = calSnap.exists() ? calSnap.data() : null;
+
+  // cargar dias del itinerario
+  const itinerarioRef = collection(folderRef, "itinerario");
+  const daysSnap = await getDocs(itinerarioRef);
+  const dias = daysSnap.docs
+    .map(d => d.data())
+    .sort((a, b) => (a.date > b.date ? 1 : a.date < b.date ? -1 : 0));
+
+  // devolver estructura simple
+  return { calendario, dias };
+}

@@ -1,5 +1,56 @@
 /* style inspirado en Fire Studio (convertidas del fragmento de Tailwind) */
 
+/* ES MEJOR EL DEL PLANNER
+:root{
+  --background: hsl(210 29% 96%);
+  --foreground: hsl(222.2 47.4% 11.2%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(222.2 47.4% 11.2%);
+  --muted-foreground: hsl(215 20.2% 65.1%);
+  --primary: hsl(207 86% 68%);
+  --accent: hsl(123 39% 64%);
+  --destructive: hsl(0 84.2% 60.2%);
+  --border: hsl(214.3 31.8% 91.4%);
+  --radius: 0.5rem;
+  --shadow: 0 8px 24px rgba(16,24,40,0.06);
+  --container-width: 1100px;
+  --muted: hsl(210 40% 90%);
+}
+*/
+
+/* Basic reset & body */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background:var(--background);
+  color:var(--foreground);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+
+/* Layout helpers */
+.container{
+  max-width:var(--container-width);
+  margin:28px auto;
+  padding:20px;
+}
+
+/* NO se usa
+.header{ 
+  text-align:center;
+  margin-bottom:20px 
+}
+.headline{
+  font-size:32px;
+  margin:0;
+  color:var(--primary);
+  font-weight:700;
+}
+*/
+
 .muted{ 
   color:var(--muted-foreground);
   margin-top:6px 
@@ -262,6 +313,14 @@
   display: flex; /* Solo se mostrará si el JS le agrega esta clase */
 }
 
+
+/* responsive */
+@media (max-width:900px){
+  .grid-main{ grid-template-columns: 1fr; }
+  .grid-3{ flex-direction:column; }
+  .container{ padding:12px }
+}
+
 /*pop up de pregunta si se quiere eliminar el item*/
 .confirm-popup {
   background: #fff;
@@ -338,12 +397,4 @@
 
 .back-button:hover {
   background-color: rgba(255, 255, 255, 0.2);
-}
-
-
-/* responsive */
-@media (max-width:900px){
-  .grid-main{ grid-template-columns: 1fr; }
-  .grid-3{ flex-direction:column; }
-  .container{ padding:12px }
 }

@@ -15,11 +15,28 @@
 </head>
 
 <body>
+  
   <div class="back-button" id="backToHome">← Volver a carpetas</div>
 
     <button id="invite-btn">
         ➕ Invitar Usuarios
     </button>
+
+    <button id="download-btn" style="
+      position: absolute;
+      top: 70px;
+      right: 20px;
+      background-color: #2c7a7b;
+      color: white;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      ">
+      📥 Descargar Datos
+    </button>
+
 
 
   <header class="hero-header">
@@ -40,18 +57,22 @@
   <!--CALENDARIO + ITINERARIO-->
 
 <section id="planner" class="tab-content active">
-  <div class="planner-container">
+  <div class="planner-container" style="display: flex; gap: 1rem;">
     
     <!-- Columna izquierda: Calendario -->
+    <div class="left-col-iti" style="flex: 1;">
       <section id="calendar-section" class="card">
         <h2>Fechas del Viaje</h2>
         <div id="trip-calendar"></div>
       </section>
+    </div>
 
     <!-- Columna derecha: Itinerario -->
+    <div class="right-col-iti" style="flex: 1;">
       <section id="itinerary-section">
         <!-- Los días se añadirán dinámicamente aquí -->
       </section>
+    </div>
 
   </div>
 

@@ -480,3 +480,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   await cargarPresupuestoInicial();
   await loadItems();
 });
+
+// === EXPORT PARA DESCARGAS (INVENTARIO) ===
+export async function getInventoryData() {
+  if (!folderId) return [];
+  const inventoryRef = collection(db, "carpetas", folderId, "inventario");
+  const snapshot = await getDocs(inventoryRef);
+  // devolver array plano con campos útiles
+  return snapshot.docs.map(d => d.data());
+}
