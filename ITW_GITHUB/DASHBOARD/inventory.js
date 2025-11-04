@@ -227,14 +227,15 @@ function showEditPopup(id) {
     <input type="number" class="edit-cost" value="${item.cost}" placeholder="Costo" />
     <input type="number" class="edit-quantity" value="${item.quantity}" placeholder="Cantidad" />
     <select class="edit-category">
-      <option value="">Selecciona categoría</option>
-      <option value="Comida">Comida</option>
-      <option value="Transporte">Transporte</option>
+      <option value="">Seleccionar...</option>
       <option value="Alojamiento">Alojamiento</option>
+      <option value="Transporte">Transporte</option>
+      <option value="Comida">Comida</option>
       <option value="Entretenimiento">Entretenimiento</option>
-      <option value="Salud">Salud</option>
-      <option value="Equipamiento">Equipamiento</option>
-      <option value="Higiene">Higiene</option>
+      <option value="Salud e Higiene">Salud e Higiene</option>
+      <option value="Ropa y Accesorios">Ropa y Accesorios</option>
+      <option value="Tecnología">Tecnología</option>
+      <option value="Documentos">Documentos</option>
       <option value="Otros">Otros</option>
     </select>
     <div class="popup-buttons">
