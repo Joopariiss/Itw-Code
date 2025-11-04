@@ -1,175 +1,30 @@
-
-#calendar-section {
-  flex: 1; /* ocupa la mitad del espacio */
-  /*max-width: 50%;*/
+#calendar-section, #itinerary-section {
   background-color: var(--card);
   padding: 1.5rem;
   border-radius: var(--radius);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
-
-#itinerary-section {
-  flex: 1;
-  /*max-width: 50%;*/
-  background-color: var(--card);
-  padding: 1.5rem;
-  border-radius: var(--radius);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-#itinerary-section h2 {
-  font-size: 1.5rem;
-  color: #2b6a2b;
-  border-bottom: 2px solid #cfe3cf;
-  padding-bottom: 0.5rem;
-}
-
-/* SE USA EL DEL INVENTORY POR AHORA
-.card {
-  background-color: var(--card);
-  color: var(--card-foreground);
-  padding: 1rem;
-  border-radius: var(--radius);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  flex: 1 1 300px;
-}
-*/
-button {
-  background-color: var(--primary);
-  color: var(--primary-foreground);
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius);
-  cursor: pointer;
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
-input, textarea {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.5rem;
-  width: 100%;
-  box-sizing: border-box;
-  background-color: var(--input);
+#calendar-section h2 {
+  text-align: center;
+  font-size: 1.25rem;
   color: var(--foreground);
+  margin-bottom: 1rem;
 }
 
-.activity-item {
-  display: flex;
-  justify-content: space-between;
-  background: var(--secondary);
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
-  border-radius: var(--radius);
-}
-
-/*MODAL*/
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal.hidden {
-  display: none;
-}
-
-.modal-content {
-  background: var(--card);
-  padding: 1rem;
-  border-radius: var(--radius);
-  width: 300px;
-}
-
-.modal-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-/* ==== CALENDARIO ESTILO ==== */
+/* calendar (flatpickr) */
 .flatpickr-calendar {
   font-family: 'Inter', Arial, sans-serif;
   border-radius: 0.75rem !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--border);
-  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
-
-.flatpickr-months {
-  background-color: var(--card);
-  color: var(--foreground);
-  font-weight: bold;
-  border-bottom: 1px solid var(--border);
-}
-
-.flatpickr-day {
-  border-radius: 8px !important;
-  transition: all 0.2s ease;
-}
-
-.flatpickr-day:hover {
-  background-color: var(--muted);
-  color: var(--foreground);
-}
-
-.flatpickr-day.inRange {
-  background-color: var(--accent);
-  color: white;
-  opacity: 0.9;
-}
-
+.flatpickr-day { border-radius: 8px !important; transition: all 0.2s ease; }
+.flatpickr-day:hover { background-color: var(--muted); color: var(--foreground); }
+.flatpickr-day.inRange { background-color: var(--accent); color: white; opacity: 0.9; }
 .flatpickr-day.startRange,
-.flatpickr-day.endRange {
-  background-color: var(--primary) !important;
-  color: var(--primary-foreground) !important;
-}
+.flatpickr-day.endRange { background-color: var(--primary); color: var(--primary-foreground); }
 
-.flatpickr-weekday {
-  color: var(--muted-foreground);
-  font-weight: 600;
-}
-
-.flatpickr-current-month input.cur-year {
-  font-weight: bold;
-  color: var(--foreground);
-}
-
-.flatpickr-next-month,
-.flatpickr-prev-month {
-  color: var(--foreground);
-  fill: var(--foreground);
-}
-
-#calendar-section h2 {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1.25rem;
-}
-
-#calendar-section h2::before {
-  content: "📅";
-  font-size: 1.3rem;
-}
-
-
-/*ITINERARIO*/
-
-/* ==========================
-   Estilos para itinerario moderno
-   ========================== */
-
+/* itinerary */
 .day-card {
   background: var(--card);
   border-radius: var(--radius);
@@ -179,36 +34,19 @@ input, textarea {
   overflow: hidden;
   transition: all 0.2s;
 }
-
 .day-trigger {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
-  background: var(--card);
   cursor: pointer;
   font-weight: 600;
-  font-size: 1rem;
   border-bottom: 1px solid var(--border);
 }
+.day-trigger:hover { background: var(--muted); }
+.day-body { display: none; padding: 1rem; }
 
-.day-trigger:hover {
-  background: var(--muted);
-}
-
-.day-body {
-  display: none; /* inicialmente colapsado */
-  padding: 1rem;
-  background: linear-gradient(180deg, rgba(0,0,0,0.02), transparent);
-}
-
-.activities {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
+.activities { display: flex; flex-direction: column; gap: 0.5rem; }
 .activity {
   display: flex;
   justify-content: space-between;
@@ -217,12 +55,6 @@ input, textarea {
   border-radius: var(--radius);
   background: var(--secondary);
 }
-
-.activity .desc {
-  flex: 1;
-  margin-left: 0.5rem;
-}
-
 .activity button {
   background: var(--primary);
   color: var(--primary-foreground);
@@ -231,10 +63,7 @@ input, textarea {
   border-radius: var(--radius);
   cursor: pointer;
 }
-
-.activity button:hover {
-  opacity: 0.85;
-}
+.activity button:hover { opacity: 0.85; }
 
 .add-activity-btn {
   margin-top: 0.5rem;
@@ -245,75 +74,36 @@ input, textarea {
   border-radius: var(--radius);
   cursor: pointer;
 }
+.add-activity-btn:hover { opacity: 0.9; }
 
-.add-activity-btn:hover {
-  opacity: 0.9;
-}
-
-/* ==== DISTRIBUCIÓN GENERAL DEL PLANNER ==== */
+/* layout */
 .planner-container {
   display: grid;
-  grid-template-columns: 0.8fr 2.2fr; /* calendario más pequeño, itinerario más ancho */
+  grid-template-columns: 30% 70%;
   gap: 2rem;
   align-items: flex-start;
-  max-width: 1200px;
+  width: 95%;
+  max-width: 1400px;
   margin: 2rem auto;
   padding: 0 1rem;
 }
 
-/* ==== COLUMNA IZQUIERDA (CALENDARIO) ==== */
-.left-col-iti {
-  display: left;
-  justify-content: center; /* centra horizontalmente el calendario */
-}
-
+/* Asegurar que las secciones usen todo el alto disponible */
 #calendar-section {
-  width: 100%;
-  max-width: 500px; /* tamaño razonable */
-  background-color: var(--card);
-  padding: 1.3rem;
-  border-radius: var(--radius);
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-  text-align: center;
-}
-
-/* ==== COLUMNA DERECHA (ITINERARIO) ==== */
-.right-col-iti {
-  width: 100%;
+  height: 100%;
 }
 
 #itinerary-section {
-  background-color: var(--card);
-  padding: 1.5rem;
-  border-radius: var(--radius);
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
   overflow-y: auto;
-  max-height: 75vh; /* para que tenga scroll si hay muchas actividades */
+  max-height: 80vh;
 }
 
-/* ==== TITULO CALENDARIO ==== */
-#calendar-section h2 {
-  text-align: center;
-  font-size: 1.25rem;
-  color: var(--foreground);
-  margin-bottom: 1rem;
-}
-
-/* ==== ADAPTACIÓN A PANTALLAS PEQUEÑAS ==== */
-@media (max-width: 768px) {
+/* Responsive */
+@media (max-width: 900px) {
   .planner-container {
     grid-template-columns: 1fr;
   }
-
-  #calendar-section {
-    max-width: 100%;
+  #itinerary-section {
+    max-height: none;
   }
-}
-
-
-/*bloquear calendario*/
-.calendar-locked {
-  pointer-events: none;
-  opacity: 0.6; /* opcional: da un efecto visual de “bloqueado” */
-  filter: grayscale(0.5);
 }
