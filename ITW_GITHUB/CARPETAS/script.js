@@ -49,15 +49,20 @@ addFolderBtn.addEventListener('click', () => {
   addTripBtn.textContent = "Agregar";
 });
 
-editFolderBtn.addEventListener('click', () => {
-  setMode("modificar");
-  showPopup("Selecciona una carpeta para modificar");
-});
+if (editFolderBtn) {
+  editFolderBtn.addEventListener('click', () => {
+    setMode("modificar");
+    showPopup("Selecciona una carpeta para modificar");
+  });
+}
 
-deleteFolderBtn.addEventListener('click', () => {
-  setMode("eliminar");
-  showPopup("Selecciona una carpeta para eliminar");
-});
+if (deleteFolderBtn) {
+  deleteFolderBtn.addEventListener('click', () => {
+    setMode("eliminar");
+    showPopup("Selecciona una carpeta para eliminar");
+  });
+}
+
 
 cancelBtn.addEventListener('click', () => closeModal());
 window.addEventListener('click', e => {
@@ -170,6 +175,50 @@ function renderFolder(folder, status = "propia") {
   });
 
   tripList.appendChild(card);
+    // === menú contextual al hacer clic derecho ===
+  card.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+
+    // Si ya hay un menú abierto, lo eliminamos
+    document.querySelectorAll(".context-menu").forEach(menu => menu.remove());
+
+    const menu = document.createElement("div");
+    menu.className = "context-menu";
+    menu.innerHTML = `
+      <button class="edit-folder">✏️ Modificar</button>
+      <button class="delete-folder">🗑 Eliminar</button>
+    `;
+    document.body.appendChild(menu);
+
+    // Posicionar menú cerca del cursor
+    menu.style.top = `${e.pageY}px`;
+    menu.style.left = `${e.pageX}px`;
+    menu.style.display = "block";
+
+    // Acciones
+    menu.querySelector(".edit-folder").onclick = () => {
+      selectedFolderId = folder.id;
+      selectedFolderDiv = card;
+      modal.style.display = 'flex';
+      tripNameInput.value = folder.name;
+      addTripBtn.textContent = "Guardar cambios";
+      setMode("modificar");
+      menu.remove();
+    };
+
+    menu.querySelector(".delete-folder").onclick = async () => {
+      if (confirm(`¿Seguro que quieres eliminar la carpeta "${folder.name}"?`)) {
+        await deleteFolder(folder.id);
+        tripList.removeChild(card);
+        showPopup(`Carpeta "${folder.name}" eliminada`);
+      }
+      menu.remove();
+    };
+
+    // Cerrar el menú si se hace clic fuera
+    document.addEventListener("click", () => menu.remove(), { once: true });
+  });
+
 }
 
 
