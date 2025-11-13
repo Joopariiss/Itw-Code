@@ -104,7 +104,7 @@ function renderFolder(folder, status = "propia") {
   card.className = "trip-card";
   card.dataset.id = folder.id;
 
-  const imageUrl = `https://loremflickr.com/600/400/${encodeURIComponent(folder.name)}`;
+  const imageUrl = `https://loremflickr.com/600/400/${encodeURIComponent(folder.name)},landscape`;
   const startDate = "2025-02-09"; // opcional: si agregas fechas reales luego
   const endDate = "2025-02-19";
 
