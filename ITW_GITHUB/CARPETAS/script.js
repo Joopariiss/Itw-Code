@@ -94,29 +94,35 @@ async function cargarCarpetas() {
 }
 
 // ---------- RENDERIZAR UNA CARPETA ----------
-// ---------- RENDERIZAR UNA CARPETA ----------
 function renderFolder(folder, status = "propia") {
-  const div = document.createElement("div");
-  div.classList.add("trip");
-  div.textContent = folder.name;
-  div.dataset.id = folder.id;
+  const card = document.createElement("div");
+  card.className = "trip-card";
+  card.dataset.id = folder.id;
 
-  // Mostrar etiqueta si es invitación
-  if (status === "pendiente") {
-    const tag = document.createElement("span");
-    tag.textContent = "Invitación pendiente";
-    tag.style.fontSize = "0.8rem";
-    tag.style.marginLeft = "10px";
-    tag.style.color = "#c94b4b";
-    div.appendChild(tag);
-  }
+  const imageUrl = `https://loremflickr.com/600/400/${encodeURIComponent(folder.name)}`;
+  const startDate = "2025-02-09"; // opcional: si agregas fechas reales luego
+  const endDate = "2025-02-19";
 
-  div.addEventListener("click", async () => {
+  card.innerHTML = `
+    <img src="${imageUrl}" alt="${folder.name}" class="trip-image" />
+    <div class="trip-header">
+      <div class="trip-title">${folder.name}</div>
+      <div class="trip-date">
+        <svg class="calendar-icon" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M3 10h18M5 6h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"/></svg>
+        <span>${startDate} - ${endDate}</span>
+      </div>
+    </div>
+    <div class="trip-content">
+      Tu carpeta de viaje personalizada. Haz clic para ver los detalles.
+    </div>
+  `;
+
+  // === comportamiento al hacer clic ===
+  card.addEventListener("click", async () => {
     if (status === "pendiente") {
-      // Mostrar popup de aceptar o rechazar
+      // manejar invitaciones igual que antes
       const confirmOverlay = document.createElement("div");
       confirmOverlay.classList.add("invite-popup");
-
       confirmOverlay.innerHTML = `
         <div class="popup-content">
           <h3>📩 Invitación a carpeta</h3>
@@ -127,14 +133,13 @@ function renderFolder(folder, status = "propia") {
           </div>
         </div>
       `;
-
       document.body.appendChild(confirmOverlay);
 
       confirmOverlay.querySelector("#acceptInvite").onclick = async () => {
         await acceptInvitation(folder.id, userId);
         document.body.removeChild(confirmOverlay);
         showPopup(`Has aceptado la invitación a "${folder.name}"`);
-        await cargarCarpetas(); // recargar lista
+        await cargarCarpetas();
       };
 
       confirmOverlay.querySelector("#rejectInvite").onclick = async () => {
@@ -143,27 +148,28 @@ function renderFolder(folder, status = "propia") {
         showPopup(`Has rechazado la invitación a "${folder.name}"`);
         await cargarCarpetas();
       };
-
       return;
     }
 
-    // --- resto igual que antes ---
     if (currentMode === "modificar") {
       selectedFolderId = folder.id;
-      selectedFolderDiv = div;
+      selectedFolderDiv = card;
       modal.style.display = 'flex';
       tripNameInput.value = folder.name;
       addTripBtn.textContent = "Guardar cambios";
     } 
     else if (currentMode === "eliminar") {
-      // (tu código de eliminar igual que antes)
-    }
+      if (!confirm(`¿Seguro que quieres eliminar la carpeta "${folder.name}"?`)) return;
+      await deleteFolder(folder.id);
+      tripList.removeChild(card);
+      showPopup(`Carpeta "${folder.name}" eliminada`);
+    } 
     else {
       window.location.href = `../DASHBOARD/index.html?id=${folder.id}`;
     }
   });
 
-  tripList.appendChild(div);
+  tripList.appendChild(card);
 }
 
 

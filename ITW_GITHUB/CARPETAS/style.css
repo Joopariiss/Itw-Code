@@ -42,35 +42,78 @@ main {
   padding: 10px 20px;
 }
 
+/* ======= NUEVO DISEÑO DE CARPETAS (Fire Studio style) ======= */
 .trip-list {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  width: 100%;
-  max-width: 650px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
   justify-items: center;
+  margin-top: 40px;
 }
 
-/* Carpetas */
-.trip {
-  background: white;
-  border-radius: 10px;
-  width: 180px;       /* ancho fijo */
-  height: 100px;      /* alto fijo */
+.trip-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.trip-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.trip-image {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.trip-card:hover .trip-image {
+  transform: scale(1.05);
+}
+
+.trip-header {
+  padding: 16px;
+}
+
+.trip-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.trip-date {
   display: flex;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  font-weight: 500;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  transition: 0.2s;
-  word-wrap: break-word; /* para textos largos */
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 6px;
 }
 
-.trip:hover {
-  background: #007bff;
-  transform: scale(1.03);
+.trip-content {
+  padding: 0 16px 16px;
+  color: #555;
+  font-size: 0.9rem;
 }
+
+.calendar-icon {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+
+
 
 /* Modal */
 .modal {
@@ -183,10 +226,11 @@ body[data-mode="eliminar"] .trip:hover {
   margin: 20px auto 40px auto;
   display: flex;
   flex-direction: column;
-  gap: 20px; /* separación entre cuadros */
+  gap: 200px; /* separación entre cuadros */
 }
 
 /* Cuadro de carpetas */
+/*
 .folders-box {
   background: #e7f0ff;
   border-radius: 12px;
@@ -199,7 +243,7 @@ body[data-mode="eliminar"] .trip:hover {
   justify-content: center;
   align-items: flex-start;
 }
-
+*/
 /* Botones horizontales */
 .folder-buttons {
   display: flex;
@@ -233,7 +277,7 @@ body[data-mode="eliminar"] .trip:hover {
 
 /* Sección explicativa */
 .intro-section {
-  max-width: 700px;
+  max-width: 1000px;
   margin: 40px auto 10px auto;
   background: #e7f0ff;
   padding: 15px 20px;
@@ -343,3 +387,4 @@ body[data-mode="eliminar"] .trip:hover {
   width: 90%;
   max-width: 320px;
 }
+
