@@ -10,7 +10,8 @@ import {
   doc,
   updateDoc,  
   arrayUnion,
-  arrayRemove      // <- AGREGAR ESTO
+  arrayRemove,
+  getDoc 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 /* ==========================================================
@@ -117,4 +118,23 @@ export async function rejectInvitation(folderId, userId) {
   await updateDoc(ref, {
     invitadosPendientes: arrayRemove(userId)
   });
+}
+
+// ==========================================================
+// OBTENER FECHAS DE LA SUBCOLECCIÓN CALENDARIO
+// ==========================================================
+export async function getFolderDates(folderId) {
+  try {
+    const infoRef = doc(db, "carpetas", folderId, "calendario", "info");
+    const snap = await getDoc(infoRef);
+
+    if (!snap.exists()) {
+      return { fechaInicio: null, fechaFin: null };
+    }
+
+    return snap.data();
+  } catch (error) {
+    console.error("❌ Error obteniendo fechas:", error);
+    return { fechaInicio: null, fechaFin: null };
+  }
 }

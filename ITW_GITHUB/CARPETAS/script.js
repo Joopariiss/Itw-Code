@@ -1,5 +1,5 @@
 import { auth } from "../firebase.js";
-import { createFolder, getUserFolders, getInvitedFolders, acceptInvitation, rejectInvitation, deleteFolder, updateFolder } from "./db.js";
+import { createFolder, getUserFolders, getInvitedFolders, acceptInvitation, rejectInvitation, deleteFolder, updateFolder, getFolderDates} from "./db.js";
 
 // ✅ IMPORTAR la función desde global.js
 import { setCurrentUserId } from "../DASHBOARD/global.js"; // Ajusta ruta según tu estructura de carpetas
@@ -99,14 +99,21 @@ async function cargarCarpetas() {
 }
 
 // ---------- RENDERIZAR UNA CARPETA ----------
-function renderFolder(folder, status = "propia") {
+async function renderFolder(folder, status = "propia") {
+
+  // === 1. Cargar fechas desde Firestore ===
+  const fechas = await getFolderDates(folder.id);
+
+  const startDate = fechas?.fechaInicio || "Sin fecha";
+  const endDate   = fechas?.fechaFin || "Sin fecha";
+
+  // === 2. Crear tarjeta ===
   const card = document.createElement("div");
   card.className = "trip-card";
   card.dataset.id = folder.id;
 
+  // Imagen automática de paisaje
   const imageUrl = `https://loremflickr.com/600/400/${encodeURIComponent(folder.name)},landscape`;
-  const startDate = "2025-02-09"; // opcional: si agregas fechas reales luego
-  const endDate = "2025-02-19";
 
   card.innerHTML = `
     <img src="${imageUrl}" alt="${folder.name}" class="trip-image" />
@@ -122,10 +129,14 @@ function renderFolder(folder, status = "propia") {
     </div>
   `;
 
-  // === comportamiento al hacer clic ===
+  // =============================
+  // CLICK, INVITACIONES, MENÚ, etc
+  // (todo tu código original tal cual)
+  // =============================
+
+  // comportamiento al hacer clic
   card.addEventListener("click", async () => {
     if (status === "pendiente") {
-      // manejar invitaciones igual que antes
       const confirmOverlay = document.createElement("div");
       confirmOverlay.classList.add("invite-popup");
       confirmOverlay.innerHTML = `
@@ -175,7 +186,8 @@ function renderFolder(folder, status = "propia") {
   });
 
   tripList.appendChild(card);
-    // === menú contextual al hacer clic derecho ===
+
+  // menú contextual
   card.addEventListener("contextmenu", (e) => {
     e.preventDefault();
 
@@ -191,11 +203,10 @@ function renderFolder(folder, status = "propia") {
     document.body.appendChild(menu);
 
     // Posicionar menú cerca del cursor
-    menu.style.top = `${e.pageY}px`;
+    menu.style.top  = `${e.pageY}px`;
     menu.style.left = `${e.pageX}px`;
     menu.style.display = "block";
 
-    // Acciones
     menu.querySelector(".edit-folder").onclick = () => {
       selectedFolderId = folder.id;
       selectedFolderDiv = card;
@@ -218,9 +229,7 @@ function renderFolder(folder, status = "propia") {
     // Cerrar el menú si se hace clic fuera
     document.addEventListener("click", () => menu.remove(), { once: true });
   });
-
 }
-
 
 // ---------- AGREGAR o MODIFICAR ----------
 addTripBtn.addEventListener('click', async () => {
@@ -229,9 +238,17 @@ addTripBtn.addEventListener('click', async () => {
 
   if (currentMode === "modificar" && selectedFolderId) {
     await updateFolder(selectedFolderId, name);
-    selectedFolderDiv.textContent = name;
+
+    // actualizar título
+    selectedFolderDiv.querySelector(".trip-title").textContent = name;
+
+    // actualizar imagen
+    const newImageUrl = `https://loremflickr.com/600/400/${encodeURIComponent(name)},landscape`;
+    selectedFolderDiv.querySelector(".trip-image").src = newImageUrl;
+
     showPopup("Carpeta modificada correctamente");
-  } 
+  }
+
   else if (currentMode === "agregar") {
     const folder = await createFolder(name, userId);
     renderFolder(folder);
