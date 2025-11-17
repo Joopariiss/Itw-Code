@@ -437,3 +437,12 @@ body[data-mode="eliminar"] .trip:hover {
 .context-menu button:hover {
   background-color: #f0f0f0;
 }
+
+.trip-type {
+  font-size: 0.9rem;
+  color: #444;
+  margin-top: 6px;
+}
+.trip-type b {
+  color: #111;
+}

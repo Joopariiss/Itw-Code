@@ -123,6 +123,9 @@ async function renderFolder(folder, status = "propia") {
         <svg class="calendar-icon" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M3 10h18M5 6h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"/></svg>
         <span>${startDate} - ${endDate}</span>
       </div>
+      <div class="trip-type">
+        Tipo: <b>${folder.invitadosAceptados && folder.invitadosAceptados.length > 0 ? "Grupal" : "Personal"}</b>
+      </div>
     </div>
     <div class="trip-content">
       Tu carpeta de viaje personalizada. Haz clic para ver los detalles.
