@@ -84,7 +84,7 @@ function showInviteError(msg) {
 }
 
 // ============================
-// DESCARGAR INVENTARIO + ITINERARIO
+// DESCARGAR INVENTARIO + ITINERARIO (VERSIÓN C: COLUMNAS DINÁMICAS)
 // ============================
 const downloadBtn = document.getElementById("download-btn");
 
@@ -95,61 +95,115 @@ downloadBtn?.addEventListener("click", async () => {
 
     const wb = XLSX.utils.book_new();
 
-    // Inventario
+    // ============================
+    // INVENTARIO
+    // ============================
     let totalGasto = 0;
     const invClean = (inventario || []).map(item => {
-      const costo = Number(item.cost) || 0;
-      totalGasto += costo;
+      const costoUnitario = Number(item.cost) || 0;
+      const cantidad = Number(item.quantity) || 1;
+      const costoTotalItem = costoUnitario * cantidad;
+      totalGasto += costoTotalItem;
+
       return {
         Nombre: item.name || "",
         Categoría: item.category || "",
-        Cantidad: item.quantity || "",
-        Costo: costo.toLocaleString("es-CL", { style: "currency", currency: "CLP" }),
+        Cantidad: cantidad,
+        "Costo Unitario": costoUnitario.toLocaleString("es-CL", { style: "currency", currency: "CLP" }),
+        "Costo Total": costoTotalItem.toLocaleString("es-CL", { style: "currency", currency: "CLP" }),
       };
     });
-    invClean.push({}, { Nombre: "TOTAL", Costo: totalGasto.toLocaleString("es-CL", { style: "currency", currency: "CLP" }) });
+
+    invClean.push(
+      {},
+      { Nombre: "TOTAL", "Costo Total": totalGasto.toLocaleString("es-CL", { style: "currency", currency: "CLP" }) }
+    );
 
     const invSheet = XLSX.utils.json_to_sheet(invClean);
-    invSheet["!cols"] = Object.keys(invClean[0] || {}).map(key => ({ wch: Math.max(key.length, ...invClean.map(r => (r[key] ? String(r[key]).length : 0))) + 2 }));
+    invSheet["!cols"] = Object.keys(invClean[0] || {}).map(key => ({
+      wch: Math.max(key.length, ...invClean.map(r => (r[key] ? String(r[key]).length : 0))) + 2
+    }));
     XLSX.utils.book_append_sheet(wb, invSheet, "Inventario");
 
-    // Itinerario
+    // ============================
+    // ITINERARIO 
+    // ============================
+
+    const days = plannerData.dias || [];
+
+    // 1) Calcular máximo de actividades
+    const maxActivities = Math.max(
+      ...days.map(d => (d.activities ? d.activities.length : 0)),
+      0
+    );
+
+    // Columnas dinámicas
+    const activityCols = Array.from({ length: maxActivities }, (_, i) => `Actividad ${i + 1}`);
+
     const plannerRows = [];
 
-    if (plannerData.calendario?.fechaInicio) {
-      plannerRows.push(
-        { "Inicio Viaje": plannerData.calendario.fechaInicio, "Fin Viaje": plannerData.calendario.fechaFin },
-        {}
-      );
-    }
-
-    (plannerData.dias || []).forEach(d => {
-      const day = new Date(d.date + "T12:00:00");
-      const weekday = day.toLocaleDateString("es-ES", { weekday: "long" });
-
-      if (!d.activities || d.activities.length === 0) {
-        plannerRows.push({ Fecha: d.date, Día: weekday, Hora: "", Actividad: "" });
-        return;
-      }
-
-      d.activities.forEach(a => {
-        plannerRows.push({
-          Fecha: d.date,
-          Día: weekday,
-          Hora: a.time || "",
-          Actividad: a.description || ""
+    // ============================
+    // Fila 1: Inicio / Fin + columna vacía
+    // ============================
+    plannerRows.push({
+      "Inicio Viaje": plannerData.calendario?.fechaInicio || "",
+      "Fin Viaje": plannerData.calendario?.fechaFin || "",
+      " ": "", // ← ← ← COLUMNA VACÍA
+      Fecha: days.length > 0 ? days[0].date : "",
+      Día: new Date(days[0].date + "T12:00:00").toLocaleDateString("es-ES", { weekday: "long" }),
+      ...(() => {
+        const base = {};
+        (days[0].activities || []).forEach((a, idx) => {
+          base[`Actividad ${idx + 1}`] = `${a.time ?? ""} — ${a.description ?? ""}`;
         });
-      });
+        for (let i = (days[0].activities?.length || 0); i < maxActivities; i++) {
+          base[`Actividad ${i + 1}`] = "";
+        }
+        return base;
+      })()
     });
 
+    // ============================
+    // Filas siguientes
+    // ============================
+    for (let i = 1; i < days.length; i++) {
+      const d = days[i];
+      const weekday = new Date(d.date + "T12:00:00").toLocaleDateString("es-ES", { weekday: "long" });
+
+      const row = {
+        "Inicio Viaje": "",
+        "Fin Viaje": "",
+        " ": "",
+        Fecha: d.date,
+        Día: weekday
+      };
+
+      (d.activities || []).forEach((a, index) => {
+        row[`Actividad ${index + 1}`] = `${a.time ?? ""} — ${a.description ?? ""}`;
+      });
+
+      for (let j = (d.activities?.length || 0); j < maxActivities; j++) {
+        row[`Actividad ${j + 1}`] = "";
+      }
+
+      plannerRows.push(row);
+    }
+
     const plannerSheet = XLSX.utils.json_to_sheet(plannerRows);
+
     plannerSheet["!cols"] = Object.keys(plannerRows[0] || {}).map(key => ({
       wch: Math.max(key.length, ...plannerRows.map(r => (r[key] ? String(r[key]).length : 0))) + 2
     }));
-    XLSX.utils.book_append_sheet(wb, plannerSheet, "Itinerario_Calendario");
 
-    // Generar el archivo Excel
-    const folderLabel = document.getElementById("current-folder-name")?.textContent?.replace(/\s+/g, "_") || "viaje";
+    XLSX.utils.book_append_sheet(wb, plannerSheet, "Itinerario");
+
+
+    // ============================
+    // GUARDAR ARCHIVO
+    // ============================
+    const folderLabel =
+      document.getElementById("current-folder-name")?.textContent?.replace(/\s+/g, "_") || "viaje";
+
     XLSX.writeFile(wb, `${folderLabel}_viaje_completo.xlsx`);
 
   } catch (err) {

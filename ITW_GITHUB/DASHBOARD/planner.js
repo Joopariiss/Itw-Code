@@ -296,12 +296,26 @@ saveActivityBtn.addEventListener('click', () => {
 
   if (!desc) return alert('Por favor ingresa una descripción.');
 
+  // ❌ Bloquear hora duplicada en el mismo día
+  const isDuplicate = editingDay.activities.some(a =>
+    a.time === time && (!editingActivity || a.id !== editingActivity.id)
+  );
+
+  if (isDuplicate) {
+    alert("Ya existe una actividad programada a esa hora.");
+    return;
+  }
+
+  // ✔ Editar
   if (editingActivity) {
     editingActivity.time = time;
     editingActivity.description = desc;
+
+  // ✔ Crear nueva
   } else if (editingDay) {
     editingDay.activities.push({ id: Date.now(), time, description: desc });
   }
+
 
   editingDay.activities.sort((a, b) => a.time.localeCompare(b.time));
 
