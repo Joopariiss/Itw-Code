@@ -170,6 +170,21 @@ async function renderFolder(folder, status = "propia") {
       return;
     }
 
+    // ------------------------------------------------------
+    // 🔒 PARTE B — BLOQUEO para usuarios invitados
+    // ------------------------------------------------------
+    if (status !== "propia") {
+      if (currentMode === "modificar") {
+        showPopup("Solo el dueño puede modificar esta carpeta.");
+        return;
+      }
+      if (currentMode === "eliminar") {
+        showPopup("Solo el dueño puede eliminar esta carpeta.");
+        return;
+      }
+    }
+    // ------------------------------------------------------
+
     if (currentMode === "modificar") {
       selectedFolderId = folder.id;
       selectedFolderDiv = card;
@@ -193,6 +208,10 @@ async function renderFolder(folder, status = "propia") {
   // menú contextual
   card.addEventListener("contextmenu", (e) => {
     e.preventDefault();
+
+
+    // Si el usuario NO es dueño, NO mostrar menú
+    if (status !== "propia") return;
 
     // Si ya hay un menú abierto, lo eliminamos
     document.querySelectorAll(".context-menu").forEach(menu => menu.remove());
