@@ -23,7 +23,39 @@ tabButtons.forEach(btn => {
 // INVITAR USUARIOS - POPUP + FIRESTORE
 // ============================
 import { db } from "../firebase.js";
-import { doc, updateDoc, arrayUnion, getDocs, collection, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { doc, updateDoc, arrayUnion, getDocs, collection, query, where, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+
+// ============================
+// VALIDAR PERMISOS DEL DUEÑO
+// ============================
+async function checkInvitePermissions() {
+  const currentUserId = localStorage.getItem("currentUserId");
+  if (!currentUserId) return;
+
+  const folderRef = doc(db, "carpetas", window.folderId);
+  const snap = await getDoc(folderRef);
+  if (!snap.exists()) return;
+
+  const data = snap.data();
+
+  // El dueño está en data.userId
+  const isOwner = data.userId === currentUserId;
+
+  if (!isOwner) {
+    // Ocultar botón
+    const btn = document.getElementById("invite-btn");
+    if (btn) btn.style.display = "none";
+    window.USER_IS_OWNER = false;
+  } else {
+    window.USER_IS_OWNER = true;
+  }
+}
+
+// Ejecutar una vez cargado el dashboard
+checkInvitePermissions();
+
+
 
 // Funciones del dashboard
 import { getInventoryData } from "./inventory.js";
@@ -48,6 +80,11 @@ closeInviteBtn?.addEventListener("click", () => inviteModal.classList.add("hidde
 
 // Enviar invitación
 sendInviteBtn?.addEventListener("click", async () => {
+  // BLOQUEO PARA INVITADOS → esta parte te faltaba
+  if (window.USER_IS_OWNER === false) {
+    return showInviteError("Solo el dueño puede invitar.");
+  }
+
   const email = inviteEmailInput.value.trim();
   if (!email) return showInviteError("Por favor ingresa un correo.");
 
