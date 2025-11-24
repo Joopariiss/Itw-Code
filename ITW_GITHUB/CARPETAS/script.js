@@ -33,6 +33,33 @@ let selectedFolderId = null;
 let selectedFolderDiv = null;
 let currentMode = null;
 
+// === UNSPLASH ===
+async function getUnsplashImage(folderName) {
+  const apiUrl = `https://api.unsplash.com/search/photos?query=${
+    encodeURIComponent(folderName + " landmark tourism beautiful scenic travel attraction")
+  }&orientation=landscape&per_page=20&client_id=pQOas4zYY4iWrx2AcbDhu4SchgJSRqCTfelsWFNBW0k`;
+
+  try {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+
+    // Si no hay resultados, devolvemos un fallback bonito
+    if (!data.results || data.results.length === 0) {
+      return "https://images.unsplash.com/photo-1507525428034-b723cf961d3e"; // playa bonita
+    }
+
+    // Tomar una al azar para más variedad
+    const randomImg = data.results[Math.floor(Math.random() * data.results.length)];
+    return randomImg.urls.regular;
+    
+  } catch (error) {
+    // Si falla la API, usar fallback
+    return "https://images.unsplash.com/photo-1507525428034-b723cf961d3e";
+  }
+}
+
+
+
 // ---------- MODO ----------
 function setMode(mode) {
   currentMode = mode;
@@ -113,7 +140,7 @@ async function renderFolder(folder, status = "propia") {
   card.dataset.id = folder.id;
 
   // Imagen automática de paisaje
-  const imageUrl = `https://loremflickr.com/600/400/${encodeURIComponent(folder.name)},landscape`;
+  const imageUrl = await getUnsplashImage(folder.name);
 
   card.innerHTML = `
     <img src="${imageUrl}" alt="${folder.name}" class="trip-image" />
@@ -265,8 +292,9 @@ addTripBtn.addEventListener('click', async () => {
     selectedFolderDiv.querySelector(".trip-title").textContent = name;
 
     // actualizar imagen
-    const newImageUrl = `https://loremflickr.com/600/400/${encodeURIComponent(name)},landscape`;
+    const newImageUrl = await getUnsplashImage(name);
     selectedFolderDiv.querySelector(".trip-image").src = newImageUrl;
+
 
     showPopup("Carpeta modificada correctamente");
   }
