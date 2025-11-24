@@ -112,7 +112,7 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
     showPopup(`✅ Registro exitoso. ¡Bienvenido, ${nombre}!`, true);
 
     // Redirige después de unos segundos
-    setTimeout(() => window.location.href = "../PERFIL/perfil.html", 2500);
+    setTimeout(() => window.location.href = "../CARPETAS/carpetas.html", 2500);
 
   } catch (error) {
     let mensaje = "";
