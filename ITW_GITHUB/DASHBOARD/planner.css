@@ -47,7 +47,7 @@ header {
 .hero-header {
   position: relative;
   height: 200px; /* puedes ajustar la altura */
-  background-image: url('../IMAGES/image3.jpg'); /* tu imagen */
+  /*background-image: url('../IMAGES/image3.jpg');  tu imagen */
   background-size: cover;
   background-position: center;
   display: flex;

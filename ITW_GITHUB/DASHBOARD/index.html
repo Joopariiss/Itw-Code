@@ -42,9 +42,10 @@
   <header class="hero-header">
     <div class="overlay">
       <h1>Planificador de Viaje</h1>
-      <p id="current-folder-name" class="folder-name"></p> <!-- 👈 nuevo -->
+      <p id="current-folder-name" class="folder-name"></p>
     </div>
   </header>
+
 
   <!--  Tabs -->
   <div class="tabs">
@@ -247,6 +248,26 @@
     import { db } from "../firebase.js";
     import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+
+    async function setRandomHeaderImage(folderName) {
+      const header = document.querySelector(".hero-header");
+      if (!header) return;
+
+      const apiUrl = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(folderName)}&client_id=pQOas4zYY4iWrx2AcbDhu4SchgJSRqCTfelsWFNBW0k`;
+
+      const res = await fetch(apiUrl);
+      const data = await res.json();
+
+      if (data.results.length > 0) {
+        const image = data.results[0].urls.full;
+        header.style.backgroundImage = `url('${image}')`;
+        header.style.backgroundSize = "cover";
+        header.style.backgroundPosition = "center";
+      }
+    }
+
+
+
     document.addEventListener("DOMContentLoaded", async () => {
       const folderNameEl = document.getElementById("current-folder-name");
       if (!window.folderId || !folderNameEl) return;
@@ -255,9 +276,11 @@
         const folderRef = doc(db, "carpetas", window.folderId);
         const folderSnap = await getDoc(folderRef);
 
-        if (folderSnap.exists()) {
-          const data = folderSnap.data();
-          folderNameEl.textContent = `Carpeta: ${data.name || "Sin nombre"}`;
+      if (folderSnap.exists()) {
+        const data = folderSnap.data();
+        const folderName = data.name || "Sin nombre";         // ← definir la variable
+        folderNameEl.textContent = `Carpeta: ${folderName}`;
+        setRandomHeaderImage(folderName);                     // ← pasar la variable correcta
         } else {
           folderNameEl.textContent = "Carpeta no encontrada";
         }
