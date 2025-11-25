@@ -1,79 +1,28 @@
-/* style inspirado en Fire Studio (convertidas del fragmento de Tailwind) */
-
-/* ES MEJOR EL DEL PLANNER
-:root{
-  --background: hsl(210 29% 96%);
-  --foreground: hsl(222.2 47.4% 11.2%);
-  --card: hsl(0 0% 100%);
-  --card-foreground: hsl(222.2 47.4% 11.2%);
-  --muted-foreground: hsl(215 20.2% 65.1%);
-  --primary: hsl(207 86% 68%);
-  --accent: hsl(123 39% 64%);
-  --destructive: hsl(0 84.2% 60.2%);
-  --border: hsl(214.3 31.8% 91.4%);
-  --radius: 0.5rem;
-  --shadow: 0 8px 24px rgba(16,24,40,0.06);
-  --container-width: 1100px;
-  --muted: hsl(210 40% 90%);
-}
-*/
-
-/* Basic reset & body */
-/*
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  background:var(--background);
-  color:var(--foreground);
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-}
-*/
+/* ============================================== */
+/* === INVENTORY: ESTILOS DE LAYOUT Y COMPONENTES === */
+/* ============================================== */
 
 /* Layout helpers */
 .container{
-  max-width:var(--container-width);
-  margin:28px auto;
-  padding:20px;
+    max-width: 1100px;
+    margin: 28px auto;
+    padding: 20px;
 }
-
-/* NO se usa
-.header{ 
-  text-align:center;
-  margin-bottom:20px 
-}
-.headline{
-  font-size:32px;
-  margin:0;
-  color:var(--primary);
-  font-weight:700;
-}
-*/
 
 .muted{ 
-  color:var(--muted-foreground);
-  margin-top:6px 
+    color:var(--muted-foreground);
+    margin-top:6px 
 }
 .mb{ 
-  margin-bottom:18px 
+    margin-bottom:18px 
 }
 
 /* Grid for 3 cards */
 .grid-3{ display:flex; gap:16px; }
 .grid-3 > .card{ flex:1 }
 
-/* Generic card */
-.card{
-  background:var(--card);
-  color:var(--card-foreground);
-  border-radius:var(--radius);
-  border:1px solid var(--border);
-  padding:12px;
-  box-shadow:var(--shadow);
-}
-.card-shadow{ box-shadow: 0 20px 40px rgba(16,24,40,0.08) }
+/* Generic card helpers (el estilo principal .card está en global.css) */
+.card-shadow{ box-shadow: 0 8px 24px rgba(0,0,0,0.3) }
 .small-card{ max-width:420px; width:100% }
 .card-header{ display:flex; align-items:center; justify-content:space-between; padding-bottom:8px; }
 .card-title{ font-weight:700; font-size:18px; margin:0 }
@@ -83,31 +32,33 @@ body{
 /* spacing */
 .space-y > * + *{ margin-top:10px }
 .form-vertical .label{ display:block; margin-bottom:10px }
-.label input{ width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); background:transparent; font-size:14px }
+.label input{ width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); background:var(--input); font-size:14px } /* Ajuste de fondo para input */
+
 
 /* input with prefix for budget */
 .input-with-prefix{ position:relative }
 .input-with-prefix .prefix{
-  position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--muted-foreground)
+    position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--muted-foreground);
+    font-size: 18px; /* Hacer el signo $ más grande */
+    font-weight: 600;
 }
 .input-with-prefix input{
-  width:100%;
-  padding:12px 12px 12px 28px;
-  border-radius:8px;
-  border:1px solid var(--border);
-  font-size:18px;
+    padding:12px 12px 12px 28px; /* Ajustar padding para el prefijo */
+    font-size:18px;
+    background: var(--input);
+    color: var(--foreground);
 }
 
-/* Buttons */
+/* Buttons (clases helper) */
 .btn{
-  display:inline-flex; align-items:center; gap:8px; justify-content:center;
-  padding:10px 12px;
-  border-radius:10px; border:1px solid transparent;
-  cursor:pointer; font-weight:600;
+    display:inline-flex; align-items:center; gap:8px; justify-content:center;
+    padding:10px 12px;
+    border-radius:10px; border:1px solid transparent;
+    cursor:pointer; font-weight:600;
 }
 .full{ width:100% }
-.btn-primary{ background:var(--primary); color: hsl(222.2 47.4% 11.2%); border-color:transparent }
-.btn-accent{ background:var(--accent); color:var(--card-foreground); border-color:transparent }
+.btn-primary{ background:var(--primary); color: var(--primary-foreground); }
+.btn-accent{ background:var(--accent); color:var(--accent-foreground); }
 .btn:active{ transform:translateY(1px) }
 
 /* grid main layout */
@@ -116,152 +67,152 @@ body{
 /* suggestions */
 .suggestions-grid{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px }
 .suggestion{
-  padding:8px 10px; border-radius:8px; cursor:pointer; font-weight:600;
-  border:1px solid var(--border); background:var(--muted); color:var(--foreground);
+    padding:8px 10px; border-radius:8px; cursor:pointer; font-weight:600;
+    border:1px solid var(--border); background:var(--secondary); /* Usar secondary para fondo sutil */
+    color:var(--foreground);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
-.suggestion:hover{ box-shadow:0 6px 18px rgba(16,24,40,0.06); transform:translateY(-2px); }
+.suggestion:hover{ box-shadow:0 6px 18px rgba(0,0,0,0.1); transform:translateY(-2px); }
 
 /* items list */
 .scroll{ max-height:420px; overflow:auto; padding-right:6px }
 .empty-state { text-align:center; color:var(--muted-foreground); padding:36px 12px }
 .item-row{
-  display:flex; align-items:center; justify-content:space-between;
-  padding:10px; border-radius:8px; border:1px solid var(--border); margin-bottom:10px;
-  background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3));
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px; border-radius:8px; border:1px solid var(--border); margin-bottom:10px;
+    background:var(--secondary); /* Fondo Gris Oscuro */
 }
 .item-row .meta{ display:flex; gap:6px; flex-direction:column }
 .item-row .meta .name{ font-weight:600 }
 .item-row .meta .cost{ color:var(--muted-foreground); font-size:14px }
 
 /* icon button delete */
-/* 🔴 Botón eliminar — estilo personalizado */
 .delete-btn {
-  color: red !important;       /* siempre rojo */
-  font-size: 1.6rem;           /* más grande */
-  background: transparent;
-  border: none;
-  padding: 6px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  line-height: 1;
+    color: var(--destructive) !important; 
+    font-size: 1.6rem; 
+    background: transparent;
+    border: none;
+    padding: 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    line-height: 1;
 }
 
-/* efecto hover para feedback visual */
 .delete-btn:hover {
-  transform: scale(1.2);
-  opacity: 0.8;
+    transform: scale(1.2);
+    opacity: 0.8;
 }
 
 /*efecto de edit del boton*/
 .edit-btn {
-  color: var(--primary);
-  font-size: 1.4rem;
-  margin-right: 6px;
+    color: var(--primary);
+    font-size: 1.4rem;
+    margin-right: 6px;
 }
 
-.edit-popup {
-  background: #fff;
-  border: 1px solid var(--muted-foreground);
-  border-radius: 8px;
-  padding: 10px;
-  width: 220px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-  z-index: 1000;
-  font-size: 14px;
+/* Edit/Confirm Popups */
+.edit-popup, .confirm-popup {
+    background: var(--card); /* Fondo Gris Pizarra Medio */
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 15px;
+    box-shadow: var(--shadow);
+    font-size: 0.9rem;
+    z-index: 1000;
+    color: var(--card-foreground);
+    max-width: 240px;
 }
 
-.edit-popup p {
-  margin: 0 0 8px 0;
-  font-weight: 600;
+.edit-popup p, .confirm-popup p {
+    margin: 0 0 8px 0;
+    color: var(--foreground);
 }
 
 .edit-popup input {
-  width: 100%;
-  margin-bottom: 6px;
-  padding: 4px 6px;
-  box-sizing: border-box;
-  font-size: 14px;
+    margin-bottom: 6px;
+    padding: 4px 6px;
+    font-size: 14px;
+    background: var(--input);
+    color: var(--foreground);
 }
 
-.edit-popup .popup-buttons {
-  display: flex;
-  justify-content: space-between;
-  gap: 4px;
+.edit-popup .popup-buttons, .confirm-popup .popup-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
 }
 
-.edit-popup .popup-buttons button {
-  flex: 1;
-  padding: 4px 0;
-  font-size: 14px;
-  cursor: pointer;
+.edit-popup .popup-buttons button, .confirm-popup button {
+    flex: 1;
+    padding: 4px 0;
+    font-size: 0.85rem;
+    cursor: pointer;
 }
 
+.confirm-popup .confirm-yes {
+    background-color: var(--destructive);
+    color: var(--destructive-foreground);
+}
 
+.confirm-popup .confirm-no {
+    background-color: var(--secondary);
+    color: var(--foreground);
+}
 
 /* ===== Encabezado del checklist ===== */
 .item-header {
-  display: flex;
-  justify-content: space-between;
-  font-weight: 700;
-  color: var(--muted-foreground);
-  padding: 10px 12px;
-  border-bottom: 2px solid var(--border);
-  margin-bottom: 6px;
-  background: rgba(255,255,255,0.9);
-  border-radius: 8px;
-  
-  position: sticky;
-  top: 0;           /* Se queda pegado arriba */
-  z-index: 10;      /* Para que siempre quede encima de las filas */
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    color: var(--muted-foreground);
+    padding: 10px 12px;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 6px;
+    background: var(--card); /* Fondo Gris Medio */
+    border-radius: var(--radius);
+    
+    position: sticky;
+    top: 0;
+    z-index: 10; 
 }
 
 
 .col-number {
-  width: 40px;         /* ancho fijo */
-  text-align: left;
-  font-weight: 600;
-  color: var(--muted-foreground);
-  flex: 0;             /* para que no intente crecer */
+    width: 40px; 
+    text-align: left;
+    font-weight: 600;
+    color: var(--muted-foreground);
+    flex: 0; 
 }
 /* ===== Filas ===== */
 .item-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  margin-bottom: 6px;
-  background: rgba(255,255,255,0.3);
-  border-radius: 8px;
-  transition: transform 0.15s ease;
+    transition: transform 0.15s ease;
 }
 
 .item-row:hover {
-  transform: translateY(-2px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
 .item-header > div,
 .item-row > div {
-  flex: 1;
+    flex: 1;
 }
 
 .col-name {
-  flex: 2;
+    flex: 2;
 }
 
 .col-cost {
-  flex: 1;
-  text-align: center;
+    flex: 1;
+    text-align: center;
 }
 
 .col-action {
-  flex: 0.5;
-  text-align: right;
+    flex: 0.5;
+    text-align: right;
 }
-.item-header {
-  background: var(--card);
-}
-
 
 
 /* big numbers */
@@ -269,8 +220,8 @@ body{
 
 /* remaining negative */
 .negative{
-  border:1px solid hsl(0 84% 60%);
-  color:hsl(0 84% 60%);
+    border:1px solid var(--destructive);
+    color:var(--destructive);
 }
 
 /* full height card */
@@ -281,148 +232,42 @@ body{
 
 /* centered fullscreen modal */
 .fullscreen-center{
-  position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
-  background:linear-gradient(180deg, rgba(12,18,30,0.12), rgba(255,255,255,0.0));
-  z-index:50;
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    background:rgba(0,0,0,0.5); 
+    backdrop-filter: blur(4px);
+    z-index:50;
 }
 
 
 /* === POPUP presupuesto inicial === */
 #budget-screen {
-  display: none; /* Oculto por defecto, se mostrará solo si no hay presupuesto */
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(4px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+    display: none; 
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
 }
 
 #budget-screen .card {
-  background: white;
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  max-width: 360px;
-  width: 90%;
+    background: var(--card);
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    max-width: 360px;
+    width: 90%;
 }
 
 #budget-screen.visible {
-  display: flex; /* Solo se mostrará si el JS le agrega esta clase */
+    display: flex; 
 }
 
 
 /* responsive */
 @media (max-width:900px){
-  .grid-main{ grid-template-columns: 1fr; }
-  .grid-3{ flex-direction:column; }
-  .container{ padding:12px }
-}
-
-/*pop up de pregunta si se quiere eliminar el item*/
-.confirm-popup {
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 10px 15px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  font-size: 0.9rem;
-  z-index: 999;
-  animation: fadeIn 0.15s ease-in-out;
-  max-width: 240px;
-  word-wrap: break-word;
-}
-
-.confirm-popup p {
-  margin: 0 0 8px 0;
-  color: #333;
-}
-
-.popup-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.confirm-popup button {
-  border: none;
-  border-radius: 6px;
-  padding: 4px 10px;
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-
-.confirm-popup .confirm-yes {
-  background-color: #d9534f;
-  color: #fff;
-}
-
-.confirm-popup .confirm-no {
-  background-color: #ccc;
-  color: #333;
-}
-
-.folder-name {
-  margin-top: 6px;
-  font-size: 1.1rem;
-  color: #eaeaea;
-  opacity: 0.9;
-  font-weight: 500;
-}
-
-
-
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.back-button {
-  position: fixed;
-  top: 20px;
-  left: 25px;
-  font-size: 18px;
-  color: white;
-  cursor: pointer;
-  background-color: rgba(0, 0, 0, 0.4);
-  border-radius: 6px;
-  padding: 8px 12px;
-  text-align: center;
-  transition: background 0.3s ease;
-  z-index: 120;
-}
-
-.back-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-/* === Select igual a input === */
-.label select {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: transparent;
-  font-size: 14px;
-  color: var(--foreground);
-  appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg fill='%23666' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 14px;
-}
-
-/* al pasar el mouse */
-.label select:hover {
-  border-color: var(--primary);
-}
-
-/* para que el texto de la opción seleccionada no se vea gris */
-.label select:focus {
-  outline: none;
-  border-color: var(--primary);
+    .grid-main{ grid-template-columns: 1fr; }
+    .grid-3{ flex-direction:column; }
+    .container{ padding:12px }
 }

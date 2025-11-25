@@ -1,51 +1,158 @@
+/* ==================================================== */
+/* === 1. DEFINICIÓN DE VARIABLES (PALETA VERDE BOSQUE) === */
+/* ==================================================== */
 :root {
-  --background: hsl(0, 0%, 94.1%);
-  --foreground: hsl(0, 0%, 3.9%);
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(0, 0%, 3.9%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(0, 0%, 3.9%);
-  --primary: hsl(151, 27%, 30%);
-  --primary-foreground: hsl(151, 15%, 95%);
-  --secondary: hsl(0, 0%, 96.1%);
-  --secondary-foreground: hsl(0, 0%, 9%);
-  --muted: hsl(0, 0%, 96.1%);
-  --muted-foreground: hsl(0, 0%, 45.1%);
-  --accent: hsl(43, 24%, 30%);
-  --accent-foreground: hsl(43, 15%, 95%);
-  --destructive: hsl(0, 84.2%, 60.2%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --border: hsl(0, 0%, 89.8%);
-  --input: hsl(0, 0%, 89.8%);
-  --ring: hsl(151, 27%, 30%);
-  --radius: 0.5rem;
+    /* Fondos */
+    --background: #1F2937; /* Gris Pizarra Oscuro */
+    --foreground: #F3F4F6; /* Blanco Roto/Claro */
+    --card: #374151; /* Gris Pizarra Medio */
+    --secondary: #4B5563; /* Gris más oscuro para items de lista */
+    --popover: #374151; 
+    
+    /* Colores de Acento (Verde Bosque Elegante) */
+    --primary: #548A5E; /* Verde Acento Principal (Botones, Fechas) */
+    --accent: #6B9E77; /* Verde Acento Suave (Fechas en rango, Add Activity) */
+    --destructive: #E74C3C; /* Rojo para Eliminar/Destructivo */
+    
+    /* Textos y Complementos */
+    --primary-foreground: #1F2937; /* Texto oscuro sobre el acento verde */
+    --secondary-foreground: #F3F4F6;
+    --card-foreground: #F3F4F6;
+    --popover-foreground: #F3F4F6;
+    --accent-foreground: #1F2937;
+    --destructive-foreground: #F3F4F6;
+    --muted-foreground: #9CA3AF; /* Gris suave para texto secundario */
+    
+    /* Bordes y Estructura */
+    --border: rgba(255, 255, 255, 0.15); /* Borde sutil */
+    --input: #1F2937; /* Fondo de Input */
+    --ring: #548A5E; /* Anillo de enfoque: Verde Acento */
+    --radius: 0.5rem;
+    --shadow: 0 4px 12px rgba(0,0,0,0.4); /* Sombra elegante */
 }
 
-/*  Estilos globales para tabs */
+
+/* ==================================================== */
+/* === 2. ESTILOS BASE (GLOBALES) === */
+/* ==================================================== */
 body {
+    background-color: var(--background);
+    color: var(--foreground);
     font-family: 'Poppins', sans-serif;
     margin: 0;
-    background-color: #f5f5f5;
 }
 
+/* === Botones Genéricos === */
+button {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+/* === Inputs, Textareas, y Select === */
+input, textarea, .label select {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--input);
+    color: var(--foreground);
+    transition: border-color 0.2s ease;
+}
+
+input:focus, textarea:focus, .label select:focus {
+    outline: none;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 2px rgba(84, 138, 94, 0.4);
+}
+
+/* Estilo para Select */
+.label select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='%239CA3AF' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+}
+
+/* === Tarjeta Genérica (.card) y Modal === */
+.card {
+    background-color: var(--card);
+    color: var(--card-foreground);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    padding: 1rem;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: var(--card);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    width: 300px;
+    color: var(--card-foreground);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+
+/* ==================================================== */
+/* === 3. ESTILOS DE ELEMENTOS ESPECÍFICOS DE GLOBAL === */
+/* ==================================================== */
+
+/* --- Tabs --- */
 .tabs {
     display: flex;
     justify-content: center;
-    background: hsl(111, 42%, 23%);
+    background: #374151; /* Un gris oscuro (var(--card)) para el fondo de las tabs */
 }
 
 .tab-btn {
-    color: #fff;
+    color: var(--muted-foreground); /* Texto gris */
     background: none;
     border: none;
     padding: 1rem 2rem;
     cursor: pointer;
     font-size: 1rem;
-    transition: background 0.3s;
+    transition: color 0.3s, border-bottom 0.3s;
 }
 
 .tab-btn.active {
-    background: #387e36;
+    color: var(--primary); /* Verde Acento al estar activa */
+    border-bottom: 3px solid var(--primary);
+    background: #4B5563; /* Gris Secundario sutil para el fondo activo */
 }
 
 .tab-content {
@@ -57,62 +164,62 @@ body {
     display: block;
 }
 
-
-/*BOTON DE VOLVER ATRAS DEL BASTI*/
+/* --- Botones Fijos de Utilidad --- */
 .back-button {
-  position: fixed;
-  top: 20px;
-  left: 25px;
-  font-size: 18px;
-  color: white;
-  cursor: pointer;
-  background-color: rgba(0, 0, 0, 0.4);
-  border-radius: 6px;
-  padding: 8px 12px;
-  text-align: center;
-  transition: background 0.3s ease;
-  z-index: 120;
+    position: fixed;
+    top: 20px;
+    left: 25px;
+    font-size: 18px;
+    color: white;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.15); /* Fondo más sutil */
+    border-radius: 6px;
+    padding: 8px 12px;
+    text-align: center;
+    transition: background 0.3s ease;
+    z-index: 120;
 }
 .back-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.3);
 }
-/*BOTON DE VOLVER ATRAS DEL BASTI*/
 
-/*BOTON DE INVITAR JORDI*/
 #invite-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: #387e36;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  z-index: 10; /* que esté sobre el overlay */
+    position: fixed; /* CAMBIO: de absolute a fixed */
+    top: 20px;
+    right: 20px; /* AJUSTE: Moverlo más a la izquierda para separarlo del botón de descarga */
+    background: var(--primary);
+    color: var(--primary-foreground);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    z-index: 10; 
 }
 
-#invite-btn:hover {
-  opacity: 0.9;
-}
-
-/*boton de descatga*/
 #download-btn {
-  position: fixed;
-  top: 85px;
-  right: 25px;
-  background-color: #2c7a7b;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  z-index: 9999;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    position: absolute; /* Usamos 'absolute' para que se posicione bien en el header */
+    top: 20px;
+    right: 25px;
+    background-color: var(--accent); /* Usamos el verde suave */
+    color: var(--accent-foreground);
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    z-index: 10;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
 #download-btn:hover {
-  background-color: #256b6b;
+    background-color: var(--primary);
+}
+
+.folder-name {
+    margin-top: 6px;
+    font-size: 1.1rem;
+    color: #eaeaea;
+    opacity: 0.9;
+    font-weight: 500;
 }
