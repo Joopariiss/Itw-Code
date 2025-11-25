@@ -1,5 +1,15 @@
 import { auth } from "../firebase.js";
-import { createFolder, getUserFolders, getInvitedFolders, acceptInvitation, rejectInvitation, deleteFolder, updateFolder, getFolderDates} from "./db.js";
+import { 
+  createFolder, 
+  getUserFolders, 
+  getInvitedFolders, 
+  acceptInvitation, 
+  rejectInvitation, 
+  deleteFolder, 
+  updateFolder, 
+  getFolderDates,
+  getOwnerName 
+} from "./db.js";
 
 // ✅ IMPORTAR la función desde global.js
 import { setCurrentUserId } from "../DASHBOARD/global.js"; // Ajusta ruta según tu estructura de carpetas
@@ -130,9 +140,20 @@ async function renderFolder(folder, status = "propia") {
 
   // === 1. Cargar fechas desde Firestore ===
   const fechas = await getFolderDates(folder.id);
-
   const startDate = fechas?.fechaInicio || "Sin fecha";
   const endDate   = fechas?.fechaFin || "Sin fecha";
+
+  // === 2. LÓGICA MEJORADA: VERIFICAR SI SOY EL DUEÑO ===
+  // CAMBIO DE LÓGICA AQUI
+  let ownerName;
+
+  if (folder.userId === userId) {
+      // SI EL ID DE LA CARPETA COINCIDE CON MI ID LOGUEADO
+      ownerName = "Tú"; 
+  } else {
+      // SI NO SOY YO, BUSCO EL NOMBRE EN LA BASE DE DATOS
+      ownerName = await getOwnerName(folder.userId); 
+  }
 
   // === 2. Crear tarjeta ===
   const card = document.createElement("div");
@@ -152,6 +173,9 @@ async function renderFolder(folder, status = "propia") {
       </div>
       <div class="trip-type">
         Tipo: <b>${folder.invitadosAceptados && folder.invitadosAceptados.length > 0 ? "Grupal" : "Personal"}</b>
+      </div>
+      <div class="trip-owner">
+        Creador: <b>${ownerName}</b>
       </div>
     </div>
     <div class="trip-content">

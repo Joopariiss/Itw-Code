@@ -427,3 +427,12 @@ body[data-mode="modificar"] .trip:hover {
 .trip-type b {
     color: #F3F4F6; /* Negrita claro */
 }
+
+.trip-owner {
+    font-size: 0.9rem;
+    color: #9CA3AF; /* Gris suave */
+    margin-top: 4px; /* Un pequeño espacio debajo del Tipo */
+}
+.trip-owner b {
+    color: #F3F4F6; /* Negrita claro */
+}

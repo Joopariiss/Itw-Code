@@ -138,3 +138,24 @@ export async function getFolderDates(folderId) {
     return { fechaInicio: null, fechaFin: null };
   }
 }
+
+/* ==========================================================
+   OBTENER NOMBRE DEL DUEÑO DE LA CARPETA
+   ========================================================== */
+export async function getOwnerName(userId) {
+  try {
+    if (!userId) return "Desconocido";
+    const userRef = doc(db, "usuarios", userId);
+    const snap = await getDoc(userRef);
+    
+    if (snap.exists()) {
+      const data = snap.data();
+      return `${data.nombre} ${data.apellido}`;
+    } else {
+      return "Usuario Desconocido";
+    }
+  } catch (error) {
+    console.error("Error obteniendo nombre del dueño:", error);
+    return "Desconocido";
+  }
+}
