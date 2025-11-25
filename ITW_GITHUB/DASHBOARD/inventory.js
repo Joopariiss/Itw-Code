@@ -214,71 +214,82 @@ function showEditPopup(id) {
   const item = items.find(i => i.id === id);
   if (!item) return;
 
-  const existingPopup = document.querySelector('.edit-popup');
+  const existingPopup = document.querySelector('.modal'); // Usamos la clase modal genérica
   if (existingPopup) existingPopup.remove();
 
   const popup = document.createElement('div');
-  popup.className = 'edit-popup';
+  popup.className = 'modal'; // Clase CSS global para fondo oscuro y centrado
+  
+  // HTML estructurado igual que el Planner
   popup.innerHTML = `
-    <p>Editar item</p>
-    <input type="text" class="edit-name" value="${escapeHtml(item.name)}" placeholder="Nombre del item" />
-    <input type="number" class="edit-cost" value="${item.cost}" placeholder="Costo" />
-    <input type="number" class="edit-quantity" value="${item.quantity}" placeholder="Cantidad" />
-    <select class="edit-category">
-      <option value="">Seleccionar...</option>
-      <option value="Alojamiento">Alojamiento</option>
-      <option value="Transporte">Transporte</option>
-      <option value="Comida">Comida</option>
-      <option value="Entretenimiento">Entretenimiento</option>
-      <option value="Salud e Higiene">Salud e Higiene</option>
-      <option value="Ropa y Accesorios">Ropa y Accesorios</option>
-      <option value="Tecnología">Tecnología</option>
-      <option value="Documentos">Documentos</option>
-      <option value="Otros">Otros</option>
-    </select>
-    <div class="popup-buttons">
-      <button class="edit-accept">Aceptar</button>
-      <button class="edit-cancel">Cancelar</button>
+    <div class="modal-content">
+      <h3 class="mb-2">Editar Item</h3>
+      
+      <div class="mb-2">
+        <label class="mb-1 d-block">Nombre:</label>
+        <input type="text" class="edit-name" value="${escapeHtml(item.name)}" />
+      </div>
+
+      <div class="mb-2" style="display: flex; gap: 10px;">
+         <div style="flex: 1;">
+            <label class="mb-1 d-block">Costo:</label>
+            <input type="number" class="edit-cost" value="${item.cost}" />
+         </div>
+         <div style="flex: 1;">
+            <label class="mb-1 d-block">Cantidad:</label>
+            <input type="number" class="edit-quantity" value="${item.quantity}" />
+         </div>
+      </div>
+
+      <div class="mb-2">
+        <label class="mb-1 d-block">Categoría:</label>
+        <select class="edit-category">
+          <option value="">Seleccionar...</option>
+          <option value="Alojamiento">Alojamiento</option>
+          <option value="Transporte">Transporte</option>
+          <option value="Comida">Comida</option>
+          <option value="Entretenimiento">Entretenimiento</option>
+          <option value="Salud e Higiene">Salud e Higiene</option>
+          <option value="Ropa y Accesorios">Ropa y Accesorios</option>
+          <option value="Tecnología">Tecnología</option>
+          <option value="Documentos">Documentos</option>
+          <option value="Otros">Otros</option>
+        </select>
+      </div>
+
+      <div class="modal-buttons">
+        <button class="btn btn-primary edit-accept">Guardar</button>
+        <button class="btn btn-secondary edit-cancel">Cancelar</button>
+      </div>
     </div>
   `;
 
-  // Posicionamiento inteligente
-  const btn = document.querySelector(`.edit-btn[data-id="${id}"]`);
-  const rect = btn.getBoundingClientRect();
-  const popupWidth = 220;
-  
-  popup.style.position = 'absolute';
-  popup.style.top = `${rect.top + window.scrollY - 10}px`;
-  
-  // Lógica simple para que no se salga de la pantalla
-  if (rect.right + popupWidth + 20 < window.innerWidth) {
-     popup.style.left = `${rect.right + 10}px`;
-  } else {
-     popup.style.left = `${rect.left - popupWidth - 10}px`;
-  }
-
   document.body.appendChild(popup);
 
+  // Lógica de llenado inicial
   const categorySelect = popup.querySelector('.edit-category');
   categorySelect.value = item.category || "Otros";
 
   const nameInput = popup.querySelector('.edit-name');
   const costInput = popup.querySelector('.edit-cost');
   const quantityInput = popup.querySelector('.edit-quantity');
-  nameInput.focus();
-  nameInput.select();
+  
+  // Foco al abrir
+  nameInput.focus(); 
 
+  // --- EVENTOS DEL POPUP ---
   popup.querySelector('.edit-accept').addEventListener('click', async () => {
     item.name = nameInput.value.trim() || item.name;
-    item.cost = parseFloat(costInput.value) || item.cost;
-    item.quantity = parseInt(quantityInput.value) || item.quantity;
+    item.cost = parseFloat(costInput.value) || 0; // Corrección para evitar NaN si borran todo
+    item.quantity = parseInt(quantityInput.value) || 1;
     item.category = categorySelect.value || item.category;
+    
     renderItems();
     updateBudgetDisplay();
     popup.remove();
 
-    if (folderId && item.id) {
-      const itemRef = doc(db, "carpetas", folderId, "inventario", item.id);
+    if (window.folderId && item.id) { // Usar window.folderId por seguridad
+      const itemRef = doc(db, "carpetas", window.folderId, "inventario", item.id);
       await updateDoc(itemRef, {
         name: item.name,
         cost: item.cost,
@@ -289,17 +300,12 @@ function showEditPopup(id) {
   });
 
   popup.querySelector('.edit-cancel').addEventListener('click', () => popup.remove());
-
-  setTimeout(() => {
-    document.addEventListener('click', function handler(e) {
-      if (!popup.contains(e.target) && e.target !== btn) {
-        popup.remove();
-        document.removeEventListener('click', handler);
-      }
-    });
-  }, 50);
+  
+  // Cerrar al hacer clic fuera
+  popup.addEventListener('click', (e) => {
+    if (e.target === popup) popup.remove();
+  });
 }
-
 
 // ---------- Sugerencias ----------
 const SUGGESTIONS = [
@@ -438,46 +444,37 @@ const editBudgetBtn = document.getElementById('edit-budget-btn');
 
 if (editBudgetBtn) {
   editBudgetBtn.addEventListener('click', () => {
+    // Verificar si ya hay un modal abierto para no duplicar
+    const existing = document.querySelector('.modal.budget-edit');
+    if (existing) existing.remove();
+
     const popup = document.createElement('div');
-    popup.className = 'edit-popup';
+    popup.className = 'modal budget-edit'; // Usamos la clase base 'modal'
+    
     popup.innerHTML = `
-      <div class="popup-inner">
-        <p><strong>Editar presupuesto inicial</strong></p>
-        <input type="number" id="new-budget-input" value="${initialBudget}" min="0" />
-        <div class="popup-buttons">
+      <div class="modal-content">
+        <h3 class="mb-2">Editar Presupuesto Inicial</h3>
+        <div class="input-with-prefix mb-2">
+            <span class="prefix" style="left: 10px; top: 50%; transform: translateY(-50%); position: absolute; color: gray;">$</span>
+            <input type="number" id="new-budget-input" value="${initialBudget}" min="0" style="padding-left: 25px;" />
+        </div>
+        
+        <div class="modal-buttons">
           <button id="save-budget" class="btn btn-primary">Guardar</button>
           <button id="cancel-budget" class="btn btn-secondary">Cancelar</button>
         </div>
       </div>
     `;
 
-    Object.assign(popup.style, {
-      position: 'fixed',
-      top: '0',
-      left: '0',
-      width: '100%',
-      height: '100%',
-      background: 'rgba(0,0,0,0.4)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: '9999'
-    });
-
-    const inner = popup.querySelector('.popup-inner');
-    Object.assign(inner.style, {
-      background: '#fff',
-      padding: '1.5rem',
-      borderRadius: '10px',
-      width: '280px',
-      textAlign: 'center',
-      boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
-    });
-
     document.body.appendChild(popup);
 
+    // Foco en el input
+    const inputEl = document.getElementById('new-budget-input');
+    inputEl.focus();
+    inputEl.select();
+
     document.getElementById('save-budget').addEventListener('click', async () => {
-      const newVal = parseFloat(document.getElementById('new-budget-input').value);
+      const newVal = parseFloat(inputEl.value);
       if (!isNaN(newVal) && newVal >= 0) {
         initialBudget = newVal;
         await guardarPresupuestoInicial();
@@ -487,6 +484,11 @@ if (editBudgetBtn) {
     });
 
     document.getElementById('cancel-budget').addEventListener('click', () => popup.remove());
+    
+    // Cerrar al hacer clic fuera del contenido
+    popup.addEventListener('click', (e) => {
+      if (e.target === popup) popup.remove();
+    });
   });
 }
 

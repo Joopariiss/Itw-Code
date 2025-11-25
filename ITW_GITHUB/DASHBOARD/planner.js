@@ -138,21 +138,26 @@ calendarSection.appendChild(calendarActions);
 const lockBtn = document.getElementById("lock-calendar-btn");
 const unlockBtn = document.getElementById("unlock-calendar-btn");
 
+// ... código anterior ...
+
 // Modal de confirmación
 const confirmModal = document.createElement("div");
 confirmModal.className = "modal hidden";
+
+// --- CAMBIO AQUÍ: Agregamos las clases a los botones ---
 confirmModal.innerHTML = `
   <div class="modal-content">
-    <h3 id="confirm-message"></h3>
-    <div class="modal-buttons">
-      <button id="confirm-yes">Aceptar</button>
-      <button id="confirm-no">Cancelar</button>
+    <h3 id="confirm-message" style="margin-bottom: 1.5rem; text-align: center;"></h3>
+    <div class="modal-buttons" style="justify-content: center;">
+      <button id="confirm-yes" class="btn btn-primary">Aceptar</button>
+      <button id="confirm-no" class="btn btn-secondary">Cancelar</button>
     </div>
   </div>
 `;
 document.body.appendChild(confirmModal);
 
 const confirmMessage = document.getElementById("confirm-message");
+// ... resto del código ...
 const confirmYes = document.getElementById("confirm-yes");
 const confirmNo = document.getElementById("confirm-no");
 
