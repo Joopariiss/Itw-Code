@@ -1,448 +1,429 @@
+/* ========================================= */
+/* === APLICACIÓN DE PALETA DE COLORES === */
+/* ========================================= */
+
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
+    background-color: #1F2937; /* Fondo principal Gris Pizarra Oscuro */
+    color: #F3F4F6; /* Texto principal Claro */
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
 .hero-header {
-  position: relative;
-  height: 150px; /* puedes ajustar la altura */
-  background-image: url('../IMAGES/image3.jpg'); /* tu imagen */
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-family: Arial, sans-serif;
+    position: relative;
+    height: 150px; 
+    background-image: url('../IMAGES/image3.jpg'); 
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    /* Ajuste para que el botón "Volver" no se pegue al borde del header */
+    padding-top: 20px; 
 }
 
 .hero-header h1 {
-  font-size: 3rem;
-  margin: 0;
+    font-size: 3rem;
+    margin: 0;
+    font-weight: 700;
 }
 
 .hero-header p {
-  font-size: 1.25rem;
-  margin-top: 0.5rem;
+    font-size: 1.25rem;
+    margin-top: 0.5rem;
+    color: #9CA3AF; /* Gris suave para subtítulos */
 }
 
+/* Overlay más pequeño y centrado (de la petición anterior) */
 .hero-header .overlay {
-  background-color: rgba(0, 0, 0, 0.4); /* overlay oscuro para que el texto destaque */
-  padding: 1rem;
-  border-radius: 1rem;
-  text-align: center;
+    background-color: rgba(0, 0, 0, 0.65); /* Overlay oscuro para que el texto destaque */
+    padding: 1.5rem 3rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    
+    /* Centrado absoluto */
+    position: absolute; 
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: auto;
+    height: auto;
 }
 
 /* Lista de viajes */
 main {
-  margin-top: 40px; /* deja espacio para header */
-  padding: 10px 20px;
+    margin-top: 40px; 
+    padding: 10px 20px;
 }
 
-/* ======= NUEVO DISEÑO DE CARPETAS (Fire Studio style) ======= */
+/* ======= DISEÑO DE CARPETAS ======= */
 .trip-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 30px;
-  justify-items: center;
-  margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    justify-items: center;
+    margin-top: 40px;
 }
 
 .trip-card {
-  background: #fff;
-  border-radius: 16px;
-  overflow: hidden;
-  width: 100%;
-  max-width: 360px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  text-decoration: none;
-  color: inherit;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
+    background: #374151; /* Gris Pizarra Medio para las tarjetas */
+    border-radius: 16px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 360px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Sombra más fuerte para contraste */
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
 }
 
 .trip-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
 }
 
 .trip-image {
-  width: 100%;
-  height: 190px;
-  object-fit: cover;
-  transition: transform 0.3s ease;
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
 }
 
 .trip-card:hover .trip-image {
-  transform: scale(1.05);
+    transform: scale(1.05);
 }
 
 .trip-header {
-  padding: 16px;
+    padding: 16px;
 }
 
 .trip-title {
-  font-size: 1.4rem;
-  font-weight: 700;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #F3F4F6; /* Título claro */
 }
 
 .trip-date {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.9rem;
-  color: #666;
-  margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    color: #9CA3AF; /* Gris suave para la fecha */
+    margin-top: 6px;
 }
 
 .trip-content {
-  padding: 0 16px 16px;
-  color: #555;
-  font-size: 0.9rem;
+    padding: 0 16px 16px;
+    color: #F3F4F6; /* Texto del contenido claro */
+    font-size: 0.9rem;
 }
 
 .calendar-icon {
-  width: 16px;
-  height: 16px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
 }
-
-
-
 
 /* Modal */
 .modal {
-  display: none;
-  position: fixed;
-  z-index: 100;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  justify-content: center;
-  align-items: center;
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7); /* Fondo más oscuro para enfoque */
+    justify-content: center;
+    align-items: center;
 }
 
 .modal-content {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 350px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  text-align: center;
+    background: #374151; /* Fondo de Modal: Gris Pizarra Medio */
+    color: #F3F4F6; /* Texto de Modal: Claro */
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 350px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    text-align: center;
 }
 
 .modal-content input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 1em;
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid #548A5E; /* Borde con Acento Verde */
+    background-color: #1F2937; /* Fondo de input más oscuro */
+    color: #F3F4F6;
+    font-size: 1em;
 }
 
 .modal-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
 }
 
 .modal-buttons button {
-  flex: 1;
-  margin: 0 5px;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
+    flex: 1;
+    margin: 0 5px;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease;
 }
 
 #cancelBtn {
-  background: #ccc;
+    background: #545b63; /* Gris más oscuro para cancelar */
+    color: #F3F4F6;
+}
+#cancelBtn:hover {
+    background: #4a5157;
 }
 
 #addTripBtn {
-  background: #007bff;
-  color: white;
+    background: #548A5E; /* Verde Acento Elegante para Agregar */
+    color: #1F2937; /* Texto oscuro para contraste */
+}
+#addTripBtn:hover {
+    background: #44704B; 
 }
 
-/* Contenedor de botones del menú */
+
+/* Contenedor de botones (no usado en tu HTML final, pero por si acaso) */
 .menu-container {
-  position: fixed;
-  top: 20px;
-  right: 25px;
-  display: flex;
-  flex-direction: column; /* los coloca uno debajo del otro */
-  gap: 10px; /* separación entre ellos */
-  z-index: 110;
+    position: fixed;
+    top: 20px;
+    right: 25px;
+    display: flex;
+    flex-direction: column; 
+    gap: 10px; 
+    z-index: 110;
 }
 
-/* Estilo general de los botones */
+/* Estilo general de los botones (solo si están fuera de folder-buttons) */
 .menu-toggle {
-  font-size: 18px;
-  color: white;
-  cursor: pointer;
-  background-color: rgba(0, 0, 0, 0.4);
-  border-radius: 6px;
-  padding: 8px 12px;
-  text-align: center;
-  transition: background 0.3s ease;
+    font-size: 18px;
+    color: white;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 6px;
+    padding: 8px 12px;
+    text-align: center;
+    transition: background 0.3s ease;
 }
 
 .menu-toggle:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .trip:hover {
-  transform: scale(1.03);
+    transform: scale(1.03);
 }
 
 .trip:active {
-  transform: scale(0.98);
+    transform: scale(0.98);
 }
 
+/* Modos de edición */
 body[data-mode="eliminar"] .trip:hover {
-  background: #ffb3b3;
+    background: #a84742; /* Rojo oscuro elegante */
 }
 
 body[data-mode="modificar"] .trip:hover {
-  background-color: #ffe08a;
+    background-color: #8b7d4c; /* Amarillo oscuro elegante */
 }
 
-body[data-mode="eliminar"] .trip:hover {
-  background-color: #ffb3b3;
-}
 
 .folder-container {
-  width: 95%;
-  max-width: 700px;
-  margin: 20px auto 40px auto;
-  display: flex;
-  flex-direction: column;
-  gap: 200px; /* separación entre cuadros */
+    width: 95%;
+    max-width: 700px;
+    margin: 20px auto 40px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 200px; 
 }
 
-/* Cuadro de carpetas */
-/*
-.folders-box {
-  background: #e7f0ff;
-  border-radius: 12px;
-  padding: 15px;
-  height: 250px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  overflow-y: auto;
-  overflow-x: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
-*/
 /* Botones horizontales */
 .folder-buttons {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
 }
 
-/* Botones individuales */
+/* Botones individuales (dentro del buttons-box) */
 .folder-buttons .menu-toggle {
-  flex: 1;
-  text-align: center;
-  padding: 10px 0;
-  font-size: 1rem;
-  border-radius: 8px;
-  background-color: #387e36;
-  color: white;
-  transition: 0.3s;
+    flex: 1;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 1rem;
+    border-radius: 8px;
+    background-color: #548A5E; /* Verde Acento Elegante */
+    color: #F3F4F6;
+    transition: 0.3s;
 }
 
 .folder-buttons .menu-toggle:hover {
-  background-color: #0056b3;
+    background-color: #44704B; /* Tono de verde más oscuro al hover */
 }
 
-/* Cuadro de botones */
+
+/* Cuadro de botones (Contenedor del botón "Agregar Carpeta") */
 .buttons-box {
-  background: #d0e0ff;
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    /* Eliminamos el background blanco para que quede limpio */
+    background: none; 
+    box-shadow: none;
+    padding: 0;
+    
+    /* Mantenemos el posicionamiento para el botón flotante "Agregar Carpeta" */
+    position: absolute;
+    /* --- MODIFICACIÓN CLAVE AQUÍ --- */
+    top: 180px; /* Se ajusta de 160px a 180px para bajarlo 30px del header (150px de altura) */
+    /* ------------------------------ */
+    right: 25px;
 }
+
+
+/* El resto del CSS se mantiene igual, conservando la paleta "Aventura Elegante" */
 
 /* Sección explicativa */
 .intro-section {
-  max-width: 1000px;
-  margin: 10px auto 10px auto;
-  background: #e7f0ff;
-  padding: 15px 20px;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    max-width: 1000px;
+    margin: 10px auto 10px auto;
+    background: #374151; /* Fondo Gris Pizarra Medio */
+    color: #F3F4F6;
+    padding: 15px 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
 .intro-section h2 {
-  color: #0056b3;
-  font-size: 1.6rem;
-  margin-bottom: 10px;
+    color: #548A5E; /* Verde Acento Elegante */
+    font-size: 1.6rem;
+    margin-bottom: 10px;
 }
 
 .intro-section p {
-  color: #333;
-  font-size: 1rem;
-  line-height: 1.5;
+    color: #9CA3AF; /* Gris suave para el texto explicativo */
+    font-size: 1rem;
+    line-height: 1.5;
 }
 
 .intro-section {
-  border-top: 5px solid #007bff;
+    border-top: 5px solid #548A5E; /* Borde superior con Verde Acento */
 }
 
 .back-button {
-  position: fixed;
-  top: 20px;
-  left: 25px;
-  font-size: 18px;
-  color: white;
-  cursor: pointer;
-  background-color: rgba(0, 0, 0, 0.4);
-  border-radius: 6px;
-  padding: 8px 12px;
-  text-align: center;
-  transition: background 0.3s ease;
-  z-index: 120;
+    position: fixed;
+    top: 20px;
+    left: 25px;
+    font-size: 18px;
+    color: white;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 6px;
+    padding: 8px 12px;
+    text-align: center;
+    transition: background 0.3s ease;
+    z-index: 120;
 }
 
 .back-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Popup general */
 .popup {
-  display: none;
-  position: fixed;
-  z-index: 200;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  justify-content: center;
-  align-items: center;
+    display: none;
+    position: fixed;
+    z-index: 200;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
 }
 
 .popup-content {
-  background: white;
-  padding: 25px 30px;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  width: 90%;
-  max-width: 320px;
+    background: #374151; /* Fondo de Popup: Gris Pizarra Medio */
+    padding: 25px 30px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    width: 90%;
+    max-width: 320px;
 }
 
 #popup-message {
-  font-size: 1.1rem;
-  margin-bottom: 20px;
-  color: #333;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    color: #F3F4F6; /* Texto de mensaje claro */
 }
 
 #popup-close {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
+    background-color: #548A5E; /* Verde Acento Elegante */
+    color: #1F2937;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
 }
 
 #popup-close:hover {
-  background-color: #0056b3;
-}
-/* Popup de invitación (diferente del popup general de mensajes) */
-.invite-popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex; /* ahora sí visible */
-  justify-content: center;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 300;
-}
-
-.invite-popup .popup-content {
-  background: white;
-  padding: 25px 30px;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  width: 90%;
-  max-width: 320px;
+    background-color: #44704B;
 }
 
 /* Mover botón Agregar al costado superior derecho */
-.buttons-box {
-  position: absolute;
-  top: 160px; /* justo debajo del header */
-  right: 25px;
-  background: none;
-  box-shadow: none;
-  padding: 0;
-}
-
-/* El único botón visible */
-.folder-buttons .menu-toggle {
-  background-color: #007bff;
-  color: white;
-  font-weight: 600;
-  border-radius: 8px;
-  padding: 10px 16px;
-  transition: background 0.3s ease;
-}
-.folder-buttons .menu-toggle:hover {
-  background-color: #0056b3;
-}
+/* El estilo se define en .folder-buttons .menu-toggle y .buttons-box */
 
 /* ====== MENÚ CONTEXTUAL ====== */
 .context-menu {
-  display: none;
-  position: absolute;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  z-index: 300;
-  width: 160px;
-  overflow: hidden;
+    display: none;
+    position: absolute;
+    background: #374151; /* Fondo de Menú Contextual: Gris Pizarra Medio */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    z-index: 300;
+    width: 160px;
+    overflow: hidden;
 }
 
 .context-menu button {
-  display: block;
-  width: 100%;
-  border: none;
-  background: none;
-  padding: 10px;
-  text-align: left;
-  cursor: pointer;
-  font-size: 0.95rem;
+    display: block;
+    width: 100%;
+    border: none;
+    background: none;
+    color: #F3F4F6; /* Texto de botón claro */
+    padding: 10px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.95rem;
 }
 
 .context-menu button:hover {
-  background-color: #f0f0f0;
+    background-color: #44704B; /* Acento de Verde Oscuro al hover */
+    color: #1F2937; /* Texto oscuro para el hover */
 }
 
 .trip-type {
-  font-size: 0.9rem;
-  color: #444;
-  margin-top: 6px;
+    font-size: 0.9rem;
+    color: #9CA3AF; /* Gris suave para el tipo de viaje */
+    margin-top: 6px;
 }
 .trip-type b {
-  color: #111;
+    color: #F3F4F6; /* Negrita claro */
 }
