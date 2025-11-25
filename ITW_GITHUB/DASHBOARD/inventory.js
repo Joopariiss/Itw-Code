@@ -22,41 +22,7 @@ const folderId = window.folderId;
 let items = [];
 let initialBudget = 0;
 
-async function cargarPresupuestoInicial() {
-  if (!folderId) return;
-
-  const folderRef = doc(db, "carpetas", folderId);
-  const folderSnap = await getDoc(folderRef);
-
-  if (folderSnap.exists()) {
-    const data = folderSnap.data();
-    initialBudget = data.presupuestoInicial || 0;
-
-    if (initialBudget > 0) {
-      if (budgetScreen) budgetScreen.classList.remove('visible');
-    } else {
-      if (budgetScreen) budgetScreen.classList.add('visible');
-    }
-
-
-    updateBudgetDisplay();
-  } else {
-    console.warn("⚠️ No se encontró la carpeta o no tiene presupuesto.");
-    // Si la carpeta no existe (raro), mostramos el popup por seguridad
-    if (budgetScreen) budgetScreen.classList.add('visible');
-  }
-}
-
-
-async function guardarPresupuestoInicial() {
-  if (!folderId) return;
-  const folderRef = doc(db, "carpetas", folderId);
-  await updateDoc(folderRef, { presupuestoInicial: initialBudget });
-  console.log("✅ Presupuesto inicial guardado correctamente en Firestore");
-}
-
-
-// ---------- Referencias DOM ----------
+// ---------- Referencias DOM (Movidar arriba para usarlas en las funciones) ----------
 const budgetScreen = document.getElementById('budget-screen');
 const budgetForm = document.getElementById('budget-form');
 const budgetInput = document.getElementById('budget-input');
@@ -68,21 +34,57 @@ const remainingCard = document.getElementById('remaining-card');
 
 const addItemForm = document.getElementById('add-item-form');
 const itemNameInput = document.getElementById('item-name');
-const itemCategorySelect = document.getElementById('item-category'); // NUEVO
+const itemCategorySelect = document.getElementById('item-category');
 const itemCostInput = document.getElementById('item-cost');
-const itemQuantityInput = document.getElementById('item-quantity'); // NUEVO
+const itemQuantityInput = document.getElementById('item-quantity');
 
 const itemsContainer = document.getElementById('items-container');
 const suggestionsContainer = document.getElementById('suggestions');
 
+
+// ---------- Funciones Principales ----------
+
+async function cargarPresupuestoInicial() {
+  if (!folderId) return;
+
+  const folderRef = doc(db, "carpetas", folderId);
+  const folderSnap = await getDoc(folderRef);
+
+  if (folderSnap.exists()) {
+    const data = folderSnap.data();
+    initialBudget = data.presupuestoInicial || 0;
+
+    // CORRECCIÓN AQUÍ: Usamos la clase 'hidden'
+    if (initialBudget > 0) {
+      // Si ya tiene presupuesto, aseguramos que esté oculto
+      if (budgetScreen) budgetScreen.classList.add('hidden');
+    } else {
+      // Si el presupuesto es 0, mostramos el popup (quitando hidden)
+      if (budgetScreen) budgetScreen.classList.remove('hidden');
+    }
+
+    updateBudgetDisplay();
+  } else {
+    // Si no existe la carpeta, mostramos el popup
+    if (budgetScreen) budgetScreen.classList.remove('hidden');
+  }
+}
+
+async function guardarPresupuestoInicial() {
+  if (!folderId) return;
+  const folderRef = doc(db, "carpetas", folderId);
+  await updateDoc(folderRef, { presupuestoInicial: initialBudget });
+  console.log("✅ Presupuesto inicial guardado correctamente en Firestore");
+}
+
 // ---------- Utilidades ----------
 function formatCurrency(amount) {
-  const hasCents = Math.round(amount * 100) % 100 !== 0;
-  return new Intl.NumberFormat('en-US', {
+  // Configuración para Chile (es-CL), Peso Chileno (CLP), sin decimales
+  return new Intl.NumberFormat('es-CL', {
     style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: hasCents ? 2 : 0,
-    maximumFractionDigits: hasCents ? 2 : 0
+    currency: 'CLP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
   }).format(amount);
 }
 
@@ -94,16 +96,18 @@ function computeTotals() {
 
 function updateBudgetDisplay() {
   const { total, remaining } = computeTotals();
-  initialBudgetEl.textContent = formatCurrency(initialBudget);
-  totalSpentEl.textContent = formatCurrency(total);
-  remainingBudgetEl.textContent = formatCurrency(remaining);
+  if (initialBudgetEl) initialBudgetEl.textContent = formatCurrency(initialBudget);
+  if (totalSpentEl) totalSpentEl.textContent = formatCurrency(total);
+  if (remainingBudgetEl) remainingBudgetEl.textContent = formatCurrency(remaining);
 
-  if (remaining < 0) {
-    remainingBudgetEl.classList.add('negative');
-    remainingCard.classList.add('negative');
-  } else {
-    remainingBudgetEl.classList.remove('negative');
-    remainingCard.classList.remove('negative');
+  if (remainingBudgetEl && remainingCard) {
+    if (remaining < 0) {
+      remainingBudgetEl.classList.add('negative');
+      remainingCard.classList.add('negative');
+    } else {
+      remainingBudgetEl.classList.remove('negative');
+      remainingCard.classList.remove('negative');
+    }
   }
 }
 
@@ -147,7 +151,7 @@ function renderItems() {
     row.className = 'item-row';
     row.dataset.id = it.id;
     
-    const totalCost = it.cost * it.quantity; // <<< ESTO ERA LO QUE FALTABA
+    const totalCost = it.cost * it.quantity;
 
     row.innerHTML = `
       <div class="col-number">${index + 1}</div>
@@ -192,11 +196,8 @@ async function addItem(name, cost, quantity, category) {
   if (folderId) {
     const inventoryRef = collection(db, "carpetas", folderId, "inventario");
     await setDoc(doc(inventoryRef, id), newItem);
-    console.log("🟢 Item guardado en Firestore:", newItem);
   }
 }
-
-
 
 async function deleteItemById(id) {
   items = items.filter(i => i.id !== id);
@@ -206,10 +207,8 @@ async function deleteItemById(id) {
   if (folderId) {
     const itemRef = doc(db, "carpetas", folderId, "inventario", id);
     await deleteDoc(itemRef);
-    console.log("🗑️ Item eliminado de Firestore:", id);
   }
 }
-
 
 function showEditPopup(id) {
   const item = items.find(i => i.id === id);
@@ -243,25 +242,23 @@ function showEditPopup(id) {
     </div>
   `;
 
-  // Posicionamiento
+  // Posicionamiento inteligente
   const btn = document.querySelector(`.edit-btn[data-id="${id}"]`);
   const rect = btn.getBoundingClientRect();
   const popupWidth = 220;
-  const spaceRight = window.innerWidth - rect.right;
-  const spaceLeft = rect.left;
+  
   popup.style.position = 'absolute';
   popup.style.top = `${rect.top + window.scrollY - 10}px`;
-  if (spaceRight > popupWidth + 20) {
-    popup.style.left = `${rect.right + 10}px`;
-  } else if (spaceLeft > popupWidth + 20) {
-    popup.style.left = `${rect.left - popupWidth - 10}px`;
+  
+  // Lógica simple para que no se salga de la pantalla
+  if (rect.right + popupWidth + 20 < window.innerWidth) {
+     popup.style.left = `${rect.right + 10}px`;
   } else {
-    popup.style.left = `${rect.left - popupWidth / 2 + rect.width / 2}px`;
+     popup.style.left = `${rect.left - popupWidth - 10}px`;
   }
 
   document.body.appendChild(popup);
 
-  // Seleccionar categoría actual
   const categorySelect = popup.querySelector('.edit-category');
   categorySelect.value = item.category || "Otros";
 
@@ -280,7 +277,6 @@ function showEditPopup(id) {
     updateBudgetDisplay();
     popup.remove();
 
-    // 🔥 Guardar cambios en Firestore
     if (folderId && item.id) {
       const itemRef = doc(db, "carpetas", folderId, "inventario", item.id);
       await updateDoc(itemRef, {
@@ -289,7 +285,6 @@ function showEditPopup(id) {
         quantity: item.quantity,
         category: item.category
       });
-      console.log("✏️ Item actualizado en Firestore:", item);
     }
   });
 
@@ -338,8 +333,11 @@ if (budgetForm) {
     const val = parseFloat(budgetInput.value);
     if (!isNaN(val) && val >= 0) {
       initialBudget = val;
-      await guardarPresupuestoInicial(); // 🔥 Guarda en Firestore
-      if (budgetScreen) budgetScreen.classList.remove('visible');
+      await guardarPresupuestoInicial(); 
+      
+      // CORRECCIÓN AQUÍ: Ocultar agregando la clase 'hidden'
+      if (budgetScreen) budgetScreen.classList.add('hidden');
+      
       updateBudgetDisplay();
       renderItems();
     } else budgetInput.focus();
@@ -391,20 +389,15 @@ if (itemsContainer) {
           <button class="confirm-no">No</button>
         </div>
       `;
-
+      // (Estilos de posición similar al edit popup...)
       const rect = deleteBtn.getBoundingClientRect();
       const popupWidth = 220;
-      const spaceRight = window.innerWidth - rect.right;
-      const spaceLeft = rect.left;
-
       popup.style.position = 'absolute';
       popup.style.top = `${rect.top + window.scrollY - 10}px`;
-      if (spaceRight > popupWidth + 20) {
-        popup.style.left = `${rect.right + 10}px`;
-      } else if (spaceLeft > popupWidth + 20) {
-        popup.style.left = `${rect.left - popupWidth - 10}px`;
+      if (rect.right + popupWidth + 20 < window.innerWidth) {
+         popup.style.left = `${rect.right + 10}px`;
       } else {
-        popup.style.left = `${rect.left - popupWidth / 2 + rect.width / 2}px`;
+         popup.style.left = `${rect.left - popupWidth - 10}px`;
       }
 
       document.body.appendChild(popup);
@@ -427,7 +420,7 @@ if (itemsContainer) {
   });
 }
 
-//cambio acá para que se vean los cambios en tiempo real
+// Listener tiempo real
 function listenInventory() {
   if (!folderId) return;
 
@@ -437,7 +430,6 @@ function listenInventory() {
     items = snapshot.docs.map(doc => doc.data());
     renderItems();
     updateBudgetDisplay();
-    console.log("📦 Inventario actualizado:", items);
   });
 }
 
@@ -446,7 +438,6 @@ const editBudgetBtn = document.getElementById('edit-budget-btn');
 
 if (editBudgetBtn) {
   editBudgetBtn.addEventListener('click', () => {
-    // Crear el popup flotante
     const popup = document.createElement('div');
     popup.className = 'edit-popup';
     popup.innerHTML = `
@@ -460,7 +451,6 @@ if (editBudgetBtn) {
       </div>
     `;
 
-    // Estilo básico para el popup (centrado)
     Object.assign(popup.style, {
       position: 'fixed',
       top: '0',
@@ -486,15 +476,13 @@ if (editBudgetBtn) {
 
     document.body.appendChild(popup);
 
-    // Eventos del popup
     document.getElementById('save-budget').addEventListener('click', async () => {
       const newVal = parseFloat(document.getElementById('new-budget-input').value);
       if (!isNaN(newVal) && newVal >= 0) {
         initialBudget = newVal;
-        await guardarPresupuestoInicial(); // 🔥 Guarda en Firestore
+        await guardarPresupuestoInicial();
         updateBudgetDisplay();
         popup.remove();
-        console.log("💰 Presupuesto inicial editado y guardado:", newVal);
       }
     });
 
@@ -502,26 +490,19 @@ if (editBudgetBtn) {
   });
 }
 
-
-
 // Inicialización
 document.addEventListener('DOMContentLoaded', async () => {
   renderSuggestions();
   updateBudgetDisplay();
   await cargarPresupuestoInicial();
-  listenInventory(); // 🔥 ahora se actualiza en tiempo real
+  listenInventory();
 });
-
-
-
-//QUITAR ESTO SI HAY ERRROR EN CARPETAS
 
 // === EXPORT PARA DESCARGAS (INVENTARIO) ===
 export async function getInventoryData() {
   if (!folderId) return [];
   const inventoryRef = collection(db, "carpetas", folderId, "inventario");
   const snapshot = await getDocs(inventoryRef);
-  // devolver array plano con campos útiles
   return snapshot.docs.map(d => d.data());
 }
 
@@ -531,17 +512,14 @@ const searchInput = document.getElementById('search-input');
 if (searchInput) {
   searchInput.addEventListener('input', () => {
     const query = searchInput.value.trim().toLowerCase();
-
     const filteredItems = items.filter(it => {
       return it.name.toLowerCase().includes(query) ||
              (it.category && it.category.toLowerCase().includes(query));
     });
-
     renderFilteredItems(filteredItems);
   });
 }
 
-// Función para renderizar items filtrados
 function renderFilteredItems(filtered) {
   itemsContainer.innerHTML = '';
 
@@ -568,7 +546,6 @@ function renderFilteredItems(filtered) {
     const row = document.createElement('div');
     row.className = 'item-row';
     row.dataset.id = it.id;
-
     const totalCost = it.cost * it.quantity;
 
     row.innerHTML = `
@@ -585,6 +562,5 @@ function renderFilteredItems(filtered) {
     `;
     fragment.appendChild(row);
   });
-
   itemsContainer.appendChild(fragment);
 }

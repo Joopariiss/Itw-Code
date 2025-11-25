@@ -142,18 +142,39 @@ downloadBtn?.addEventListener("click", async () => {
       const costoTotalItem = costoUnitario * cantidad;
       totalGasto += costoTotalItem;
 
+      // ... dentro del map de invClean ...
       return {
         Nombre: item.name || "",
         Categoría: item.category || "",
         Cantidad: cantidad,
-        "Costo Unitario": costoUnitario.toLocaleString("es-CL", { style: "currency", currency: "CLP" }),
-        "Costo Total": costoTotalItem.toLocaleString("es-CL", { style: "currency", currency: "CLP" }),
+        // Forzamos 0 decimales aquí también
+        "Costo Unitario": costoUnitario.toLocaleString("es-CL", { 
+            style: "currency", 
+            currency: "CLP", 
+            minimumFractionDigits: 0, 
+            maximumFractionDigits: 0 
+        }),
+        "Costo Total": costoTotalItem.toLocaleString("es-CL", { 
+            style: "currency", 
+            currency: "CLP", 
+            minimumFractionDigits: 0, 
+            maximumFractionDigits: 0 
+        }),
       };
+      // ...
     });
 
     invClean.push(
       {},
-      { Nombre: "TOTAL", "Costo Total": totalGasto.toLocaleString("es-CL", { style: "currency", currency: "CLP" }) }
+      { 
+        Nombre: "TOTAL", 
+        "Costo Total": totalGasto.toLocaleString("es-CL", { 
+            style: "currency", 
+            currency: "CLP", 
+            minimumFractionDigits: 0, 
+            maximumFractionDigits: 0 
+        }) 
+      }
     );
 
     const invSheet = XLSX.utils.json_to_sheet(invClean);
