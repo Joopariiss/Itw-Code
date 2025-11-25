@@ -12,7 +12,7 @@ import {
 } from "./db.js";
 
 // ✅ IMPORTAR la función desde global.js
-import { setCurrentUserId } from "../DASHBOARD/global.js"; // Ajusta ruta según tu estructura de carpetas
+import { setCurrentUserId } from "../DASHBOARD/global.js"; 
 
 const tripList = document.getElementById('tripList');
 const modal = document.getElementById('modal');
@@ -23,12 +23,11 @@ const addTripBtn = document.getElementById('addTripBtn');
 const cancelBtn = document.getElementById('cancelBtn');
 const tripNameInput = document.getElementById('tripName');
 
-// 🔹 Popup
+// 🔹 Popup General
 const popup = document.getElementById("popup");
 const popupMessage = document.getElementById("popup-message");
 const popupClose = document.getElementById("popup-close");
 
-// Funciones del popup
 function showPopup(message) {
   popupMessage.textContent = message;
   popup.style.display = "flex";
@@ -36,6 +35,27 @@ function showPopup(message) {
 popupClose.addEventListener("click", () => popup.style.display = "none");
 window.addEventListener("click", e => {
   if (e.target === popup) popup.style.display = "none";
+});
+
+
+// 🔹 Modal de Confirmación Personalizado
+const confirmModal = document.getElementById('confirmModal');
+const confirmMessage = document.getElementById('confirmMessage');
+const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
+// Función para cerrar el modal de confirmación
+function closeConfirmModal() {
+    confirmModal.style.display = 'none';
+    confirmDeleteBtn.onclick = null; // Limpiar evento para evitar duplicados
+}
+
+// Evento para cerrar con el botón cancelar
+cancelDeleteBtn.addEventListener('click', closeConfirmModal);
+
+// Cerrar si se hace clic fuera del modal
+window.addEventListener('click', e => {
+    if (e.target === confirmModal) closeConfirmModal();
 });
 
 let userId = null;
@@ -52,23 +72,15 @@ async function getUnsplashImage(folderName) {
   try {
     const response = await fetch(apiUrl);
     const data = await response.json();
-
-    // Si no hay resultados, devolvemos un fallback bonito
     if (!data.results || data.results.length === 0) {
-      return "https://images.unsplash.com/photo-1507525428034-b723cf961d3e"; // playa bonita
+      return "https://images.unsplash.com/photo-1507525428034-b723cf961d3e"; 
     }
-
-    // Tomar una al azar para más variedad
     const randomImg = data.results[Math.floor(Math.random() * data.results.length)];
     return randomImg.urls.regular;
-    
   } catch (error) {
-    // Si falla la API, usar fallback
     return "https://images.unsplash.com/photo-1507525428034-b723cf961d3e";
   }
 }
-
-
 
 // ---------- MODO ----------
 function setMode(mode) {
@@ -100,7 +112,6 @@ if (deleteFolderBtn) {
   });
 }
 
-
 cancelBtn.addEventListener('click', () => closeModal());
 window.addEventListener('click', e => {
   if (e.target === modal) closeModal();
@@ -112,55 +123,96 @@ function closeModal() {
   setMode(null);
 }
 
-  // ---------- FIREBASE AUTH ----------
-  auth.onAuthStateChanged(async (user) => {
-    if (!user) return;
-    userId = user.uid;
-    setCurrentUserId(userId);
-    localStorage.setItem("currentUserId", userId); // 🔹 persistir para otras páginas
-    await cargarCarpetas();
-  });
+// ---------- FIREBASE AUTH ----------
+auth.onAuthStateChanged(async (user) => {
+  if (!user) return;
+  userId = user.uid;
+  setCurrentUserId(userId);
+  localStorage.setItem("currentUserId", userId); 
+  await cargarCarpetas();
+});
 
 
-// ---------- CARGAR CARPETAS ----------
+// ---------- CARGAR CARPETAS (CON ORDENAMIENTO) ----------
 async function cargarCarpetas() {
   tripList.innerHTML = "";
 
-  // Carpetas propias
-  const folders = await getUserFolders(userId);
-  folders.forEach(folder => renderFolder(folder, "propia"));
-
-  // Carpetas compartidas (donde estoy invitado)
+  // 1. Obtener carpetas
+  const myFolders = await getUserFolders(userId);
   const invitedFolders = await getInvitedFolders(userId);
-  invitedFolders.forEach(folder => renderFolder(folder, folder.status));
+
+  // 2. Unificar y ordenar por FECHA (createdAt) descendente (más nuevo primero)
+  // Si una carpeta antigua no tiene 'createdAt', se asume 0 (va al final)
+  const allFolders = [...myFolders, ...invitedFolders].sort((a, b) => {
+    const dateA = a.createdAt || 0;
+    const dateB = b.createdAt || 0;
+    return dateB - dateA; // De mayor a menor (Más nuevo arriba)
+  });
+
+  // 3. Renderizar en orden
+  for (const folder of allFolders) {
+    // Determinar estatus para la función render
+    let status = "propia";
+    if (folder.status) status = folder.status; // si viene de invitedFolders tiene status
+    
+    await renderFolder(folder, status);
+  }
 }
+
+// ---------- FUNCIÓN EXTRAÍDA: MOSTRAR POPUP INVITACIÓN ----------
+function triggerInvitePopup(folder) {
+  // Borrar popup anterior si existe para evitar superposiciones
+  const existingPopup = document.querySelector(".invite-popup");
+  if (existingPopup) existingPopup.remove();
+
+  const confirmOverlay = document.createElement("div");
+  confirmOverlay.classList.add("invite-popup");
+  confirmOverlay.innerHTML = `
+    <div class="popup-content">
+      <h3>📩 Invitación a carpeta</h3>
+      <p>Has sido invitado a la carpeta <b>${folder.name}</b>.</p>
+      <div style="display:flex; justify-content:space-around; margin-top:15px;">
+        <button id="acceptInvite" style="background:#4CAF50; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer;">Aceptar</button>
+        <button id="rejectInvite" style="background:#d9534f; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer;">Rechazar</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(confirmOverlay);
+
+  confirmOverlay.querySelector("#acceptInvite").onclick = async () => {
+    await acceptInvitation(folder.id, userId);
+    document.body.removeChild(confirmOverlay);
+    showPopup(`Has aceptado la invitación a "${folder.name}"`);
+    await cargarCarpetas();
+  };
+
+  confirmOverlay.querySelector("#rejectInvite").onclick = async () => {
+    await rejectInvitation(folder.id, userId);
+    document.body.removeChild(confirmOverlay);
+    showPopup(`Has rechazado la invitación a "${folder.name}"`);
+    await cargarCarpetas();
+  };
+}
+
 
 // ---------- RENDERIZAR UNA CARPETA ----------
 async function renderFolder(folder, status = "propia") {
 
-  // === 1. Cargar fechas desde Firestore ===
   const fechas = await getFolderDates(folder.id);
   const startDate = fechas?.fechaInicio || "Sin fecha";
   const endDate   = fechas?.fechaFin || "Sin fecha";
 
-  // === 2. LÓGICA MEJORADA: VERIFICAR SI SOY EL DUEÑO ===
-  // CAMBIO DE LÓGICA AQUI
   let ownerName;
-
   if (folder.userId === userId) {
-      // SI EL ID DE LA CARPETA COINCIDE CON MI ID LOGUEADO
       ownerName = "Tú"; 
   } else {
-      // SI NO SOY YO, BUSCO EL NOMBRE EN LA BASE DE DATOS
       ownerName = await getOwnerName(folder.userId); 
   }
 
-  // === 2. Crear tarjeta ===
   const card = document.createElement("div");
   card.className = "trip-card";
   card.dataset.id = folder.id;
 
-  // Imagen automática de paisaje
   const imageUrl = await getUnsplashImage(folder.name);
 
   card.innerHTML = `
@@ -183,47 +235,25 @@ async function renderFolder(folder, status = "propia") {
     </div>
   `;
 
-  // =============================
-  // CLICK, INVITACIONES, MENÚ, etc
-  // (todo tu código original tal cual)
-  // =============================
+  // ==========================================
+  // 🔥 LOGICA DE AUTO-POPUP (NUEVO)
+  // ==========================================
+  if (status === "pendiente") {
+    // Mostrar automáticamente si no hay otro popup abierto
+    if (!document.querySelector(".invite-popup")) {
+       triggerInvitePopup(folder);
+    }
+  }
 
-  // comportamiento al hacer clic
+  // Click en la tarjeta
   card.addEventListener("click", async () => {
+    // Si está pendiente, mostramos el popup (reutilizando la función)
     if (status === "pendiente") {
-      const confirmOverlay = document.createElement("div");
-      confirmOverlay.classList.add("invite-popup");
-      confirmOverlay.innerHTML = `
-        <div class="popup-content">
-          <h3>📩 Invitación a carpeta</h3>
-          <p>Has sido invitado a la carpeta <b>${folder.name}</b>.</p>
-          <div style="display:flex; justify-content:space-around; margin-top:15px;">
-            <button id="acceptInvite" style="background:#4CAF50; color:white; border:none; padding:8px 16px; border-radius:8px;">Aceptar</button>
-            <button id="rejectInvite" style="background:#d9534f; color:white; border:none; padding:8px 16px; border-radius:8px;">Rechazar</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(confirmOverlay);
-
-      confirmOverlay.querySelector("#acceptInvite").onclick = async () => {
-        await acceptInvitation(folder.id, userId);
-        document.body.removeChild(confirmOverlay);
-        showPopup(`Has aceptado la invitación a "${folder.name}"`);
-        await cargarCarpetas();
-      };
-
-      confirmOverlay.querySelector("#rejectInvite").onclick = async () => {
-        await rejectInvitation(folder.id, userId);
-        document.body.removeChild(confirmOverlay);
-        showPopup(`Has rechazado la invitación a "${folder.name}"`);
-        await cargarCarpetas();
-      };
+      triggerInvitePopup(folder);
       return;
     }
 
-    // ------------------------------------------------------
-    // 🔒 PARTE B — BLOQUEO para usuarios invitados
-    // ------------------------------------------------------
+    // Bloqueo invitados
     if (status !== "propia") {
       if (currentMode === "modificar") {
         showPopup("Solo el dueño puede modificar esta carpeta.");
@@ -234,8 +264,8 @@ async function renderFolder(folder, status = "propia") {
         return;
       }
     }
-    // ------------------------------------------------------
 
+    // Modos normales
     if (currentMode === "modificar") {
       selectedFolderId = folder.id;
       selectedFolderDiv = card;
@@ -244,11 +274,18 @@ async function renderFolder(folder, status = "propia") {
       addTripBtn.textContent = "Guardar cambios";
     } 
     else if (currentMode === "eliminar") {
-      if (!confirm(`¿Seguro que quieres eliminar la carpeta "${folder.name}"?`)) return;
-      await deleteFolder(folder.id);
-      tripList.removeChild(card);
-      showPopup(`Carpeta "${folder.name}" eliminada`);
-    } 
+      // Abrimos el modal personalizado
+      confirmMessage.textContent = `¿Seguro que quieres eliminar la carpeta "${folder.name}"? Esta acción no se puede deshacer.`;
+      confirmModal.style.display = 'flex';
+
+      // Definimos qué pasa cuando dicen "Sí"
+      confirmDeleteBtn.onclick = async () => {
+          confirmModal.style.display = 'none'; // Cerrar modal inmediatamente
+          await deleteFolder(folder.id);       // Lógica original de DB
+          await cargarCarpetas();              // Recargar UI
+          showPopup(`Carpeta "${folder.name}" eliminada`); // Tu popup de éxito original
+      };
+    }
     else {
       window.location.href = `../DASHBOARD/index.html?id=${folder.id}`;
     }
@@ -256,15 +293,12 @@ async function renderFolder(folder, status = "propia") {
 
   tripList.appendChild(card);
 
-  // menú contextual
+  // Menú contextual (Click derecho)
   card.addEventListener("contextmenu", (e) => {
     e.preventDefault();
 
-
-    // Si el usuario NO es dueño, NO mostrar menú
     if (status !== "propia") return;
 
-    // Si ya hay un menú abierto, lo eliminamos
     document.querySelectorAll(".context-menu").forEach(menu => menu.remove());
 
     const menu = document.createElement("div");
@@ -275,7 +309,6 @@ async function renderFolder(folder, status = "propia") {
     `;
     document.body.appendChild(menu);
 
-    // Posicionar menú cerca del cursor
     menu.style.top  = `${e.pageY}px`;
     menu.style.left = `${e.pageX}px`;
     menu.style.display = "block";
@@ -290,16 +323,22 @@ async function renderFolder(folder, status = "propia") {
       menu.remove();
     };
 
-    menu.querySelector(".delete-folder").onclick = async () => {
-      if (confirm(`¿Seguro que quieres eliminar la carpeta "${folder.name}"?`)) {
-        await deleteFolder(folder.id);
-        tripList.removeChild(card);
-        showPopup(`Carpeta "${folder.name}" eliminada`);
-      }
-      menu.remove();
+    menu.querySelector(".delete-folder").onclick = () => {
+      menu.remove(); // Quitamos el menú contextual primero
+
+      // Abrimos el modal personalizado
+      confirmMessage.textContent = `¿Seguro que quieres eliminar la carpeta "${folder.name}"?`;
+      confirmModal.style.display = 'flex';
+
+      // Definimos qué pasa cuando dicen "Sí"
+      confirmDeleteBtn.onclick = async () => {
+          confirmModal.style.display = 'none';
+          await deleteFolder(folder.id);
+          await cargarCarpetas(); 
+          showPopup(`Carpeta "${folder.name}" eliminada`);
+      };
     };
 
-    // Cerrar el menú si se hace clic fuera
     document.addEventListener("click", () => menu.remove(), { once: true });
   });
 }
@@ -311,21 +350,18 @@ addTripBtn.addEventListener('click', async () => {
 
   if (currentMode === "modificar" && selectedFolderId) {
     await updateFolder(selectedFolderId, name);
-
-    // actualizar título
+    // Recargar todo para re-ordenar si fuera necesario (aunque modificar nombre no cambia fecha)
+    // Pero para simplificar, podemos solo actualizar el DOM si queremos rapidez
     selectedFolderDiv.querySelector(".trip-title").textContent = name;
-
-    // actualizar imagen
     const newImageUrl = await getUnsplashImage(name);
     selectedFolderDiv.querySelector(".trip-image").src = newImageUrl;
-
-
     showPopup("Carpeta modificada correctamente");
   }
 
   else if (currentMode === "agregar") {
-    const folder = await createFolder(name, userId);
-    renderFolder(folder);
+    await createFolder(name, userId);
+    // Recargar todo para que la nueva carpeta salga PRIMERA
+    await cargarCarpetas();
     showPopup("Carpeta creada correctamente");
   }
 

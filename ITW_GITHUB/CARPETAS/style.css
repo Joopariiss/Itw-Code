@@ -203,6 +203,8 @@ main {
     transition: background 0.3s ease;
 }
 
+
+
 #cancelBtn {
     background: #545b63; /* Gris más oscuro para cancelar */
     color: #F3F4F6;
@@ -455,4 +457,89 @@ body[data-mode="modificar"] .trip:hover {
 }
 .trip-owner b {
     color: #F3F4F6; /* Negrita claro */
+}
+
+/* ========================================= */
+/* === POPUP DE INVITACIÓN (FLOTANTE) === */
+/* ========================================= */
+
+.invite-popup {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 3000; /* Asegura que quede por encima de todo, incluido el header */
+    
+    /* Estilo de Tarjeta Dark */
+    background-color: #374151; /* Gris Pizarra Medio */
+    color: #F3F4F6;
+    border-radius: 12px;
+    
+    /* Dimensiones */
+    width: 320px;
+    padding: 20px;
+    
+    /* Decoración Visual */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Sombra profunda */
+    border: 1px solid #548A5E; /* Borde verde para destacar */
+    border-left: 6px solid #548A5E; /* Borde izquierdo más grueso */
+    
+    /* Animación de entrada deslizante */
+    animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Ajustes de texto internos */
+.invite-popup h3 {
+    margin-top: 0;
+    font-size: 1.1rem;
+    color: #548A5E; /* Título en verde */
+    margin-bottom: 8px;
+}
+
+.invite-popup p {
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    color: #d1d5db;
+    line-height: 1.4;
+}
+
+/* Animación para que entre suavemente desde la derecha */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* ========================================= */
+/* === ESTILOS DEL MODAL DE CONFIRMACIÓN === */
+/* ========================================= */
+
+/* Ajuste específico para el contenido de confirmación */
+.confirm-content {
+    border-left: 6px solid #a84742; /* Borde rojo elegante a la izquierda */
+    max-width: 400px; /* Un poco más ancho para leer mejor el texto */
+}
+
+/* Botón de peligro (Eliminar) */
+.btn-danger {
+    background-color: #a84742; /* Rojo oscuro elegante */
+    color: #F3F4F6;
+}
+
+.btn-danger:hover {
+    background-color: #8c3b36; /* Rojo más oscuro al hover */
+}
+
+/* El botón cancelar reutiliza los estilos de tu botón gris existente, 
+   pero aseguramos que el texto sea legible */
+#cancelDeleteBtn {
+    background: #545b63;
+    color: #F3F4F6;
+}
+#cancelDeleteBtn:hover {
+    background: #4a5157;
 }

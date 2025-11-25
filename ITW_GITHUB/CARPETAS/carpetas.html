@@ -61,11 +61,20 @@
   <div id="popup" class="popup">
     <div class="popup-content">
       <p id="popup-message"></p>
-      <button id="popup-close">Cerrar</button>
+      <button id="popup-close">Aceptar</button>
     </div>
   </div>
-  
 
+  <div id="confirmModal" class="modal">
+    <div class="modal-content confirm-content">
+      <h3 style="color: #a84742; margin-top:0;">⚠️ Eliminar Carpeta</h3>
+      <p id="confirmMessage">¿Estás seguro?</p>
+      <div class="modal-buttons">
+        <button id="cancelDeleteBtn">Cancelar</button>
+        <button id="confirmDeleteBtn" class="btn-danger">Sí, Eliminar</button>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="script.js"></script>
 </body>

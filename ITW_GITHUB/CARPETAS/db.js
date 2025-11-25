@@ -15,16 +15,17 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 /* ==========================================================
-   CREAR CARPETA
+   CREAR CARPETA (AHORA CON FECHA)
    ========================================================== */
 export async function createFolder(name, userId) {
   try {
     const docRef = await addDoc(collection(db, "carpetas"), {
       name: name,
       userId: userId,
+      createdAt: Date.now() // <--- NUEVO: Guardamos la fecha actual
     });
     console.log("📁 Carpeta creada con ID:", docRef.id);
-    return { id: docRef.id, name };
+    return { id: docRef.id, name, createdAt: Date.now() };
   } catch (error) {
     console.error("❌ Error creando carpeta:", error);
   }
