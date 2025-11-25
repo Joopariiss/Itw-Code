@@ -72,16 +72,49 @@ body {
 .btn-accent { background-color: var(--accent); color: var(--accent-foreground); }
 .btn-destructive { background-color: transparent; color: var(--destructive); }
 
-/* Botón flotante (Descargar e Invitar) */
+/* ============================================== */
+/* === BOTONES FLOTANTES (MODO VERTICAL) === */
+/* ============================================== */
+
 .btn-floating {
-    position: fixed; /* Ojo: Fixed para que siempre se vea al scrollear */
-    top: 20px;
+    position: fixed;
     z-index: 50;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    right: 20px; /* Ambos alineados a la derecha */
+    
+    /* TAMAÑO MÁS PEQUEÑO */
+    padding: 0.4rem 0.8rem; /* Menos relleno */
+    font-size: 0.8rem;      /* Texto más pequeño */
+    min-width: 140px;       /* Ancho mínimo para que se vean uniformes */
+    
+    /* ESTILOS VISUALES (Glassmorphism) */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(4px);
+    border-radius: var(--radius);
+    
+    /* Transición suave */
+    transition: all 0.3s ease;
 }
 
-.btn-invite { right: 20px; } /* Ajuste de posición */
-.btn-download { right: 180px; } /* Ajuste para que no se pisen */
+/* Efecto Hover */
+.btn-floating:hover {
+    transform: translateX(-3px); /* Se mueve un poco a la izquierda al pasar el mouse */
+    filter: brightness(1.1);
+}
+
+/* === POSICIONES INDIVIDUALES (Uno debajo del otro) === */
+
+/* 1. Botón Invitar (Arriba) */
+.btn-invite { 
+    top: 20px; 
+    background: linear-gradient(135deg, var(--primary), #44704B);
+} 
+
+/* 2. Botón Descargar (Abajo, con separación) */
+.btn-download { 
+    top: 70px; /* 20px (top inicial) + altura botón + 10px de espacio */
+    background: linear-gradient(135deg, var(--accent), #236c6d);
+}
 
 .back-button {
     position: fixed;
