@@ -62,19 +62,39 @@ main {
 /* ======= DISEÑO DE CARPETAS ======= */
 .trip-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    
+    /* TRUCO MATEMÁTICO:
+       - Usamos '23%' como mínimo. Esto garantiza que entren máximo 4 por fila 
+         (porque 23% x 5 = 115%, lo cual excede el 100% y fuerza el salto de línea).
+       - '1fr' hace que las 4 carpetas se estiren para ocupar todo el ancho disponible.
+       - 'auto-fill' mantiene la alineación a la izquierda.
+    */
+    grid-template-columns: repeat(auto-fill, minmax(23%, 1fr));
+    
     gap: 30px;
-    justify-items: center;
+    
+    /* Alineación al inicio (izquierda) */
+    justify-content: start; 
+    
     margin-top: 40px;
 }
 
+/* AJUSTE RESPONSIVE: 
+   Para que en celulares no se vean 4 columnas diminutas, 
+   volvemos a un tamaño fijo en pantallas pequeñas */
+@media (max-width: 800px) {
+    .trip-list {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+}
+
 .trip-card {
-    background: #374151; /* Gris Pizarra Medio para las tarjetas */
+    background: #374151; 
     border-radius: 16px;
     overflow: hidden;
     width: 100%;
-    max-width: 360px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Sombra más fuerte para contraste */
+    /* max-width: 360px; <--- MANTENER COMENTADO O BORRADO */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); 
     text-decoration: none;
     color: inherit;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
