@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Organizador de Viajes</title>
 
+  <link rel="stylesheet" href="detalle.css">
   <link rel="stylesheet" href="global.css">   <link rel="stylesheet" href="planner.css">
   <link rel="stylesheet" href="inventory.css">
 
@@ -13,15 +14,12 @@
 
 <body>
 
+  <div id="online-users-badge" class="online-badge">
+    <span class="pulse-icon">●</span>
+    <span id="online-count">1</span> online
+  </div>
+
   <div class="back-button" id="backToHome">← Volver a carpetas</div>
-
-  <button id="invite-btn" class="btn btn-primary btn-floating btn-invite">
-      ➕ Invitar Usuarios
-  </button>
-
-  <button id="download-btn" class="btn btn-accent btn-floating btn-download">
-      📥 Descargar
-  </button>
 
   <header class="hero-header">
     <div class="overlay">
@@ -33,6 +31,7 @@
   <div class="tabs">
     <button class="tab-btn active" data-tab="planner">Itinerario</button>
     <button class="tab-btn" data-tab="inventory">Inventario</button>
+    <button class="tab-btn" data-tab="details">Detalles del Viaje</button>
   </div>
 
   <section id="planner" class="tab-content active">
@@ -169,8 +168,40 @@
                 </div>
           </div>
         </section>
-
       </div>
+    </div>
+  </section>
+
+
+  <section id="details" class="tab-content">
+    <div class="details-container">
+      
+      <div class="card mb-2">
+        <div class="card-header">
+          <div class="card-title">Gestionar Viaje</div>
+        </div>
+        <div class="details-actions">
+          <p class="text-muted mb-2">Acciones rápidas para tu carpeta.</p>
+          <div class="buttons-row">
+              <button id="details-invite-btn" class="btn btn-primary">
+                  ➕ Invitar Usuario
+              </button>
+              <button id="details-download-btn" class="btn btn-accent">
+                  📥 Descargar Excel
+              </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Participantes</div>
+        </div>
+        <div id="participants-list" class="user-list">
+          <p class="text-muted">Cargando usuarios...</p>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -185,6 +216,8 @@
       <p id="invite-status" class="text-center mt-2"></p>
     </div>
   </div>
+
+  <script src="detalle.js" type="module"></script>
 
   <script>
     // Recuperar ID de Carpeta
@@ -201,6 +234,9 @@
   <script type="module">
     import { db } from "../firebase.js";
     import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // 1. IMPORTAR LA FUNCIÓN (NUEVO)
+    import { initPresence } from "./activo.js";
 
     async function setRandomHeaderImage(folderName) {
       const header = document.querySelector(".hero-header");
@@ -223,21 +259,30 @@
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
-      const folderNameEl = document.getElementById("current-folder-name");
-      if (!window.folderId || !folderNameEl) return;
-      try {
-        const folderRef = doc(db, "carpetas", window.folderId);
-        const folderSnap = await getDoc(folderRef);
-        if (folderSnap.exists()) {
-          const data = folderSnap.data();
-          const folderName = data.name || "Sin nombre";
-          folderNameEl.textContent = folderName; // Texto simple y limpio
-          setRandomHeaderImage(folderName);
-        }
-      } catch (error) {
-        console.error("Error carpeta:", error);
-      }
-    });
+          const folderNameEl = document.getElementById("current-folder-name");
+          
+          // 2. INICIAR EL CONTADOR DE USUARIOS (NUEVO)
+          // Lo hacemos aquí para asegurarnos de que window.folderId ya existe
+          if (window.folderId) {
+              initPresence(); 
+          }
+
+          if (!window.folderId || !folderNameEl) return;
+          try {
+            const folderRef = doc(db, "carpetas", window.folderId);
+            const folderSnap = await getDoc(folderRef);
+            if (folderSnap.exists()) {
+              const data = folderSnap.data();
+              const folderName = data.name || "Sin nombre";
+              folderNameEl.textContent = folderName; 
+              setRandomHeaderImage(folderName);
+            }
+          } catch (error) {
+            console.error("Error carpeta:", error);
+          }
+        });
+
+    
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -245,6 +290,7 @@
   <script src="planner.js" type="module"></script>
   <script src="inventory.js" type="module"></script>
   <script src="dashboard.js" type="module"></script>
+  <script src="activo.js" type="module"></script>
   
   <script>
     document.getElementById("backToHome").addEventListener("click", () => {

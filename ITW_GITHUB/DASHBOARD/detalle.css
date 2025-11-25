@@ -1,0 +1,60 @@
+/* === ESTILOS PESTAÑA DETALLES === */
+
+.details-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    width: 95%;
+}
+
+.buttons-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* Lista de Usuarios */
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.user-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem;
+    background-color: rgba(0,0,0,0.2); /* Fondo sutil */
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.user-status {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.status-owner { background: rgba(84, 138, 94, 0.3); color: #86efac; border: 1px solid #86efac; }
+.status-pending { background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid #fde047; }
+.status-accepted { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid #93c5fd; }
