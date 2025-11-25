@@ -1,66 +1,81 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Into The World</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Into The World</title>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <!-- VIDEO DE FONDO -->
-   <!--
-  <video autoplay muted loop class="bg-video">
-    <source src="../VIDEOS/forest.mp4" type="video/mp4" />
-    Tu navegador no soporta video.
-  </video>
-  -->
+    <div class="logout-button" id="logoutButton">⎋ Cerrar Sesión</div>
 
-  <!-- Sección principal -->
-   <!--
-  <div class="main-wrapper">
-    <h1>Into The World</h1>
-    <h2 id="saludo"></h2>
-  </div>
-   -->
-  <div class="logout-button" id="logoutButton">⎋ Logout</div>
+    <header class="hero-header">
+        <div class="overlay">
+            <h1>Mi Perfil</h1>
+            <h2 id="saludo"></h2>
+            </div>
+    </header>
 
-  <header class="hero-header">
-    <div class="overlay">
-      <h1>Mi Perfil</h1>
-      <h2 id="saludo"></h2>
+<div id="perfil-container" class="perfil-card">
+        <div class="profile-header">
+            <div class="avatar" id="avatar">
+                <span id="avatar-initials"></span>
+                </div>
+            <h2 id="profile-name"></h2>
+            <p id="profile-description">¡Bienvenido a tu perfil!</p> 
+            <button class="edit-profile-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="profile-details">
+            <div class="data-group">
+                <span class="data-label">Nombre</span>
+                <span class="data-value" id="nombre"></span>
+            </div>
+            <div class="data-group">
+                <span class="data-label">Apellido</span>
+                <span class="data-value" id="apellido"></span>
+            </div>
+            <div class="data-group">
+                <span class="data-label">País</span>
+                <span class="data-value" id="pais"></span>
+            </div>
+            <div class="data-group">
+                <span class="data-label">Edad</span>
+                <span class="data-value" id="fechaNacimiento"></span>
+            </div>
+            <div class="data-group">
+                <span class="data-label">Correo Electrónico</span>
+                <span class="data-value" id="email"></span>
+            </div>
+            <div class="data-group">
+                <span class="data-label">Fecha de Registro</span>
+                <span class="data-value" id="fechaRegistro"></span>
+            </div>
+        </div>
     </div>
-  </header>
 
-  <div id="perfil-container" class="perfil-container">
-    <table>
-      <tr><th>Campos</th><th>Datos</th></tr>
-      <tr><td>Nombre</td><td id="nombre"></td></tr>
-      <tr><td>Apellido</td><td id="apellido"></td></tr>
-      <tr><td>País</td><td id="pais"></td></tr>
-      <tr><td>Edad</td><td id="fechaNacimiento"></td></tr>
-      <tr><td>Correo Electronico</td><td id="email"></td></tr>
-      <tr><td>Fecha de Registro</td><td id="fechaRegistro"></td></tr>
-    </table>
-  </div>
+    <div class="menu-toggle" id="menu-toggle">☰</div>
 
-  <!-- BOTÓN HAMBURGUESA -->
-  <div class="menu-toggle" id="menu-toggle">☰</div>
+    <aside class="sidebar-right" id="sidebar">
+        <ul>
+            <li><a href="#" class="active-link">Perfil</a></li>
+            <li><a href="#" class="btn-primary" id="carpetasBtn">Carpetas</a></li>
+        </ul>
+    </aside>
 
-  <!-- SIDEBAR DERECHO -->
-  <aside class="sidebar-right" id="sidebar">
-    <ul>
-      <li><a href="#">Perfil</a></li>
-      <li><a href="#" class="btn-primary" id="carpetasBtn">Carpetas</a></li>
-    </ul>
-  </aside>
-
-  <script type="module" src="script.js" defer></script>
-  <script>
-    document.getElementById("logoutButton").addEventListener("click", () => {
-      window.location.href = "../LOGOUT/logout.html";
-    });
-  </script>
-
+    <script type="module" src="script.js" defer></script>
+    <script>
+        document.getElementById("logoutButton").addEventListener("click", () => {
+            // Se mantiene la lógica del botón de cerrar sesión
+            window.location.href = "../LOGOUT/logout.html"; 
+        });
+    </script>
 </body>
 </html>
