@@ -35,27 +35,41 @@
 }
 
 /* ==== DISTRIBUCIÓN GENERAL DEL PLANNER ==== */
+/* ==== DISTRIBUCIÓN GENERAL DEL PLANNER ==== */
 .planner-container {
     display: grid;
-    grid-template-columns: 0.8fr 2.2fr; 
+    /* Mantenemos 340px fijos para el calendario a la izquierda
+       y '1fr' para que el itinerario ocupe TODO el espacio restante */
+    grid-template-columns: 340px 1fr; 
     gap: 2rem;
     align-items: flex-start;
-    max-width: 1200px;
+
+    /* --- AQUÍ ESTÁ EL CAMBIO CLAVE --- */
+    /* Antes tenías max-width: 1200px. 
+       Al poner 1600px o 95%, se estirará casi hasta los bordes como el inventario */
+    max-width: 98%; 
+    width: 100%; 
+    /* -------------------------------- */
+
     margin: 2rem auto;
     padding: 0 1rem;
+    box-sizing: border-box; /* Asegura que el padding no rompa el ancho */
 }
 
 /* ==== COLUMNA IZQUIERDA (CALENDARIO) ==== */
 .left-col-iti {
-    display: left;
-    justify-content: center; 
+    width: 100%;
 }
 
 #calendar-section {
     width: 100%;
-    max-width: 500px; 
-    padding: 1.3rem;
+    /* Quitamos max-width para que llene sus 340px asignados */
+    box-sizing: border-box; 
+    padding: 1rem; 
     text-align: center;
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
 #calendar-section h2 {
@@ -64,7 +78,7 @@
     gap: 0.5rem;
     font-size: 1.25rem;
     color: var(--foreground);
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem; 
     justify-content: center;
 }
 
@@ -83,17 +97,23 @@
 /* ==== COLUMNA DERECHA (ITINERARIO) ==== */
 .right-col-iti {
     width: 100%;
+    /* Min-width: 0 evita que el grid se rompa si el contenido es muy ancho */
+    min-width: 0; 
 }
 
 #itinerary-section {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     padding: 1.5rem;
+    /* Altura ajustada para scroll */
     overflow-y: auto;
-    max-height: 75vh; 
+    max-height: 80vh; 
 }
 
 #itinerary-section h2 {
     font-size: 1.5rem;
-    color: var(--primary); /* Verde principal */
+    color: var(--primary); 
     border-bottom: 2px solid var(--border);
     padding-bottom: 0.5rem;
 }
@@ -104,7 +124,7 @@
 /* ============================================== */
 
 .day-card {
-    background: var(--secondary); /* Fondo Gris Oscuro */
+    background: var(--secondary);
     border-radius: var(--radius);
     border: 1px solid var(--border);
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
@@ -118,7 +138,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem 1rem;
-    background: var(--card); /* Fondo Gris Medio */
+    background: var(--card);
     cursor: pointer;
     font-weight: 600;
     font-size: 1rem;
@@ -149,7 +169,7 @@
     align-items: center;
     padding: 0.7rem;
     border-radius: var(--radius);
-    background: var(--secondary); /* Fondo Gris Oscuro */
+    background: var(--secondary);
 }
 
 .activity .desc {
@@ -157,7 +177,6 @@
     margin-left: 0.5rem;
 }
 
-/* Botones dentro de la actividad (Editar/Eliminar) */
 .activity button {
     background: var(--primary);
     color: var(--primary-foreground);
@@ -182,15 +201,17 @@
 
 
 /* ============================================== */
-/* === PLANNER: ESTILOS DE CALENDARIO (FLATPCIKR) === */
+/* === PLANNER: ESTILOS DE CALENDARIO (FLATPICKR) === */
 /* ============================================== */
 
 .flatpickr-calendar {
     font-family: 'Inter', Arial, sans-serif;
-    border-radius: 0.75rem !important;
+    border-radius: 0.5rem !important; 
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     border: 1px solid var(--border);
     overflow: hidden;
+    /* Centrar el calendario dentro de su contenedor si sobra espacio */
+    margin: 0 auto; 
 }
 
 .flatpickr-months {
@@ -235,12 +256,14 @@
 }
 
 /* ==== ADAPTACIÓN A PANTALLAS PEQUEÑAS ==== */
-@media (max-width: 768px) {
+@media (max-width: 850px) {
     .planner-container {
+        /* En móviles, volvemos a una sola columna */
         grid-template-columns: 1fr;
     }
 
     #calendar-section {
         max-width: 100%;
+        padding: 1rem; 
     }
 }
