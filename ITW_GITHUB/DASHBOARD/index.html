@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="detalle.css">
   <link rel="stylesheet" href="global.css">   <link rel="stylesheet" href="planner.css">
   <link rel="stylesheet" href="inventory.css">
+  <link rel="stylesheet" href="checklist.css">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
@@ -31,6 +32,8 @@
   <div class="tabs">
     <button class="tab-btn active" data-tab="planner">Itinerario</button>
     <button class="tab-btn" data-tab="inventory">Inventario</button>
+    <button class="tab-btn" data-tab="checklist">Checklist</button>
+
     <button class="tab-btn" data-tab="details">Detalles del Viaje</button>
   </div>
 
@@ -172,6 +175,48 @@
     </div>
   </section>
 
+<section id="checklist" class="tab-content">
+    <div class="wide-container">
+        
+        <div class="card full-height-card">
+            <div class="checklist-header-row">
+                <h2 class="checklist-title">Check List</h2>
+                <span class="checklist-summary" id="progress-text-count">0 / 0 items</span>
+            </div>
+            
+            <div class="progress-track-wrapper">
+                <div class="progress-track">
+                    <div id="progress-bar-fill" class="progress-fill"></div>
+                </div>
+            </div>
+
+            <form id="add-checklist-form" class="checklist-toolbar">
+                <div class="input-group">
+                    <input type="text" id="check-name" placeholder="¿Qué necesitas llevar?" required autocomplete="off">
+                </div>
+                <div class="select-group">
+                    <select id="check-category" required>
+                        <option value="" disabled selected>Categoría</option>
+                        <option value="Ropa">Ropa</option>
+                        <option value="Documentos">Documentos</option>
+                        <option value="Electrónica">Electrónica</option>
+                        <option value="Aseo">Aseo Personal</option>
+                        <option value="Varios">Varios</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <span>＋</span> Agregar
+                </button>
+            </form>
+
+            <div id="checklist-items-container" class="checklist-scroll-area">
+                <p class="text-muted text-center mt-4">Cargando tu lista...</p>
+            </div>
+        </div>
+
+    </div>
+  </section>
+
 
   <section id="details" class="tab-content">
     <div class="details-container">
@@ -216,6 +261,50 @@
       <p id="invite-status" class="text-center mt-2"></p>
     </div>
   </div>
+
+  <div id="checklist-delete-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3 class="mb-2">Confirmar Eliminación</h3>
+      <p id="checklist-delete-msg" class="mb-2">¿Estás seguro de eliminar este item?</p>
+      
+      <div class="modal-buttons">
+        <button id="confirm-delete-check-btn" class="btn btn-primary" style="background-color: var(--destructive, #d9534f); border-color: var(--destructive, #d9534f);">
+          Eliminar
+        </button>
+        <button id="cancel-delete-check-btn" class="btn btn-secondary">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="delete-user-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3 class="mb-2">Expulsar Colaborador</h3>
+      <p id="delete-user-msg" class="mb-2 text-center" style="color: #cbd5e1;">
+        ¿Estás seguro?
+      </p>
+      
+      <div class="modal-buttons">
+        <button id="confirm-expel-btn" class="btn btn-primary" style="background-color: var(--destructive); border: 1px solid var(--destructive);">
+          Expulsar
+        </button>
+        <button id="cancel-expel-btn" class="btn btn-secondary">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <script type="module">
+    import { initChecklist } from "./checklist.js";
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // Iniciar la lógica del checklist
+        initChecklist();
+    });
+  </script>
 
   <script src="detalle.js" type="module"></script>
 

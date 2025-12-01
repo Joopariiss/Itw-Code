@@ -7,63 +7,94 @@ import {
     collection 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Referencias HTML (esto está bien afuera porque el DOM ya existe al cargar el script al final del body)
 const onlineBadge = document.getElementById('online-users-badge');
 const onlineCount = document.getElementById('online-count');
 
 export async function initPresence() {
-    // 🔥 CORRECCIÓN CRÍTICA:
-    // Obtenemos las variables AQUÍ dentro, justo cuando se llama la función.
-    // Así nos aseguramos de que window.folderId ya tenga valor.
     const folderId = window.folderId;
     const currentUserId = localStorage.getItem("currentUserId");
 
-    console.log("Iniciando presencia...", { folderId, currentUserId }); // Debug para ver si llegan datos
+    if (!folderId || !currentUserId) return;
 
-    if (!folderId || !currentUserId) {
-        console.error("❌ Faltan datos para iniciar presencia.");
-        return;
-    }
-
-    // Referencia a MI documento
+    // Referencia a MI documento de presencia
     const myPresenceRef = doc(db, "carpetas", folderId, "presencia", currentUserId);
 
-    // 1. ME AGREGO A LA LISTA
-    try {
-        await setDoc(myPresenceRef, {
-            userId: currentUserId,
-            onlineAt: Date.now(),
-            device: navigator.userAgent
-        });
-        console.log("✅ Presencia marcada en Firestore");
-    } catch (e) {
-        console.error("❌ Error al marcar presencia (Revisa reglas de Firestore):", e);
-    }
+    // ============================================================
+    // 1. SISTEMA DE LATIDO (HEARTBEAT) ❤️
+    // ============================================================
+    // Función que actualiza "lastSeen" (visto por última vez)
+    const sendHeartbeat = async () => {
+        try {
+            await setDoc(myPresenceRef, {
+                userId: currentUserId,
+                device: navigator.userAgent,
+                lastSeen: Date.now() // Actualizamos la hora actual
+            }, { merge: true }); // merge para no borrar otros datos si los hubiera
+        } catch (e) {
+            console.error("Error enviando latido:", e);
+        }
+    };
 
-    // 2. ESCUCHAR CAMBIOS
+    // A. Enviamos el primer latido al entrar
+    sendHeartbeat();
+
+    // B. Configuramos un reloj para enviar latido cada 10 segundos
+    const heartbeatInterval = setInterval(sendHeartbeat, 10000);
+
+
+    // ============================================================
+    // 2. ESCUCHAR Y FILTRAR FANTASMAS 👻
+    // ============================================================
     const presenceColl = collection(db, "carpetas", folderId, "presencia");
     
     onSnapshot(presenceColl, (snapshot) => {
-        const count = snapshot.size;
-        console.log(`📡 Cambios detectados. Usuarios online: ${count}`); // Debug
-        updateBadge(count);
+        const now = Date.now();
+        let activeUsers = 0;
+
+        snapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+            
+            // ¿Hace cuánto fue la última vez que este usuario dio señales de vida?
+            // Si no tiene 'lastSeen', usamos 'onlineAt' (compatibilidad) o asumimos 0
+            const lastSeenTime = data.lastSeen || data.onlineAt || 0;
+            const timeDiff = now - lastSeenTime;
+
+            // CRITERIO: Consideramos "Online" solo si se reportó hace menos de 60 segundos
+            if (timeDiff < 60000) { 
+                activeUsers++;
+            } else {
+                // ES UN FANTASMA (Lleva más de 1 min inactivo)
+                // Opcional: Si lleva MUCHO tiempo (ej. 5 min) muerto, lo limpiamos de la BD
+                if (timeDiff > 300000) { 
+                   deleteDoc(docSnap.ref).catch(e => console.log("Limpieza auto:", e));
+                }
+            }
+        });
+
+        // Actualizamos la UI con el número REAL de usuarios activos
+        updateBadge(activeUsers);
     });
 
-    // 3. LIMPIEZA AL SALIR
+    // ============================================================
+    // 3. LIMPIEZA AL SALIR (Voluntaria)
+    // ============================================================
     const cleanup = () => {
-        deleteDoc(myPresenceRef).catch(err => console.error("Error al salir", err));
+        clearInterval(heartbeatInterval); // Detener el reloj interno
+        deleteDoc(myPresenceRef); // Intentar borrar mi doc
     };
 
     window.addEventListener('beforeunload', cleanup);
-    // window.addEventListener('unload', cleanup); // A veces unload da problemas en módulos, beforeunload es estándar
 }
 
 function updateBadge(count) {
     if (!onlineBadge || !onlineCount) return;
     
-    onlineCount.textContent = count;
+    // Mínimo mostrar 1 si el usuario está viendo la página (por si hay lag en la red)
+    const displayCount = count < 1 ? 1 : count;
+
+    onlineCount.textContent = displayCount;
     
-    if (count > 1) {
+    if (displayCount > 1) {
         onlineBadge.classList.add('active');
     } else {
         onlineBadge.classList.remove('active');

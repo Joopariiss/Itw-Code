@@ -143,6 +143,40 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
+/* ============================================== */
+/* === POPUP DE CONFIRMACIÓN (Mini Tarjeta) === */
+/* ============================================== */
+.confirm-popup {
+    background-color: #1e293b; /* Fondo oscuro sólido (Slate 800) */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Borde sutil */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); /* Sombra fuerte para dar profundidad */
+    padding: 15px;
+    border-radius: 8px;
+    z-index: 1000; /* Asegura que flote sobre todo */
+    width: 240px;
+    text-align: center;
+    color: var(--foreground);
+    animation: fadeIn 0.2s ease-out;
+}
+
+.confirm-popup p {
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    color: #e2e8f0;
+}
+
+.popup-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Animación suave al aparecer */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 /* Responsive */
 @media (max-width: 900px) {
     .grid-main { grid-template-columns: 1fr; }

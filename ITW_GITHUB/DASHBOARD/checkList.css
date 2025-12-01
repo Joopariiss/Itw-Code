@@ -1,0 +1,207 @@
+/* =========================================
+   ESTILOS ESPECÍFICOS DEL MODULO CHECKLIST
+   ========================================= */
+
+.checklist-scroll-area {
+    padding: 10px 5px;
+    margin-top: 2rem;
+}
+
+.checklist-empty-msg {
+    text-align: center;
+    color: var(--muted-foreground);
+    margin-top: 40px;
+    font-style: italic;
+}
+
+/* --- BARRA DE PROGRESO --- */
+.progress-track-wrapper {
+    margin-bottom: 3rem;
+}
+
+.progress-track {
+    background-color: rgba(255, 255, 255, 0.1);
+    height: 4px !important;
+    border-radius: 4px;
+}
+
+.progress-fill {
+    background-color: #00897B; /* Verde Teal */
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+}
+
+.checklist-summary {
+    font-size: 0.85rem;
+    color: var(--muted-foreground);
+    font-weight: 500;
+}
+
+/* --- SECCIÓN DE CATEGORÍA --- */
+.checklist-category-section {
+    margin-bottom: 3rem; /* Más espacio entre el final de una lista y el sgte título */
+}
+
+.checklist-category-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+    color: var(--foreground);
+    opacity: 0.95;
+    /* Opcional: Una línea sutil debajo del título para separar más */
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+}
+
+.checklist-cat-icon {
+    font-size: 1.5rem;
+}
+
+.checklist-cat-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* --- GRUPO DE ITEMS (LA TABULACIÓN) --- */
+.checklist-items-group {
+    display: flex;
+    flex-direction: column;
+    /* AQUÍ ESTÁ EL CAMBIO DE TABULACIÓN */
+    padding-left: 40px; /* Empuja los items a la derecha */
+    gap: 12px; /* Espacio vertical entre cada cajita de item */
+}
+
+/* --- FILA DEL ITEM (EL RECUADRO/CAJITA) --- */
+.checklist-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+    
+    /* ESTILOS DE CAJA/RECUADRO */
+    background-color: rgba(255, 255, 255, 0.04); /* Fondo gris muy suave */
+    border: 1px solid rgba(255, 255, 255, 0.08); /* Borde sutil */
+    border-radius: 8px; /* Bordes redondeados */
+    padding: 12px 20px; /* Espacio interno cómodo */
+}
+
+/* Efecto Hover: Se ilumina un poco al pasar el mouse */
+.checklist-item-row:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateX(4px); /* Pequeño movimiento a la derecha */
+}
+
+/* Label envuelve el checkbox y el texto */
+.checklist-label {
+    display: flex;
+    align-items: center;
+    gap: 18px; /* Más espacio entre el check y el texto */
+    cursor: pointer;
+    flex: 1;
+    width: 100%;
+}
+
+.checklist-input-hidden {
+    display: none; 
+}
+
+/* Checkbox Personalizado */
+.checklist-custom-checkbox {
+    width: 22px;
+    height: 22px;
+    border: 2px solid #5a6b7c;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background-color: rgba(0,0,0,0.2); /* Fondo oscuro dentro del check */
+    flex-shrink: 0;
+}
+
+.checklist-input-hidden:checked + .checklist-custom-checkbox {
+    background-color: #00897B;
+    border-color: #00897B;
+}
+
+.checklist-input-hidden:checked + .checklist-custom-checkbox::after {
+    content: '✓';
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Texto del item */
+.checklist-item-name {
+    font-size: 1.05rem;
+    color: var(--foreground);
+    transition: color 0.2s;
+    font-weight: 400;
+}
+
+/* Estado Completo */
+.checklist-item-checked .checklist-item-name {
+    text-decoration: line-through;
+    color: var(--muted-foreground);
+    opacity: 0.6;
+}
+
+/* Botón eliminar */
+.checklist-delete-btn {
+    background: none;
+    border: none;
+    color: #ef4444; 
+    font-size: 1.4rem;
+    cursor: pointer;
+    opacity: 0; 
+    transition: opacity 0.2s;
+    padding: 0 10px;
+}
+
+.checklist-item-row:hover .checklist-delete-btn {
+    opacity: 1;
+}
+
+/* --- FORMULARIO DE AGREGAR --- */
+#add-checklist-form {
+    background-color: rgba(255,255,255,0.03); 
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 3rem; 
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border: 1px dashed rgba(255,255,255,0.1); /* Borde punteado para diferenciarlo */
+}
+
+#add-checklist-form input {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    padding: 12px; /* Inputs un poco más altos */
+    border-radius: 6px;
+    flex: 2;
+}
+
+#add-checklist-form select {
+    background: var(--background);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    padding: 12px;
+    border-radius: 6px;
+    flex: 1;
+}
+
+@media (max-width: 600px) {
+    #add-checklist-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .checklist-items-group {
+        padding-left: 15px; /* Menos sangría en móvil */
+    }
+}

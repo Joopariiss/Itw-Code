@@ -383,23 +383,30 @@ if (itemsContainer) {
       const id = deleteBtn.dataset.id;
       if (!id) return;
 
+      // Borrar popup anterior si existe
       const existingPopup = document.querySelector('.confirm-popup');
       if (existingPopup) existingPopup.remove();
 
       const popup = document.createElement('div');
       popup.className = 'confirm-popup';
+      
+      // CAMBIO AQUÍ: HTML mejorado con clases de botones (btn-danger y btn-secondary)
       popup.innerHTML = `
-        <p>¿Seguro que quieres eliminar este item?</p>
+        <p>¿Eliminar este item?</p>
         <div class="popup-buttons">
-          <button class="confirm-yes">Sí</button>
-          <button class="confirm-no">No</button>
+          <button class="confirm-yes btn" style="background-color: #ef4444; color: white; padding: 4px 12px; font-size: 0.85rem; border:none; border-radius:4px; cursor:pointer;">Sí</button>
+          <button class="confirm-no btn" style="background-color: #475569; color: white; padding: 4px 12px; font-size: 0.85rem; border:none; border-radius:4px; cursor:pointer;">No</button>
         </div>
       `;
-      // (Estilos de posición similar al edit popup...)
+
+      // Posicionamiento inteligente (Mantenemos tu lógica que estaba bien)
       const rect = deleteBtn.getBoundingClientRect();
-      const popupWidth = 220;
+      const popupWidth = 240; // Ajustado al CSS
+      
       popup.style.position = 'absolute';
-      popup.style.top = `${rect.top + window.scrollY - 10}px`;
+      popup.style.top = `${rect.top + window.scrollY - 10}px`; // Un poco más arriba para alinear
+      
+      // Si se sale por la derecha, lo mostramos a la izquierda del botón
       if (rect.right + popupWidth + 20 < window.innerWidth) {
          popup.style.left = `${rect.right + 10}px`;
       } else {
@@ -408,12 +415,14 @@ if (itemsContainer) {
 
       document.body.appendChild(popup);
 
+      // Eventos de los botones
       popup.querySelector('.confirm-yes').addEventListener('click', () => {
         deleteItemById(id);
         popup.remove();
       });
       popup.querySelector('.confirm-no').addEventListener('click', () => popup.remove());
 
+      // Cerrar al hacer click fuera
       setTimeout(() => {
         document.addEventListener('click', function handler(e) {
           if (!popup.contains(e.target) && e.target !== deleteBtn) {

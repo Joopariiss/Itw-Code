@@ -12,7 +12,8 @@ import {
   doc,
   updateDoc,
   getDoc,
-  setDoc
+  setDoc,
+  onSnapshot  // <--- IMPORTANTE: AGREGAR ESTE
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // === NUEVAS FUNCIONES PARA FIRESTORE ===
