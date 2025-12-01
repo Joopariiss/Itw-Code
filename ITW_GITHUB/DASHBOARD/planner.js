@@ -1,120 +1,29 @@
 /* ============================
-   Travel Planner - planner.js
+   Travel Planner - planner.js (Versión Real-Time Optimizada)
    ============================ */
 
-// FIRESTORE DATABASE:
 import { db } from "../firebase.js";
 import {
   collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
   doc,
-  updateDoc,
-  getDoc,
   setDoc,
-  onSnapshot  // <--- IMPORTANTE: AGREGAR ESTE
+  deleteDoc,
+  getDocs,
+  getDoc,
+  onSnapshot // Importante para el tiempo real
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// === NUEVAS FUNCIONES PARA FIRESTORE ===
-// Guardar calendario + itinerario en subcolecciones
-// Guardar calendario + itinerario en subcolecciones
-async function saveItineraryToFirestore() {
-  try {
-    if (!window.folderId) return console.warn("❌ No hay folderId activo");
-    const folderRef = doc(db, "carpetas", window.folderId);
-
-    const start = tripDays.length ? tripDays[0].date : null;
-    const end = tripDays.length ? tripDays[tripDays.length - 1].date : null;
-
-    // 🔹 Guardar calendario en subcolección
-    const calendarioRef = doc(collection(folderRef, "calendario"), "info");
-    await setDoc(calendarioRef, {
-      fechaInicio: start,
-      fechaFin: end
-    });
-
-    // 🔹 Reemplazar itinerario completo (borrar el anterior)
-    const itinerarioRef = collection(folderRef, "itinerario");
-    const oldDays = await getDocs(itinerarioRef);
-
-    // Borrar todos los documentos viejos
-    const deleteOps = oldDays.docs.map(d => deleteDoc(d.ref));
-    await Promise.all(deleteOps);
-
-    // Crear los nuevos días
-    for (const day of tripDays) {
-      const dayDoc = doc(itinerarioRef, day.date);
-      await setDoc(dayDoc, { date: day.date, activities: day.activities || [] });
-    }
-
-    console.log("✅ Itinerario y calendario reemplazados en Firestore");
-  } catch (err) {
-    console.error("Error guardando itinerario:", err);
-  }
-}
-// Cargar itinerario desde Firestore
-// Cargar calendario + itinerario desde subcolecciones
-async function loadItineraryFromFirestore() {
-  try {
-    if (!window.folderId) return;
-    const folderRef = doc(db, "carpetas", window.folderId);
-
-    // 🔹 Cargar calendario
-    const calendarioRef = doc(collection(folderRef, "calendario"), "info");
-    const calSnap = await getDoc(calendarioRef);
-
-    if (!calSnap.exists()) {
-      renderItinerary();
-      return;
-    }
-
-    const calendarioData = calSnap.data();
-    const startDateString = calendarioData.fechaInicio + "T12:00:00";
-    const endDateString = calendarioData.fechaFin + "T12:00:00";
-
-    tripDays = generateDaysBetween(new Date(startDateString), new Date(endDateString));
-
-    // 🔹 Cargar itinerario (cada día desde subcolección)
-    const itinerarioRef = collection(folderRef, "itinerario");
-    const daysSnap = await getDocs(itinerarioRef);
-
-    daysSnap.forEach(docSnap => {
-      const dayData = docSnap.data();
-      const day = tripDays.find(d => d.date === dayData.date);
-      if (day) day.activities = dayData.activities || [];
-    });
-
-    // 🔹 Bloquear calendario al cargar
-    calendarLocked = true;
-    lockBtn.style.display = "none";
-    unlockBtn.style.display = "block";
-
-    if (calendarPicker) {
-      calendarPicker.setDate(
-        [calendarioData.fechaInicio, calendarioData.fechaFin],
-        true
-      );
-      calendarPicker.input.disabled = true;
-      const calendarElement = document.querySelector(".flatpickr-calendar");
-      if (calendarElement) calendarElement.classList.add("calendar-locked");
-    }
-
-    renderItinerary();
-    console.log("📅 Itinerario cargado desde subcolecciones Firestore");
-  } catch (err) {
-    console.error("Error cargando itinerario:", err);
-  }
-}
-
-
-
+// ==========================================
+// 1. VARIABLES DE ESTADO
+// ==========================================
 let tripDays = [];
 let editingActivity = null;
 let editingDay = null;
 let calendarLocked = false;
 
-// Elementos del DOM
+// ==========================================
+// 2. REFERENCIAS AL DOM
+// ==========================================
 const itinerarySection = document.getElementById('itinerary-section');
 const activityModal = document.getElementById('activity-modal');
 const activityTimeInput = document.getElementById('activity-time');
@@ -124,7 +33,7 @@ const cancelActivityBtn = document.getElementById('cancel-activity-btn');
 const modalTitle = document.getElementById('modal-title');
 const calendarSection = document.getElementById('calendar-section');
 
-// Crear contenedor de botones al lado del calendario
+// Botones del Calendario
 const calendarActions = document.createElement('div');
 calendarActions.style.display = "flex";
 calendarActions.style.flexDirection = "column";
@@ -139,13 +48,9 @@ calendarSection.appendChild(calendarActions);
 const lockBtn = document.getElementById("lock-calendar-btn");
 const unlockBtn = document.getElementById("unlock-calendar-btn");
 
-// ... código anterior ...
-
-// Modal de confirmación
+// Modal de Confirmación Genérico
 const confirmModal = document.createElement("div");
 confirmModal.className = "modal hidden";
-
-// --- CAMBIO AQUÍ: Agregamos las clases a los botones ---
 confirmModal.innerHTML = `
   <div class="modal-content">
     <h3 id="confirm-message" style="margin-bottom: 1.5rem; text-align: center;"></h3>
@@ -158,23 +63,123 @@ confirmModal.innerHTML = `
 document.body.appendChild(confirmModal);
 
 const confirmMessage = document.getElementById("confirm-message");
-// ... resto del código ...
 const confirmYes = document.getElementById("confirm-yes");
 const confirmNo = document.getElementById("confirm-no");
 
 function showConfirm(message, callback) {
   confirmMessage.textContent = message;
   confirmModal.classList.remove("hidden");
-
-  confirmYes.onclick = () => {
-    callback(true);
-    confirmModal.classList.add("hidden");
-  };
-  confirmNo.onclick = () => {
-    callback(false);
-    confirmModal.classList.add("hidden");
-  };
+  confirmYes.onclick = () => { callback(true); confirmModal.classList.add("hidden"); };
+  confirmNo.onclick = () => { callback(false); confirmModal.classList.add("hidden"); };
 }
+
+
+// ==========================================
+// 3. LÓGICA DE TIEMPO REAL (CORE)
+// ==========================================
+
+function initPlannerRealTime() {
+  if (!window.folderId) return;
+  const folderRef = doc(db, "carpetas", window.folderId);
+
+  // A) ESCUCHAR CALENDARIO (Fechas)
+  const calendarioRef = doc(collection(folderRef, "calendario"), "info");
+  
+  onSnapshot(calendarioRef, (docSnap) => {
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      const newStart = data.fechaInicio;
+      const newEnd = data.fechaFin;
+
+      // Actualizar UI del calendario
+      calendarLocked = true;
+      if(lockBtn) lockBtn.style.display = "none";
+      if(unlockBtn) unlockBtn.style.display = "block";
+
+      if (calendarPicker) {
+        calendarPicker.setDate([newStart, newEnd], true);
+        calendarPicker.input.disabled = true;
+        document.querySelector(".flatpickr-calendar")?.classList.add("calendar-locked");
+      }
+
+      // Si es la primera carga o cambiaron las fechas drásticamente, regeneramos estructura base
+      if (tripDays.length === 0 || tripDays[0].date !== newStart || tripDays[tripDays.length-1].date !== newEnd) {
+         tripDays = generateDaysBetween(new Date(newStart + "T12:00:00"), new Date(newEnd + "T12:00:00"));
+         renderItinerary(); 
+      }
+    }
+  });
+
+  // B) ESCUCHAR ITINERARIO (Actividades)
+  const itinerarioRef = collection(folderRef, "itinerario");
+
+  onSnapshot(itinerarioRef, (snapshot) => {
+    let needsRender = false;
+
+    snapshot.docChanges().forEach((change) => {
+      const dayData = change.doc.data();
+      // Buscar el día correspondiente en nuestro array local
+      const dayIndex = tripDays.findIndex(d => d.date === dayData.date);
+      
+      if (dayIndex !== -1) {
+        if (change.type === "added" || change.type === "modified") {
+          tripDays[dayIndex].activities = dayData.activities || [];
+          needsRender = true;
+        } 
+      }
+    });
+    
+    if (needsRender || snapshot.size === 0) {
+        renderItinerary();
+    }
+  });
+}
+
+// ==========================================
+// 4. FUNCIONES DE GUARDADO (OPTIMIZADAS)
+// ==========================================
+
+// A) Guardar TODO (Solo se usa al cambiar fechas)
+async function saveFullItineraryToFirestore() {
+  try {
+    if (!window.folderId) return;
+    const folderRef = doc(db, "carpetas", window.folderId);
+
+    const start = tripDays.length ? tripDays[0].date : null;
+    const end = tripDays.length ? tripDays[tripDays.length - 1].date : null;
+
+    // 1. Guardar info de fechas
+    await setDoc(doc(collection(folderRef, "calendario"), "info"), {
+      fechaInicio: start,
+      fechaFin: end
+    });
+
+    // 2. Limpiar itinerario viejo y guardar nuevo
+    const itinerarioRef = collection(folderRef, "itinerario");
+    const oldDays = await getDocs(itinerarioRef);
+    const deleteOps = oldDays.docs.map(d => deleteDoc(d.ref));
+    await Promise.all(deleteOps);
+
+    // 3. Crear documentos vacíos para los días
+    for (const day of tripDays) {
+      await setDoc(doc(itinerarioRef, day.date), { date: day.date, activities: [] });
+    }
+    console.log("✅ Calendario reiniciado y guardado.");
+  } catch (err) { console.error("Error guardando fechas:", err); }
+}
+
+// B) Guardar SOLO UN DÍA (Se usa al agregar/editar/borrar actividades)
+async function saveDayToFirestore(dayObj) {
+    if (!window.folderId || !dayObj) return;
+    try {
+        const dayRef = doc(db, "carpetas", window.folderId, "itinerario", dayObj.date);
+        await setDoc(dayRef, { 
+            date: dayObj.date, 
+            activities: dayObj.activities || [] 
+        }, { merge: true });
+    } catch (e) { console.error("Error guardando día:", e); }
+}
+
 
 /* ------------------------
    Renderizar Itinerario
@@ -191,23 +196,18 @@ function renderItinerary() {
   title.style.fontWeight = "600";
   itinerarySection.appendChild(title);
 
-  // 🔹 No mostrar días si el calendario no está bloqueado todavía
   if (!calendarLocked) {
     const msg = document.createElement('p');
     msg.style.color = 'var(--muted-foreground)';
     msg.style.textAlign = 'center';
     msg.textContent = 'Selecciona y establece un rango en el calendario para generar el itinerario.';
     itinerarySection.appendChild(msg);
-    return; // ⛔ No mostrar los días hasta que se bloquee el calendario
+    return;
   }
 
-
   if (!tripDays.length) {
-    const msg = document.createElement('p');
-    msg.style.color = 'var(--muted-foreground)';
-    msg.style.textAlign = 'center';
-    msg.textContent = 'Selecciona un rango en el calendario para generar el itinerario.';
-    itinerarySection.appendChild(msg);
+    itinerarySection.innerHTML += '<p class="text-center text-muted">Cargando días...</p>';
+    return;
   }
 
   tripDays.forEach(day => {
@@ -226,34 +226,43 @@ function renderItinerary() {
 
     const body = document.createElement('div');
     body.className = 'day-body';
+    // Si hay actividades, mantenemos abierto el día (opcional, mejora UX)
+    if(day.activities && day.activities.length > 0) {
+        // body.style.display = 'block'; // Descomentar si quieres que se abran solos
+    }
+
     const activitiesContainer = document.createElement('div');
     activitiesContainer.className = 'activities';
 
     const activities = Array.isArray(day.activities) ? day.activities : [];
+    
+    // Ordenar actividades por hora
+    activities.sort((a, b) => a.time.localeCompare(b.time));
+
     if (activities.length > 0) {
       activities.forEach(act => {
         const activityDiv = document.createElement('div');
         activityDiv.className = 'activity';
         activityDiv.innerHTML = `
-          <span class="desc">${act.time} - ${act.description}</span>
+          <span class="desc"><strong>${act.time}</strong> - ${act.description}</span>
           <div>
             <button class="edit-btn">🖊️</button>
             <button class="delete-btn">🗑</button>
           </div>
         `;
 
+        // Editar
         activityDiv.querySelector('.edit-btn').addEventListener('click', () => {
-          showConfirm("¿Deseas editar esta actividad?", ok => {
-            if (ok) openModal(day, act);
-          });
+             openModal(day, act);
         });
 
+        // Eliminar
         activityDiv.querySelector('.delete-btn').addEventListener('click', () => {
-          showConfirm("¿Seguro que quieres eliminar esta actividad?", ok => {
+          showConfirm("¿Eliminar actividad?", ok => {
             if (ok) {
               day.activities = day.activities.filter(a => a.id !== act.id);
-              renderItinerary();
-              saveItineraryToFirestore();
+              // Guardamos cambios -> onSnapshot actualizará la vista
+              saveDayToFirestore(day);
             }
           });
         });
@@ -264,6 +273,7 @@ function renderItinerary() {
       const empty = document.createElement('p');
       empty.textContent = 'No hay actividades.';
       empty.style.color = 'var(--muted-foreground)';
+      empty.style.fontStyle = 'italic';
       activitiesContainer.appendChild(empty);
     }
 
@@ -272,11 +282,13 @@ function renderItinerary() {
     dayCard.appendChild(body);
     itinerarySection.appendChild(dayCard);
 
+    // Acordeón
     trigger.addEventListener('click', e => {
       if (e.target.classList.contains('add-activity-btn')) return;
       body.style.display = body.style.display === 'block' ? 'none' : 'block';
     });
 
+    // Botón Agregar
     trigger.querySelector('.add-activity-btn').addEventListener('click', e => {
       e.stopPropagation();
       openModal(day);
@@ -294,6 +306,7 @@ function openModal(day, activity = null) {
   activityTimeInput.value = activity ? activity.time : '12:00';
   activityDescInput.value = activity ? activity.description : '';
   activityModal.classList.remove('hidden');
+  activityDescInput.focus();
 }
 
 saveActivityBtn.addEventListener('click', () => {
@@ -302,41 +315,29 @@ saveActivityBtn.addEventListener('click', () => {
 
   if (!desc) return alert('Por favor ingresa una descripción.');
 
-  // ❌ Bloquear hora duplicada en el mismo día
+  // Validación de duplicados
   const isDuplicate = editingDay.activities.some(a =>
     a.time === time && (!editingActivity || a.id !== editingActivity.id)
   );
 
   if (isDuplicate) {
-    alert("Ya existe una actividad programada a esa hora.");
+    alert("Ya existe una actividad a esa hora.");
     return;
   }
 
-  // ✔ Editar
+  // Editar o Crear
   if (editingActivity) {
     editingActivity.time = time;
     editingActivity.description = desc;
-
-  // ✔ Crear nueva
   } else if (editingDay) {
     editingDay.activities.push({ id: Date.now(), time, description: desc });
   }
 
-
-  editingDay.activities.sort((a, b) => a.time.localeCompare(b.time));
-
+  // Cerrar modal
   activityModal.classList.add('hidden');
-  renderItinerary();
-  saveItineraryToFirestore();
-
-  const dayCards = document.querySelectorAll('.day-card');
-  dayCards.forEach(card => {
-    const dayTitle = card.querySelector('small');
-    if (dayTitle && dayTitle.textContent.includes(formatDate(editingDay.date))) {
-      const body = card.querySelector('.day-body');
-      if (body) body.style.display = 'block';
-    }
-  });
+  
+  // Guardamos SOLO el día afectado -> onSnapshot hará el render
+  saveDayToFirestore(editingDay);
 });
 
 cancelActivityBtn.addEventListener('click', () => {
@@ -344,7 +345,7 @@ cancelActivityBtn.addEventListener('click', () => {
 });
 
 /* ------------------------
-   Utilidades
+   Utilidades y Flatpickr
    ------------------------ */
 function createSafeDate(dateStr) {
   if (!dateStr || dateStr.includes('T')) return new Date(dateStr);
@@ -353,16 +354,14 @@ function createSafeDate(dateStr) {
 
 function formatDate(dateStr) {
   const date = createSafeDate(dateStr);
-  return date.toLocaleDateString('es-ES', { month: 'long', day: 'numeric', year: 'numeric' });
+  return date.toLocaleDateString('es-ES', { month: 'long', day: 'numeric' });
 }
 
 function getWeekday(dateStr) {
-  return createSafeDate(dateStr).toLocaleDateString('es-ES', { weekday: 'long' });
+  const date = createSafeDate(dateStr);
+  return date.toLocaleDateString('es-ES', { weekday: 'long' });
 }
 
-/* ------------------------
-   Rango de fechas
-   ------------------------ */
 const calendarPicker = flatpickr('#trip-calendar', {
   mode: 'range',
   dateFormat: 'Y-m-d',
@@ -383,123 +382,79 @@ function generateDaysBetween(startDate, endDate) {
   const arr = [];
   const d = new Date(startDate);
   d.setHours(12, 0, 0, 0);
-
   const loopEndDate = new Date(endDate);
-  loopEndDate.setDate(loopEndDate.getDate() + 1);
+  loopEndDate.setDate(loopEndDate.getDate() + 1); // Incluir último día
 
   while (d < loopEndDate) {
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
-    const dateString = `${year}-${month}-${day}`;
-    arr.push({ date: dateString, activities: [] });
+    arr.push({ date: `${year}-${month}-${day}`, activities: [] });
     d.setDate(d.getDate() + 1);
   }
   return arr;
 }
 
 /* ------------------------
-   Bloquear/Desbloquear Calendario
+   Bloquear/Desbloquear
    ------------------------ */
 lockBtn.addEventListener("click", () => {
   if (tripDays.length === 0) {
-    showPopup("⚠️ No puedes establecer fechas sin haber seleccionado un rango en el calendario.", "error");
-    return; // 🚫 detenemos aquí si no hay rango
+    showPopup("⚠️ Selecciona un rango de fechas primero.", "error");
+    return;
   }
-
-  // ✅ Si sí hay fechas, bloqueamos calendario y renderizamos
-  calendarLocked = true;
-  lockBtn.style.display = "none";
-  unlockBtn.style.display = "block";
-
-  const calendarElement = document.querySelector(".flatpickr-calendar");
-  if (calendarElement) calendarElement.classList.add("calendar-locked");
-
-  // 🔹 Deshabilitar interacción
-  calendarPicker.input.disabled = true;
-  calendarPicker.close(); // cerrar calendario si estaba abierto
-
-  showPopup("✅ Fechas establecidas correctamente.", "success");
-
-  // 🔹 Guardar en Firestore y mostrar itinerario
-  saveItineraryToFirestore();
-  renderItinerary(); // 👈 AHORA se ejecuta correctamente
+  // Al bloquear fechas, guardamos la estructura completa
+  saveFullItineraryToFirestore();
+  // El onSnapshot se encargará de actualizar la UI
 });
 
 unlockBtn.addEventListener("click", () => {
-  showConfirm("¿Deseas cambiar las fechas del viaje?", ok => {
+  showConfirm("¿Cambiar fechas borrará el itinerario actual. ¿Seguro?", ok => {
     if (ok) {
       calendarLocked = false;
       lockBtn.style.display = "block";
       unlockBtn.style.display = "none";
-
-      const calendarElement = document.querySelector(".flatpickr-calendar");
-      if (calendarElement) calendarElement.classList.remove("calendar-locked");
-
-      // 🔹 Habilitar interacción de nuevo
+      document.querySelector(".flatpickr-calendar")?.classList.remove("calendar-locked");
       calendarPicker.input.disabled = false;
-      alert("Ahora puedes editar las fechas 🗓️");
+      renderItinerary();
     }
   });
 });
 
-// Popup simple
 function showPopup(message, type = "info") {
   const existing = document.querySelector(".popup-alert");
   if (existing) existing.remove();
-
   const popup = document.createElement("div");
   popup.className = "popup-alert";
   popup.textContent = message;
   document.body.appendChild(popup);
-
-  popup.style.position = "fixed";
-  popup.style.top = "20px";
-  popup.style.left = "50%";
-  popup.style.transform = "translateX(-50%)";
-  popup.style.padding = "10px 20px";
-  popup.style.borderRadius = "10px";
-  popup.style.color = "white";
-  popup.style.fontWeight = "500";
-  popup.style.zIndex = "9999";
-  popup.style.boxShadow = "0 4px 10px rgba(0,0,0,0.2)";
-  popup.style.transition = "opacity 0.4s ease";
-  popup.style.opacity = "1";
-  popup.style.background =
-    type === "error" ? "#d32f2f" : type === "success" ? "#2e7d32" : "#333";
-
-  setTimeout(() => {
-    popup.style.opacity = "0";
-    setTimeout(() => popup.remove(), 500);
-  }, 2500);
+  popup.style.position = "fixed"; popup.style.top = "20px"; popup.style.left = "50%";
+  popup.style.transform = "translateX(-50%)"; popup.style.padding = "10px 20px";
+  popup.style.borderRadius = "10px"; popup.style.color = "white"; popup.style.fontWeight = "500";
+  popup.style.zIndex = "9999"; popup.style.background = type === "error" ? "#d32f2f" : "#2e7d32";
+  setTimeout(() => { popup.style.opacity = "0"; setTimeout(() => popup.remove(), 500); }, 2500);
 }
 
-
+// === INICIALIZACIÓN ===
 document.addEventListener("DOMContentLoaded", () => {
   renderItinerary();
-  loadItineraryFromFirestore();
+  initPlannerRealTime(); // Iniciamos el listener
 });
 
-//QUITAR ESTO SI HAY ERRROR EN CARPETAS
-
-// === EXPORT PARA DESCARGAS (ITINERARIO + CALENDARIO) ===
+// === EXPORT PARA EXCEL ===
 export async function getPlannerData() {
   if (!window.folderId) return { calendario: null, dias: [] };
-
   const folderRef = doc(db, "carpetas", window.folderId);
-
-  // cargar calendario info
-  const calendarioRef = doc(collection(folderRef, "calendario"), "info");
-  const calSnap = await getDoc(calendarioRef);
+  
+  // Info calendario
+  const calSnap = await getDoc(doc(collection(folderRef, "calendario"), "info"));
   const calendario = calSnap.exists() ? calSnap.data() : null;
 
-  // cargar dias del itinerario
-  const itinerarioRef = collection(folderRef, "itinerario");
-  const daysSnap = await getDocs(itinerarioRef);
+  // Días con actividades
+  const daysSnap = await getDocs(collection(folderRef, "itinerario"));
   const dias = daysSnap.docs
     .map(d => d.data())
     .sort((a, b) => (a.date > b.date ? 1 : a.date < b.date ? -1 : 0));
 
-  // devolver estructura simple
   return { calendario, dias };
 }
