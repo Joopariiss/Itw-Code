@@ -249,3 +249,113 @@ select option {
 .back-button:hover {
   background-color: rgba(255, 255, 255, 0.2);
 }
+
+/* Corrige el autocompletado de Chrome */
+/* Corrección de Autocompletado para Inputs Y Selects */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+  /* La magia para mantener el fondo transparente/oscuro */
+  -webkit-box-shadow: 0 0 0 30px rgba(0, 0, 0, 0.2) inset !important; 
+  -webkit-text-fill-color: #ffffff !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+  
+  /* Mantener bordes consistentes */
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 40px !important;
+  font-size: 16px !important;
+  caret-color: white; /* Color del cursor al escribir */
+}
+
+/* ========================================= */
+/* === RESPONSIVE REGISTRO Y LOGIN === */
+/* ========================================= */
+
+@media (max-width: 900px) {
+    /* 1. Habilitamos el scroll vertical (CRÍTICO en móviles) */
+    body, html {
+        height: auto;
+        overflow-y: auto !important; /* "auto" permite bajar si el teclado tapa algo */
+    }
+
+    .container {
+        flex-direction: column; /* Cambia de lado-a-lado a columna vertical */
+        height: auto;
+    }
+
+    /* 2. Ocultamos el panel izquierdo (Texto decorativo) */
+    /* En móvil, el usuario quiere registrarse rápido, el texto extraorba */
+    .left-panel {
+        display: none; 
+    }
+
+    /* 3. El panel del formulario ocupa el 100% */
+    .right-panel {
+        width: 100%;
+        border-left: none; /* Quitamos la línea divisoria */
+        min-height: 100vh; /* Aseguramos que cubra toda la altura */
+        padding-top: 60px; /* Espacio para que el botón "Volver" no tape el título */
+    }
+
+    /* 4. Ajustamos el relleno interno del formulario */
+    .right-panel form {
+        padding: 30px 20px; /* Mucho menos padding lateral (antes era 120px) */
+        justify-content: flex-start; /* Alineamos al inicio para que no quede flotando raro */
+    }
+
+    /* 5. Ajustes de tipografía para móvil */
+    h1 {
+        font-size: 28px; /* Título un poco más pequeño */
+        margin-bottom: 25px;
+    }
+
+    /* 6. Aseguramos que los inputs sean fáciles de tocar */
+    input, select, .btn {
+        height: 50px; /* Un poco más altos para dedos táctiles */
+        font-size: 16px; /* Evita que iPhone haga zoom automático al escribir */
+    }
+
+    /* ========================================= */
+    /* === FIX FECHA SOLO PARA MÓVIL (IPHONE) === */
+    /* ========================================= */
+    
+    /* 1. Quitamos el estilo nativo de iOS solo en móvil */
+    input[type="date"] {
+        appearance: none;
+        -webkit-appearance: none;
+        min-height: 50px; /* Igual que tus otros inputs en móvil */
+        position: relative;
+        color: white; 
+        padding: 12px 15px; /* Mismo padding que tus otros inputs */
+        line-height: 1.2;   /* Ayuda a centrar el texto en iOS */
+    }
+
+    /* 2. Ocultamos el formato feo "--/--/----" si está vacío */
+    input[type="date"]:invalid::-webkit-datetime-edit {
+        color: transparent;
+    }
+
+    /* 3. Inyectamos el texto "Fecha de nacimiento" */
+    input[type="date"]:invalid::before {
+        content: "Fecha de nacimiento"; /* El texto que quieres mostrar */
+        color: #ffffff; /* Mismo color que tus placeholders */
+        position: absolute;
+        left: 15px; /* Alineado con el padding de tus otros inputs */
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        font-family: 'Poppins', sans-serif; /* Aseguramos la misma fuente */
+    }
+
+    /* 4. Cuando tocas o llenas el campo, el texto falso desaparece */
+    input[type="date"]:focus::before,
+    input[type="date"]:valid::before {
+        display: none;
+    }
+}
+

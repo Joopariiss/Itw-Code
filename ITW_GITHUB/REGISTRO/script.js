@@ -132,3 +132,5 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
     showPopup("❌ " + mensaje);
   }
 });
+
+
