@@ -348,3 +348,26 @@ input:focus, textarea:focus, select:focus {
     70% { transform: scale(1.1); opacity: 0.7; text-shadow: 0 0 10px rgba(74, 222, 128, 0); }
     100% { transform: scale(0.95); opacity: 1; text-shadow: 0 0 0 rgba(74, 222, 128, 0); }
 }
+
+/* ============================================== */
+/* === OVERRIDE: CORRECCIÓN DE AUTOFILL === */
+/* ============================================== */
+
+/* Esto quita el fondo blanco y el texto negro que pone el navegador por defecto */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    /* 1. Usamos una sombra interior gigante para "tapar" el color blanco del navegador */
+    -webkit-box-shadow: 0 0 0 30px var(--input) inset !important;
+    
+    /* 2. Cambiamos el color del texto para que sea tu blanco roto/claro */
+    -webkit-text-fill-color: var(--foreground) !important;
+    
+    /* 3. Mantenemos el borde y radio consistentes */
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    
+    /* 4. Transición para evitar parpadeos bruscos */
+    transition: background-color 5000s ease-in-out 0s;
+}
