@@ -543,3 +543,41 @@ body[data-mode="modificar"] .trip:hover {
 #cancelDeleteBtn:hover {
     background: #4a5157;
 }
+
+/* ========================================= */
+/* === RESPONSIVE HERO HEADER (MÓVIL) === */
+/* ========================================= */
+
+@media (max-width: 768px) {
+    /* 1. Ajustamos la altura del encabezado si es necesario (opcional) */
+    .hero-header {
+        /* Mantenemos 150px o lo bajamos un poco si prefieres */
+        height: 140px; 
+    }
+
+    /* 2. El cuadro negro (overlay) se vuelve más compacto */
+    .hero-header .overlay {
+        padding: 0.8rem 1.5rem; /* Menos relleno (antes era 1.5rem 3rem) */
+        width: 80%;            /* Ocupa máximo el 80% del ancho para no tocar los bordes */
+        min-width: 200px;      /* Ancho mínimo para que no se vea ridículamente flaco */
+    }
+
+    /* 3. Reducimos el tamaño del Título */
+    .hero-header h1 {
+        font-size: 1.8rem; /* Bajamos de 3rem a 1.8rem */
+    }
+
+    /* 4. Reducimos el subtítulo "Into The World" */
+    .hero-header p {
+        font-size: 1rem;   /* Bajamos de 1.25rem a 1rem */
+        margin-top: 0.2rem;
+    }
+    
+    /* 5. Ajuste del botón "Volver" para que no moleste */
+    .back-button {
+        padding: 5px 10px;
+        font-size: 14px;
+        top: 15px;
+        left: 15px;
+    }
+}
