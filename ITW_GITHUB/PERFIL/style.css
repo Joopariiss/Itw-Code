@@ -466,3 +466,134 @@ body {
     border-radius: 6px;
     cursor: pointer;
 }
+
+/* =========================================
+   RESPONSIVE PERFIL (CORRECCIONES PRO)
+   ========================================= */
+@media (max-width: 768px) {
+    
+    /* 1. Ajuste del Encabezado para ganar espacio */
+    .hero-header {
+        height: 160px; /* Reducimos altura */
+        background-position: center; /* Centramos mejor la imagen de fondo */
+    }
+    .hero-header h1 {
+        font-size: 2rem; /* Título más pequeño */
+    }
+
+    /* 2. Tarjeta de Perfil */
+    .perfil-card {
+        width: 95%; /* Usamos casi todo el ancho disponible */
+        margin-top: -30px; /* Efecto visual: que "pise" un poco el header */
+        padding: 20px;
+        position: relative;
+        z-index: 10; /* Asegura que quede sobre el header */
+        gap: 1.5rem; /* Espacio entre la foto y los datos */
+    }
+
+    /* 3. Columna de la Foto (Header) */
+    .profile-header {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-right: 0;
+        padding-bottom: 1.5rem;
+        /* IMPORTANTE: Necesario para que el botón se posicione respecto a esto */
+        position: relative; 
+    }
+
+    /* 4. Avatar (Foto) */
+    .avatar {
+        width: 110px;
+        height: 110px;
+        margin-bottom: 10px;
+        font-size: 2.5rem;
+    }
+
+    /* 5. EL TRUCO DEL BOTÓN EDITAR (LÁPIZ) ✏️ */
+    /* Lo ubicamos matemáticamente perfecto sobre la foto */
+    .edit-profile-btn {
+        right: auto; /* Quitamos el valor fijo problemático */
+        bottom: auto; /* Quitamos el valor fijo */
+        
+        /* Coordenadas relativas al avatar */
+        top: 80px;  /* Bajamos casi al final del avatar (110px) */
+        left: 50%;  /* Nos paramos justo al centro de la pantalla */
+        
+        /* Moverlo a la derecha del centro: 
+           35px = 55px (mitad del avatar) - 20px (ajuste visual) */
+        transform: translateX(35px); 
+        
+        width: 35px;
+        height: 35px;
+        border: 2px solid #374151; /* Borde del color del fondo para que se vea recortado */
+    }
+
+    /* 6. Detalles y Datos */
+    .profile-details {
+        padding-left: 0;
+        margin-top: 0;
+    }
+
+    .data-group {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 0;
+        gap: 5px;
+    }
+
+    .data-label {
+        font-size: 0.85rem;
+        color: #9CA3AF; /* Gris un poco más claro para la etiqueta */
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .data-value {
+        text-align: left;
+        width: 100%;
+        padding-left: 12px;
+        border-left: 3px solid var(--primary, #548A5E); /* Línea verde decorativa */
+        font-size: 1rem;
+        color: white;
+    }
+}
+
+/* =========================================
+   FIX BOTÓN "LOGOUT" EN MÓVIL (ICONO SOLAMENTE)
+   ========================================= */
+@media (max-width: 768px) {
+    .logout-button {
+        /* 1. Forma Circular fija */
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        padding: 0;
+        
+        /* 2. Ocultar el texto largo "Cerrar Sesión" */
+        font-size: 0 !important; 
+        
+        /* 3. Centrar el nuevo contenido */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        /* 4. Ajustes visuales */
+        background-color: rgba(0, 0, 0, 0.6); /* Fondo oscuro semitransparente */
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        
+        /* Asegurar posición (por si acaso) */
+        left: 20px;
+        top: 20px;
+    }
+
+    /* 5. Dibujar el ícono de nuevo */
+    .logout-button::after {
+        content: "⎋"; /* El símbolo de Power/Salir */
+        font-size: 22px !important; /* Tamaño grande y visible */
+        color: #ef4444; /* Rojo suave para indicar "peligro/salir" */
+        font-weight: bold;
+        line-height: 1;
+        margin-left: 2px; /* Pequeño ajuste visual para centrar el ícono */
+    }
+}
