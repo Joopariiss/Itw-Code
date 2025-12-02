@@ -205,3 +205,36 @@
         padding-left: 15px; /* Menos sangría en móvil */
     }
 }
+
+/* =========================================
+   RESPONSIVE CHECKLIST (MÓVIL)
+   ========================================= */
+@media (max-width: 768px) {
+    /* 1. Formulario de agregar vertical */
+    #add-checklist-form {
+        flex-direction: column;
+        align-items: stretch; /* Botones ancho completo */
+        padding: 1rem;
+    }
+
+    #add-checklist-form input, 
+    #add-checklist-form select,
+    #add-checklist-form button {
+        width: 100%; /* Todo al 100% de ancho */
+        margin-bottom: 0.5rem;
+    }
+
+    /* 2. Items del checklist */
+    .checklist-items-group {
+        padding-left: 0; /* Quitamos sangría para ganar espacio */
+    }
+    
+    .checklist-item-row {
+        padding: 10px;
+    }
+
+    .checklist-label {
+        font-size: 0.95rem;
+        gap: 10px;
+    }
+}

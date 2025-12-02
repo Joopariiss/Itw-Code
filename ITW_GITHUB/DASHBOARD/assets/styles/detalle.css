@@ -58,3 +58,31 @@
 .status-owner { background: rgba(84, 138, 94, 0.3); color: #86efac; border: 1px solid #86efac; }
 .status-pending { background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid #fde047; }
 .status-accepted { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid #93c5fd; }
+
+/* =========================================
+   RESPONSIVE DETALLES (MÓVIL)
+   ========================================= */
+@media (max-width: 768px) {
+    /* 1. Botones de acción (Invitar / Descargar) */
+    .buttons-row {
+        flex-direction: column; /* Uno debajo del otro */
+        width: 100%;
+    }
+    
+    .buttons-row button {
+        width: 100%; /* Botones grandes fáciles de tocar */
+    }
+
+    /* 2. Fila de Usuario */
+    .user-row {
+        flex-direction: column; /* Avatar arriba, estado abajo */
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .user-row > div:last-child {
+        width: 100%;
+        justify-content: space-between; /* Estado a la izq, borrar a la der */
+        margin-top: 5px;
+    }
+}

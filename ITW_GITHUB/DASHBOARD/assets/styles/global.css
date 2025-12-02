@@ -371,3 +371,85 @@ input:-webkit-autofill:active {
     /* 4. Transición para evitar parpadeos bruscos */
     transition: background-color 5000s ease-in-out 0s;
 }
+
+/* =========================================
+   RESPONSIVE GLOBAL (MÓVIL)
+   ========================================= */
+@media (max-width: 768px) {
+    /* 1. Ajustar el encabezado Hero */
+    .hero-header {
+        height: 120px; /* Más bajito */
+    }
+    .hero-header h1 {
+        font-size: 1.8rem; /* Letra más pequeña */
+    }
+    .folder-name {
+        font-size: 1rem;
+    }
+
+    /* 2. Pestañas Deslizables (Swipe) */
+    .tabs {
+        justify-content: flex-start; /* Alinear a la izquierda */
+        overflow-x: auto; /* Permitir scroll lateral */
+        white-space: nowrap; /* Que no se bajen a otra línea */
+        padding-bottom: 5px; /* Espacio para la barra de scroll */
+        -webkit-overflow-scrolling: touch; /* Scroll suave en iPhone */
+    }
+    
+    /* Ocultar la barra de scroll fea pero mantener la funcionalidad */
+    .tabs::-webkit-scrollbar {
+        height: 4px;
+    }
+    .tabs::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.2);
+        border-radius: 4px;
+    }
+
+    .tab-btn {
+        padding: 0.8rem 1.2rem; /* Botones un poco más compactos */
+        font-size: 0.9rem;
+    }
+
+    /* 3. Ajustar Modales */
+    .modal-content {
+        width: 95%;
+        padding: 1.5rem;
+    }
+}
+
+/* =========================================
+   FIX BOTÓN "VOLVER" EN MÓVIL (ICONO SOLAMENTE)
+   ========================================= */
+@media (max-width: 768px) {
+    .back-button {
+        /* 1. Tamaño fijo circular */
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        padding: 0;
+        
+        /* 2. Posición */
+        left: 15px;
+        top: 15px;
+        
+        /* 3. TRUCO CORREGIDO: "Matamos" el texto original */
+        font-size: 0 !important; /* El texto desaparece y deja de ocupar espacio */
+        
+        /* 4. Centrado */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.2); /* Borde sutil para que destaque */
+    }
+
+    /* 5. Insertamos la flecha nueva */
+    .back-button::after {
+        content: "←"; 
+        color: white; 
+        font-size: 24px !important; /* Restauramos el tamaño SOLO para la flecha */
+        font-weight: bold;
+        line-height: 1; /* Evita que se desencuadre verticalmente */
+        margin-top: -2px; /* Pequeño ajuste visual para centrar perfecto */
+    }
+}

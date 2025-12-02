@@ -192,3 +192,53 @@
     
     .scroll { max-height: 500px; }
 }
+
+/* =========================================
+   RESPONSIVE INVENTORY (MÓVIL)
+   ========================================= */
+@media (max-width: 768px) {
+    /* 1. Tarjetas de Presupuesto (3 arriba) */
+    .grid-3 {
+        /* Cambiamos el minmax de 300px a 100% para que no se salgan */
+        grid-template-columns: 1fr; 
+        gap: 1rem;
+    }
+
+    .card-content.big-value {
+        font-size: 1.5rem; /* Números un poco más chicos */
+    }
+
+    /* 2. Grid Principal (Formulario y Lista) */
+    .grid-main {
+        grid-template-columns: 1fr; /* Una columna */
+    }
+
+    /* 3. Formulario de Agregar Item */
+    #add-item-form .mb-2[style*="display: flex"] {
+        /* Romper el flex de Costo y Cantidad para que estén uno bajo otro */
+        /* O mantenerlo si crees que caben, pero asegurar width */
+        gap: 10px; 
+    }
+
+    /* 4. Lista de Items (La Tabla) */
+    .inventory-container {
+        padding: 0 0.5rem; /* Menos margen lateral */
+    }
+
+    /* Redefinimos las columnas para móvil estricto */
+    .item-header, .item-row {
+        /* Solo mostramos: Nombre, Costo y Botones */
+        grid-template-columns: 1fr 80px 70px !important; 
+        gap: 5px;
+        padding: 0.8rem 0.5rem;
+    }
+
+    /* Ocultamos lo que no es vital en el celu */
+    .col-number, .col-category, .col-quantity, .col-total {
+        display: none;
+    }
+    
+    /* Ajustes de texto */
+    .col-name { font-size: 0.9rem; word-break: break-word; }
+    .col-cost { font-size: 0.9rem; text-align: right; }
+}

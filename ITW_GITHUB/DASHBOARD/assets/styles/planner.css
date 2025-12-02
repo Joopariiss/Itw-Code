@@ -162,3 +162,39 @@
     .planner-container { grid-template-columns: 1fr; }
     #calendar-section { margin-bottom: 1rem; }
 }
+
+/* =========================================
+   RESPONSIVE PLANNER (MÓVIL)
+   ========================================= */
+@media (max-width: 768px) {
+    /* 1. Forzar una sola columna */
+    .planner-container {
+        grid-template-columns: 1fr; /* Una sola columna que ocupe todo */
+        gap: 1rem;
+        margin: 1rem auto;
+    }
+
+    /* 2. Calendario centrado y compacto */
+    #calendar-section {
+        padding: 0.5rem;
+    }
+    
+    /* 3. Actividades */
+    .day-trigger {
+        padding: 0.8rem; /* Un poco menos de padding */
+    }
+    
+    .activity {
+        flex-direction: column; /* Apilar descripción y botones */
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .activity > div:last-child {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end; /* Botones a la derecha */
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 8px;
+    }
+}
