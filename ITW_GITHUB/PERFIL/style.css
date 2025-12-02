@@ -373,3 +373,96 @@ body {
         color: #548A5E; /* Valor en Verde Acento Elegante */
     }
 }
+
+/* ========================================= */
+/* === ESTILOS SELECCIÓN DE AVATAR === */
+/* ========================================= */
+
+/* Asegurar que la imagen llene el círculo del avatar existente */
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Ocultar las iniciales si hay imagen */
+.avatar.has-image #avatar-initials {
+    display: none;
+}
+
+/* Estilos del Modal de Avatar (Reutilizando lógica de modales anteriores) */
+.modal.hidden {
+    display: none;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000; /* Por encima de todo */
+}
+
+.avatar-selection-content {
+    background: #374151;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.avatar-selection-content h3 {
+    color: #F3F4F6;
+    margin-bottom: 1.5rem;
+}
+
+/* Grilla de opciones */
+.avatar-grid {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.avatar-option {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: transform 0.2s, border-color 0.2s;
+    background-color: #1F2937;
+    padding: 2px;
+}
+
+.avatar-option img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.avatar-option:hover {
+    transform: scale(1.1);
+    border-color: #548A5E; /* Verde al pasar el mouse */
+}
+
+/* Botón cancelar específico */
+#close-avatar-modal {
+    background-color: #4B5563;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
