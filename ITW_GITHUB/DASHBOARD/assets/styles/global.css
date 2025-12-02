@@ -120,17 +120,20 @@ body {
     position: fixed;
     top: 20px;
     left: 25px;
-    font-size: 1rem;
+    font-size: 18px;
     color: white;
-    background-color: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(4px);
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.4);
     border-radius: 6px;
     padding: 8px 12px;
-    cursor: pointer;
+    text-align: center;
+    transition: background 0.3s ease;
     z-index: 120;
-    transition: background 0.3s;
 }
-.back-button:hover { background-color: rgba(255, 255, 255, 0.25); }
+
+.back-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
 
 
 /* --- Inputs y Formularios --- */
