@@ -5,7 +5,8 @@ import {
     onSnapshot, 
     doc, 
     updateDoc, 
-    deleteDoc 
+    deleteDoc,
+    getDocs // <--- AGREGAR ESTO
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // Iconos para las categorías
@@ -177,4 +178,24 @@ function renderChecklist(items, container, progressBar, progressText) {
 
         container.appendChild(section);
     });
+}
+
+// En checkList.js, al final del todo:
+
+// === EXPORT PARA EXCEL ===
+export async function getChecklistData() {
+    if (!window.folderId) return [];
+    try {
+        const checklistRef = collection(db, "carpetas", window.folderId, "checklist");
+        const snapshot = await getDocs(checklistRef);
+        
+        // Retornamos los datos y ordenamos: primero los pendientes, luego los listos
+        return snapshot.docs
+            .map(doc => doc.data())
+            .sort((a, b) => (a.packed === b.packed) ? 0 : a.packed ? 1 : -1);
+            
+    } catch (error) {
+        console.error("Error obteniendo checklist para Excel:", error);
+        return [];
+    }
 }

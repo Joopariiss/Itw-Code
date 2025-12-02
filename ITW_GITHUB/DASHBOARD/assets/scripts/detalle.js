@@ -10,8 +10,11 @@ import {
     arrayUnion, 
     arrayRemove 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
 import { getInventoryData } from "./inventory.js";
 import { getPlannerData } from "./planner.js";
+// Agregar a tus imports existentes:
+import { getChecklistData } from "./checkList.js";
 import * as XLSX from "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/+esm";
 
 const folderId = window.folderId;
@@ -297,11 +300,16 @@ function showInviteError(msg) {
 // Lógica de descarga Excel
 downloadBtn?.addEventListener("click", async () => {
   try {
+    // 1. OBTENER DATOS (Incluyendo Checklist)
     const inventario = await getInventoryData();
     const plannerData = await getPlannerData();
+    const checklistData = await getChecklistData(); // <--- NUEVO
+
     const wb = XLSX.utils.book_new();
 
-    // Hoja Inventario
+    // ==========================================
+    // HOJA 1: INVENTARIO
+    // ==========================================
     let totalGasto = 0;
     const invClean = (inventario || []).map(item => {
       const costo = Number(item.cost) || 0;
@@ -326,7 +334,9 @@ downloadBtn?.addEventListener("click", async () => {
     invSheet["!cols"] = Object.keys(invClean[0] || {}).map(k => ({ wch: 20 }));
     XLSX.utils.book_append_sheet(wb, invSheet, "Inventario");
 
-    // Hoja Itinerario
+    // ==========================================
+    // HOJA 2: ITINERARIO
+    // ==========================================
     const days = plannerData.dias || [];
     const plannerRows = [];
 
@@ -354,6 +364,28 @@ downloadBtn?.addEventListener("click", async () => {
     plannerSheet["!cols"] = Object.keys(plannerRows[0] || {}).map(k => ({ wch: 25 }));
     XLSX.utils.book_append_sheet(wb, plannerSheet, "Itinerario");
 
+    // ==========================================
+        // HOJA 3: CHECKLIST
+        // ==========================================
+        if (checklistData && checklistData.length > 0) {
+            const checkRows = checklistData.map(item => ({
+                // AQUÍ ESTÁ EL CAMBIO: Solo dejamos el icono
+                "Estado": item.packed ? "✅" : "❌", 
+                "Categoría": item.category || "Varios",
+                "Item": item.name
+            }));
+            
+            const checkSheet = XLSX.utils.json_to_sheet(checkRows);
+            
+            // Ajustamos un poco el ancho porque ahora la columna Estado es más corta
+            checkSheet["!cols"] = [{ wch: 8 }, { wch: 20 }, { wch: 40 }];
+            
+            XLSX.utils.book_append_sheet(wb, checkSheet, "Checklist");
+        }
+
+    // ==========================================
+    // GUARDAR ARCHIVO
+    // ==========================================
     const folderLabel = document.getElementById("current-folder-name")?.textContent?.replace(/\s+/g, "_") || "viaje";
     XLSX.writeFile(wb, `${folderLabel}_viaje_completo.xlsx`);
 
