@@ -12,7 +12,7 @@ import {
 } from "./db.js";
 
 // ✅ IMPORTAR la función desde global.js
-import { setCurrentUserId } from "../DASHBOARD/global.js"; 
+import { setCurrentUserId } from "../DASHBOARD/assets/scripts/global.js";
 
 const tripList = document.getElementById('tripList');
 const modal = document.getElementById('modal');
