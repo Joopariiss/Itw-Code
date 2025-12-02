@@ -22,7 +22,7 @@ tabButtons.forEach(btn => {
 // ============================
 // INVITAR USUARIOS - POPUP + FIRESTORE
 // ============================
-import { db } from "../firebase.js";
+import { db } from "../../../firebase.js";
 import { doc, updateDoc, arrayUnion, getDocs, collection, query, where, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 

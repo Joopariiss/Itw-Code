@@ -4,13 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Organizador de Viajes</title>
+  <link rel="icon" type="image/png" href="../IMAGES/iconHD.png">
 
-  <link rel="stylesheet" href="detalle.css">
-  <link rel="stylesheet" href="global.css">   <link rel="stylesheet" href="planner.css">
-  <link rel="stylesheet" href="inventory.css">
-  <link rel="stylesheet" href="checklist.css">
+  <link rel="stylesheet" href="assets/styles/detalle.css">
+  <link rel="stylesheet" href="assets/styles/global.css">
+  <link rel="stylesheet" href="assets/styles/planner.css">
+  <link rel="stylesheet" href="assets/styles/inventory.css">
+  <link rel="stylesheet" href="assets/styles/checkList.css"> <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 
 <body>
@@ -298,7 +299,7 @@
 
 
   <script type="module">
-    import { initChecklist } from "./checklist.js";
+    import { initChecklist } from "./assets/scripts/checkList.js";
 
     document.addEventListener("DOMContentLoaded", () => {
         // Iniciar la lógica del checklist
@@ -306,7 +307,7 @@
     });
   </script>
 
-  <script src="detalle.js" type="module"></script>
+  <script src="assets/scripts/detalle.js" type="module"></script>
 
   <script>
     // Recuperar ID de Carpeta
@@ -325,7 +326,7 @@
     import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     // 1. IMPORTAR LA FUNCIÓN (NUEVO)
-    import { initPresence } from "./activo.js";
+    import { initPresence } from "./assets/scripts/activo.js";
 
     async function setRandomHeaderImage(folderName) {
       const header = document.querySelector(".hero-header");
@@ -375,11 +376,12 @@
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="global.js" type="module"></script>
-  <script src="planner.js" type="module"></script>
-  <script src="inventory.js" type="module"></script>
-  <script src="dashboard.js" type="module"></script>
-  <script src="activo.js" type="module"></script>
+
+  <script src="assets/scripts/global.js" type="module"></script>
+  <script src="assets/scripts/planner.js" type="module"></script>
+  <script src="assets/scripts/inventory.js" type="module"></script>
+  <script src="assets/scripts/dashboard.js" type="module"></script>
+  <script src="assets/scripts/activo.js" type="module"></script>
   
   <script>
     document.getElementById("backToHome").addEventListener("click", () => {

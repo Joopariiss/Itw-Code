@@ -2,7 +2,7 @@
 // Trip Wallet — JS puro adaptado al HTML/CSS que compartiste
 
 // --- Importar Firebase ---
-import { db } from "../firebase.js";
+import { db } from "../../../firebase.js";
 import {
   collection,
   doc,

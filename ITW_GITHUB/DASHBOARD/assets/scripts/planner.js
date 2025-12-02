@@ -2,7 +2,7 @@
    Travel Planner - planner.js (Versión Real-Time Optimizada)
    ============================ */
 
-import { db } from "../firebase.js";
+import { db } from "../../../firebase.js";
 import {
   collection,
   doc,
