@@ -63,6 +63,8 @@ body {
   top: 50%;
   transform: translateY(-50%);
   font-size: 20px;
+  cursor: pointer; /* Asegura que aparezca la manito al pasar el mouse */
+  z-index: 10;
 }
 
 .wrapper .remember-forgot {

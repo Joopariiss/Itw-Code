@@ -76,3 +76,23 @@ if (loginForm) {
     }
   });
 }
+
+// ==========================================
+// 👁️ LÓGICA MOSTRAR / OCULTAR CONTRASEÑA
+// ==========================================
+const togglePassword = document.getElementById('togglePassword');
+const passwordInput = document.getElementById('password');
+
+if (togglePassword && passwordInput) {
+  togglePassword.addEventListener('click', function () {
+    // 1. Alternar el tipo de input (password <-> text)
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+
+    // 2. Alternar el icono (ojo abierto <-> ojo cerrado)
+    // 'bxs-hide' es el ojo tachado/cerrado
+    // 'bxs-show' es el ojo abierto
+    this.classList.toggle('bxs-hide');
+    this.classList.toggle('bxs-show');
+  });
+}
