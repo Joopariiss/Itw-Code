@@ -195,7 +195,7 @@ function triggerInvitePopup(folder) {
 }
 
 
-// ---------- RENDERIZAR UNA CARPETA ----------
+// ---------- RENDERIZAR UNA CARPETA (OPTIMIZADO) ----------
 async function renderFolder(folder, status = "propia") {
 
   const fechas = await getFolderDates(folder.id);
@@ -212,6 +212,9 @@ async function renderFolder(folder, status = "propia") {
   const card = document.createElement("div");
   card.className = "trip-card";
   card.dataset.id = folder.id;
+  
+  // AGREGA ESTO: Un tooltip nativo que aparece al dejar el mouse encima
+  card.title = "Click derecho para opciones";
 
   const imageUrl = await getUnsplashImage(folder.name);
 
@@ -235,37 +238,25 @@ async function renderFolder(folder, status = "propia") {
     </div>
   `;
 
-  // ==========================================
-  // 🔥 LOGICA DE AUTO-POPUP (NUEVO)
-  // ==========================================
+  // LOGICA DE AUTO-POPUP
   if (status === "pendiente") {
-    // Mostrar automáticamente si no hay otro popup abierto
     if (!document.querySelector(".invite-popup")) {
        triggerInvitePopup(folder);
     }
   }
 
-  // Click en la tarjeta
+  // === EVENTO CLICK EN TARJETA ===
   card.addEventListener("click", async () => {
-    // Si está pendiente, mostramos el popup (reutilizando la función)
     if (status === "pendiente") {
       triggerInvitePopup(folder);
       return;
     }
 
-    // Bloqueo invitados
     if (status !== "propia") {
-      if (currentMode === "modificar") {
-        showPopup("Solo el dueño puede modificar esta carpeta.");
-        return;
-      }
-      if (currentMode === "eliminar") {
-        showPopup("Solo el dueño puede eliminar esta carpeta.");
-        return;
-      }
+      if (currentMode === "modificar") return showPopup("Solo el dueño puede modificar esta carpeta.");
+      if (currentMode === "eliminar") return showPopup("Solo el dueño puede eliminar esta carpeta.");
     }
 
-    // Modos normales
     if (currentMode === "modificar") {
       selectedFolderId = folder.id;
       selectedFolderDiv = card;
@@ -274,16 +265,33 @@ async function renderFolder(folder, status = "propia") {
       addTripBtn.textContent = "Guardar cambios";
     } 
     else if (currentMode === "eliminar") {
-      // Abrimos el modal personalizado
-      confirmMessage.textContent = `¿Seguro que quieres eliminar la carpeta "${folder.name}"? Esta acción no se puede deshacer.`;
+      // --- LÓGICA DE ELIMINAR (OPTIMIZADA) ---
+      confirmMessage.textContent = `¿Seguro que quieres eliminar la carpeta "${folder.name}"?`;
       confirmModal.style.display = 'flex';
 
-      // Definimos qué pasa cuando dicen "Sí"
       confirmDeleteBtn.onclick = async () => {
-          confirmModal.style.display = 'none'; // Cerrar modal inmediatamente
-          await deleteFolder(folder.id);       // Lógica original de DB
-          await cargarCarpetas();              // Recargar UI
-          showPopup(`Carpeta "${folder.name}" eliminada`); // Tu popup de éxito original
+          // 1. Cerrar modal visualmente YA
+          confirmModal.style.display = 'none'; 
+          
+          // 2. 🔥 UI OPTIMISTA: Borrar tarjeta del DOM inmediatamente
+          card.style.transition = "transform 0.3s, opacity 0.3s";
+          card.style.transform = "scale(0.8)";
+          card.style.opacity = "0";
+          setTimeout(() => card.remove(), 300); // Quitar del HTML tras animación
+
+          // 3. Mostrar mensaje de éxito YA
+          showPopup(`Carpeta "${folder.name}" eliminada`); 
+
+          // 4. Borrar en Firebase en segundo plano (sin await que bloquee la UI)
+          try {
+             await deleteFolder(folder.id);
+             // ¡OJO! NO llamamos a cargarCarpetas() aquí. No hace falta.
+          } catch (error) {
+             console.error("Error eliminando:", error);
+             showPopup("Error al eliminar en la nube.");
+             // Si falla, aquí sí recargaríamos para recuperar la carpeta
+             cargarCarpetas(); 
+          }
       };
     }
     else {
@@ -293,7 +301,7 @@ async function renderFolder(folder, status = "propia") {
 
   tripList.appendChild(card);
 
-  // Menú contextual (Click derecho)
+  // === MENÚ CONTEXTUAL (CLICK DERECHO) ===
   card.addEventListener("contextmenu", (e) => {
     e.preventDefault();
 
@@ -324,25 +332,38 @@ async function renderFolder(folder, status = "propia") {
     };
 
     menu.querySelector(".delete-folder").onclick = () => {
-      menu.remove(); // Quitamos el menú contextual primero
+      menu.remove(); 
 
-      // Abrimos el modal personalizado
+      // --- LÓGICA DE ELIMINAR CONTEXTUAL (OPTIMIZADA) ---
       confirmMessage.textContent = `¿Seguro que quieres eliminar la carpeta "${folder.name}"?`;
       confirmModal.style.display = 'flex';
 
-      // Definimos qué pasa cuando dicen "Sí"
       confirmDeleteBtn.onclick = async () => {
+          // 1. Cerrar modal YA
           confirmModal.style.display = 'none';
-          await deleteFolder(folder.id);
-          await cargarCarpetas(); 
+
+          // 2. 🔥 UI OPTIMISTA: Borrar visualmente YA
+          card.style.transition = "transform 0.3s, opacity 0.3s";
+          card.style.transform = "scale(0.8)";
+          card.style.opacity = "0";
+          setTimeout(() => card.remove(), 300);
+
+          // 3. Feedback YA
           showPopup(`Carpeta "${folder.name}" eliminada`);
+
+          // 4. Backend en segundo plano
+          try {
+             await deleteFolder(folder.id);
+          } catch (error) {
+             console.error("Error eliminando:", error);
+             cargarCarpetas(); 
+          }
       };
     };
 
     document.addEventListener("click", () => menu.remove(), { once: true });
   });
 }
-
 // ---------- AGREGAR o MODIFICAR (OPTIMIZADO) ----------
 addTripBtn.addEventListener('click', async () => {
   const name = tripNameInput.value.trim();
