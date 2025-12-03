@@ -96,21 +96,39 @@ function computeTotals() {
 
 function updateBudgetDisplay() {
   const { total, remaining } = computeTotals();
+  
+  // Actualizar textos en pantalla
   if (initialBudgetEl) initialBudgetEl.textContent = formatCurrency(initialBudget);
   if (totalSpentEl) totalSpentEl.textContent = formatCurrency(total);
   if (remainingBudgetEl) remainingBudgetEl.textContent = formatCurrency(remaining);
 
+  // Lógica de Semáforo por Cuartiles
   if (remainingBudgetEl && remainingCard) {
-    if (remaining < 0) {
-      remainingBudgetEl.classList.add('negative');
-      remainingCard.classList.add('negative');
+    // 1. Limpiamos clases previas
+    remainingCard.classList.remove('status-green', 'status-yellow', 'status-orange', 'status-red');
+    remainingBudgetEl.classList.remove('negative');
+    remainingCard.classList.remove('negative');
+
+    // 2. Calculamos porcentaje restante
+    const percentage = initialBudget > 0 ? (remaining / initialBudget) * 100 : 0;
+
+    // 3. Aplicamos la clase según tus reglas estrictas
+    if (percentage < 25) {
+      // Menos del 25% (Ej: 24 pesos de 100) -> ROJO
+      // Esto incluye también si te vas a números negativos.
+      remainingCard.classList.add('status-red');
+    } else if (percentage < 50) {
+      // Entre 25% y 49.9% (Ej: 25 pesos exactos) -> NARANJA
+      remainingCard.classList.add('status-orange');
+    } else if (percentage < 75) {
+      // Entre 50% y 74.9% (Ej: 50 pesos exactos) -> AMARILLO
+      remainingCard.classList.add('status-yellow');
     } else {
-      remainingBudgetEl.classList.remove('negative');
-      remainingCard.classList.remove('negative');
+      // 75% o más (Ej: 75 pesos) -> VERDE
+      remainingCard.classList.add('status-green');
     }
   }
 }
-
 // ---------- Renderizado de items ----------
 function renderEmptyState() {
   itemsContainer.innerHTML = '';

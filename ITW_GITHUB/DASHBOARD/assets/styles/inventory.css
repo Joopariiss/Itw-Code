@@ -242,3 +242,62 @@
     .col-name { font-size: 0.9rem; word-break: break-word; }
     .col-cost { font-size: 0.9rem; text-align: right; }
 }
+
+/* --- Estados del Presupuesto (Estilo Dark Mode Elegante) --- */
+
+#remaining-card {
+    transition: all 0.3s ease;
+    border: 2px solid transparent; /* Grosor base */
+    background-color: #1e293b; /* Forzamos el color de fondo oscuro original (Slate 800) */
+}
+
+/* > 75% : Verde (Saludable) */
+#remaining-card.status-green {
+    border-color: #10b981 !important;     /* Borde Verde Neón */
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); /* Resplandor suave */
+}
+#remaining-card.status-green #remaining-budget {
+    color: #34d399 !important;            /* Texto Verde Claro */
+}
+#remaining-card.status-green .card-title-sm {
+    color: #6ee7b7 !important;            /* Título Verde pálido */
+}
+
+
+/* 50% - 75% : Amarillo (Precaución) - TU CASO ACTUAL */
+#remaining-card.status-yellow {
+    border-color: #f59e0b !important;     /* Borde Amarillo/Dorado */
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+}
+#remaining-card.status-yellow #remaining-budget {
+    color: #fbbf24 !important;            /* Texto Amarillo Brillante */
+}
+#remaining-card.status-yellow .card-title-sm {
+    color: #fcd34d !important;
+}
+
+
+/* 25% - 50% : Naranja (Alerta) */
+#remaining-card.status-orange {
+    border-color: #f97316 !important;     /* Borde Naranja */
+    box-shadow: 0 0 15px rgba(249, 115, 22, 0.2);
+}
+#remaining-card.status-orange #remaining-budget {
+    color: #fb923c !important;            /* Texto Naranja Claro */
+}
+#remaining-card.status-orange .card-title-sm {
+    color: #fdba74 !important;
+}
+
+
+/* < 25% : Rojo (Crítico) */
+#remaining-card.status-red {
+    border-color: #ef4444 !important;     /* Borde Rojo */
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+}
+#remaining-card.status-red #remaining-budget {
+    color: #f87171 !important;            /* Texto Rojo Claro */
+}
+#remaining-card.status-red .card-title-sm {
+    color: #fca5a5 !important;
+}
