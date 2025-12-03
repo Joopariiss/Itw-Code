@@ -581,3 +581,49 @@ body[data-mode="modificar"] .trip:hover {
         left: 15px;
     }
 }
+
+
+/* === BOTÓN DE PERFIL (AVATAR) === */
+.profile-btn {
+    position: fixed;
+    top: 25px;
+    left: 30px;  /* ✅ Correcto: Alineado a la IZQUIERDA */
+    z-index: 1000;
+    
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.profile-btn:hover {
+    background-color: #548A5E;
+    transform: scale(1.1);
+    border-color: #548A5E;
+}
+
+/* Ajuste para móvil */
+@media (max-width: 768px) {
+    .profile-btn {
+        top: 15px;
+        /* ⚠️ IMPORTANTE: Cambiamos 'right' por 'left' aquí también */
+        left: 15px; 
+        
+        width: 40px;
+        height: 40px;
+        font-size: 1.3rem;
+    }
+}
