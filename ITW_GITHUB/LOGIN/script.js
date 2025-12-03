@@ -1,13 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  setPersistence,           // <--- NUEVO
-  browserLocalPersistence,  // <--- NUEVO (Para "Recuérdame" activado)
-  browserSessionPersistence // <--- NUEVO (Para "Recuérdame" desactivado)
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// ✅ Configuración de Firebase
+// 🔥 Misma configuración (o importar de firebase.js si lo usaras centralizado)
 const firebaseConfig = {
   apiKey: "AIzaSyD7_sQySsUWBu9byuno2e8R3Gpzop5DQgo",
   authDomain: "into-the-world-db.firebaseapp.com",
@@ -15,70 +9,70 @@ const firebaseConfig = {
   storageBucket: "into-the-world-db.firebasestorage.app",
   messagingSenderId: "212497407719",
   appId: "1:212497407719:web:a7241cb9bb8dea08ca4c42",
-  measurementId: "G-K03N1YM4RG",
+  measurementId: "G-K03N1YM4RG"
 };
 
-
-// Inicializa Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// 🎯 Elementos del popup
+// === POPUP (Reutilizando la lógica si existe en tu HTML de Login) ===
 const popupOverlay = document.getElementById("popup-overlay");
 const popupMessage = document.getElementById("popup-message");
 const popupText = document.getElementById("popup-text");
 const popupClose = document.getElementById("popup-close");
 
-// Funciones del popup
-function showPopup(message, redirect = false) {
-  popupText.textContent = message;
-  popupOverlay.style.display = "block";
-  popupMessage.style.display = "block";
-
-  popupClose.onclick = () => {
-    popupOverlay.style.display = "none";
-    popupMessage.style.display = "none";
-    if (redirect) window.location.href = "../CARPETAS/carpetas.html";
-  };
+function showPopup(mensaje) {
+  if (popupText && popupOverlay) {
+    popupText.textContent = mensaje;
+    popupOverlay.style.display = "block";
+    popupMessage.style.display = "block";
+  } else {
+    // Fallback si no hay popup en el HTML
+    alert(mensaje);
+  }
 }
 
-popupOverlay.addEventListener("click", () => {
-  popupOverlay.style.display = "none";
-  popupMessage.style.display = "none";
-});
-
-// 🧾 Login Actualizado
-document.getElementById("loginForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  const email = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const rememberMe = document.getElementById("rememberMe").checked; // <--- Verificamos el checkbox
-
-  if (!email || !password) {
-    showPopup("⚠️ Por favor, completa todos los campos.");
-    return;
-  }
-
-  // Definimos el tipo de persistencia según el checkbox
-  const persistenceType = rememberMe ? browserLocalPersistence : browserSessionPersistence;
-
-  // 1. Primero configuramos la persistencia
-  setPersistence(auth, persistenceType)
-    .then(() => {
-      // 2. Luego hacemos el login
-      return signInWithEmailAndPassword(auth, email, password);
-    })
-    .then((userCredential) => {
-      console.log("Login correcto:", userCredential.user);
-      console.log("Modo de sesión:", rememberMe ? "Persistente (Local)" : "Temporal (Sesión)");
-      showPopup(`✅ Bienvenido de nuevo, ${email.split("@")[0]}!`, true);
-    })
-    .catch((error) => {
-      console.error("Error en login:", error);
-      // Manejo de errores comunes para dar mensajes más claros
-      let msg = "❌ Correo o contraseña incorrectos.";
-      if (error.code === 'auth/too-many-requests') msg = "⚠️ Demasiados intentos fallidos. Intenta más tarde.";
-      showPopup(msg);
+if (popupClose) {
+    popupClose.addEventListener("click", () => {
+        popupOverlay.style.display = "none";
+        popupMessage.style.display = "none";
     });
-});
+}
+
+// === LOGIN ===
+const loginForm = document.getElementById("loginForm");
+
+if (loginForm) {
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("username").value; // En tu HTML el ID es username
+    const password = document.getElementById("password").value;
+
+    try {
+      // 1. Intentamos loguear
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // 2. VERIFICACIÓN DE EMAIL (NUEVO)
+      if (user.emailVerified) {
+        // A. Si verificó, entra
+        window.location.href = "../CARPETAS/carpetas.html";
+      } else {
+        // B. Si no verificó, cerramos sesión y avisamos
+        await signOut(auth);
+        showPopup("⚠️ Tu cuenta aún no ha sido verificada. Por favor revisa tu correo electrónico.");
+      }
+
+    } catch (error) {
+      console.error(error);
+      if (error.code === "auth/invalid-credential" || error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+         showPopup("❌ Correo o contraseña incorrectos.");
+      } else if (error.code === "auth/too-many-requests") {
+         showPopup("❌ Demasiados intentos. Espera un momento.");
+      } else {
+         showPopup("❌ Error: " + error.message);
+      }
+    }
+  });
+}
