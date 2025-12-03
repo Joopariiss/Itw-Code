@@ -343,27 +343,65 @@ async function renderFolder(folder, status = "propia") {
   });
 }
 
-// ---------- AGREGAR o MODIFICAR ----------
+// ---------- AGREGAR o MODIFICAR (OPTIMIZADO) ----------
 addTripBtn.addEventListener('click', async () => {
   const name = tripNameInput.value.trim();
   if (!name) return showPopup('Ingresa un nombre');
 
-  if (currentMode === "modificar" && selectedFolderId) {
-    await updateFolder(selectedFolderId, name);
-    // Recargar todo para re-ordenar si fuera necesario (aunque modificar nombre no cambia fecha)
-    // Pero para simplificar, podemos solo actualizar el DOM si queremos rapidez
-    selectedFolderDiv.querySelector(".trip-title").textContent = name;
-    const newImageUrl = await getUnsplashImage(name);
-    selectedFolderDiv.querySelector(".trip-image").src = newImageUrl;
-    showPopup("Carpeta modificada correctamente");
-  }
+  // 1. BLOQUEO DE BOTÓN (Evita duplicados)
+  const originalBtnText = addTripBtn.textContent;
+  addTripBtn.disabled = true;
+  addTripBtn.textContent = originalBtnText === "Agregar" ? "Creando..." : "Guardando...";
+  addTripBtn.style.opacity = "0.7";
+  addTripBtn.style.cursor = "not-allowed";
 
-  else if (currentMode === "agregar") {
-    await createFolder(name, userId);
-    // Recargar todo para que la nueva carpeta salga PRIMERA
-    await cargarCarpetas();
-    showPopup("Carpeta creada correctamente");
-  }
+  try {
+    if (currentMode === "modificar" && selectedFolderId) {
+      // --- LÓGICA DE MODIFICAR ---
+      await updateFolder(selectedFolderId, name);
+      
+      // Actualización visual directa (sin recargar todo)
+      if (selectedFolderDiv) {
+        selectedFolderDiv.querySelector(".trip-title").textContent = name;
+        // Opcional: Actualizar imagen si quieres que cambie con el nombre
+        const newImageUrl = await getUnsplashImage(name);
+        selectedFolderDiv.querySelector(".trip-image").src = newImageUrl;
+      }
+      showPopup("Carpeta modificada correctamente");
 
-  closeModal();
+    } else if (currentMode === "agregar") {
+      // --- LÓGICA DE AGREGAR (OPTIMIZADA) ---
+      
+      // 1. Crear en Firebase
+      const newFolderData = await createFolder(name, userId);
+      
+      // 2. Renderizar SOLO esta tarjeta nueva
+      // Pasamos status "propia" porque acabamos de crearla
+      await renderFolder(newFolderData, "propia");
+
+      // 3. Truco visual: Mover la nueva tarjeta al principio
+      // Como renderFolder usa appendChild (la pone al final), la movemos al inicio
+      const newCard = tripList.lastElementChild;
+      if (newCard) {
+        tripList.prepend(newCard);
+        
+        // Pequeña animación para que se note que apareció
+        newCard.style.animation = "fadeIn 0.5s ease-out";
+      }
+
+      showPopup("Carpeta creada correctamente");
+    }
+
+    closeModal();
+
+  } catch (error) {
+    console.error("Error:", error);
+    showPopup("Hubo un error al procesar la solicitud.");
+  } finally {
+    // 4. DESBLOQUEO DE BOTÓN (Siempre se ejecuta, haya error o no)
+    addTripBtn.disabled = false;
+    addTripBtn.textContent = originalBtnText; // Restauramos texto original
+    addTripBtn.style.opacity = "1";
+    addTripBtn.style.cursor = "pointer";
+  }
 });
