@@ -246,57 +246,106 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Lógica de invitación
+// ================================================================
+// LÓGICA DE INVITACIÓN (OPTIMIZADA Y BLINDADA)
+// ================================================================
+
+// Listener para abrir el modal (este se mantiene igual, solo para contexto)
 inviteBtn?.addEventListener("click", () => {
   if (inviteModal) {
       inviteModal.classList.remove("hidden");
       if (inviteStatus) inviteStatus.textContent = "";
-      if (inviteEmailInput) inviteEmailInput.value = "";
+      if (inviteEmailInput) {
+          inviteEmailInput.value = "";
+          inviteEmailInput.focus(); // Pequeño detalle UX: pone el cursor listo para escribir
+      }
   }
 });
+
 closeInviteBtn?.addEventListener("click", () => inviteModal?.classList.add("hidden"));
 
+// --- AQUÍ ESTÁ LA LÓGICA CORREGIDA (VISUALMENTE PERFECTA) ---
 sendInviteBtn?.addEventListener("click", async () => {
+  // 1. Validaciones iniciales
   if (window.USER_IS_OWNER === false) return showInviteError("Solo el dueño puede invitar.");
   const email = inviteEmailInput.value.trim();
   if (!email) return showInviteError("Por favor ingresa un correo.");
 
+  // 2. BLOQUEO DEL BOTÓN
+  const originalText = "Invitar"; // Texto base
+  sendInviteBtn.disabled = true;
+  sendInviteBtn.textContent = "Enviando...";
+  sendInviteBtn.style.cursor = "not-allowed";
+  sendInviteBtn.style.opacity = "0.7";
+
+  // Limpiamos mensajes previos
+  if (inviteStatus) inviteStatus.textContent = "";
+
   try {
+    // 3. Buscar si el usuario existe
     const usersRef = collection(db, "usuarios");
     const q = query(usersRef, where("email", "==", email));
     const querySnap = await getDocs(q);
 
-    if (querySnap.empty) return showInviteError("Usuario no encontrado en la app.");
+    if (querySnap.empty) {
+        throw new Error("No existe ningún usuario con este correo en la App.");
+    }
     
     const invitedUid = querySnap.docs[0].id;
-    if (invitedUid === currentUserId) return showInviteError("No puedes invitarte a ti mismo.");
+    
+    if (invitedUid === currentUserId) {
+        throw new Error("No puedes invitarte a ti mismo.");
+    }
 
+    // 4. Actualizar Base de Datos
     const folderRef = doc(db, "carpetas", window.folderId);
     await updateDoc(folderRef, { invitadosPendientes: arrayUnion(invitedUid) });
 
+    // 5. ÉXITO VISUAL
     if (inviteStatus) {
         inviteStatus.textContent = `✅ Invitación enviada a ${email}`;
-        inviteStatus.style.color = "lightgreen";
+        inviteStatus.style.color = "#4ade80"; 
     }
     
+    // 6. ACTUALIZAR LISTA DE FONDO
+    await loadParticipants(); 
+
+    // 7. CERRAR MODAL (Y AQUÍ DESBLOQUEAMOS)
     setTimeout(() => {
         inviteModal.classList.add("hidden");
-        loadParticipants(); // Recargar lista para ver si se ve reflejado (opcional)
-    }, 1500);
+        
+        // REINICIAMOS EL ESTADO PARA LA PRÓXIMA VEZ (Invisible al usuario porque ya se cerró)
+        inviteEmailInput.value = "";
+        inviteStatus.textContent = "";
+        
+        sendInviteBtn.disabled = false;
+        sendInviteBtn.textContent = originalText;
+        sendInviteBtn.style.cursor = "pointer";
+        sendInviteBtn.style.opacity = "1";
+    }, 1200); // Esperamos 1.2 segundos con el botón AÚN BLOQUEADO
 
   } catch (error) {
     console.error("Error al invitar:", error);
-    showInviteError("Error al enviar invitación.");
+    const msg = error.message.includes("No existe") || error.message.includes("mismo") 
+                ? error.message 
+                : "Ocurrió un error al enviar la invitación.";
+    showInviteError(msg);
+
+    // 8. SI HAY ERROR: DESBLOQUEAMOS INMEDIATAMENTE
+    // Para que el usuario pueda corregir y volver a intentar
+    sendInviteBtn.disabled = false;
+    sendInviteBtn.textContent = originalText;
+    sendInviteBtn.style.cursor = "pointer";
+    sendInviteBtn.style.opacity = "1";
   }
 });
 
 function showInviteError(msg) {
   if (inviteStatus) {
       inviteStatus.textContent = msg;
-      inviteStatus.style.color = "#ef4444";
+      inviteStatus.style.color = "#ef4444"; // Rojo alerta
   }
 }
-
 // Lógica de descarga Excel
 downloadBtn?.addEventListener("click", async () => {
   try {
