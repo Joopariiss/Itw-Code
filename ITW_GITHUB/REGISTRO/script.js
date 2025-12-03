@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // 🔥 Configuración Firebase
@@ -21,12 +21,16 @@ const db = getFirestore(app);
 // === POPUP ===
 const popupOverlay = document.getElementById("popup-overlay");
 const popupMessage = document.getElementById("popup-message");
+const popupTitle = document.getElementById("popup-title"); // Agregué esto según tu HTML
 const popupText = document.getElementById("popup-text");
 const popupClose = document.getElementById("popup-close");
 
-function showPopup(mensaje, esExito = false) {
+function showPopup(mensaje, esExito = false, titulo = "") {
+  if(popupTitle) popupTitle.textContent = titulo || (esExito ? "¡Éxito!" : "Atención");
   popupText.textContent = mensaje;
-  popupMessage.style.border = esExito ? "3px solid #4CAF50" : "3px solid #f44336";
+  // Cambiamos el borde o color del título según sea éxito o error
+  if(popupTitle) popupTitle.style.color = esExito ? "#4CAF50" : "#f44336";
+  
   popupOverlay.style.display = "block";
   popupMessage.style.display = "block";
 }
@@ -36,8 +40,8 @@ function closePopup() {
   popupMessage.style.display = "none";
 }
 
-popupClose.addEventListener("click", closePopup);
-popupOverlay.addEventListener("click", closePopup);
+if(popupClose) popupClose.addEventListener("click", closePopup);
+if(popupOverlay) popupOverlay.addEventListener("click", closePopup);
 
 // === CARGAR PAÍSES ===
 fetch("paises.txt")
@@ -45,14 +49,16 @@ fetch("paises.txt")
   .then(data => {
     const paises = data.split("\n").map(p => p.trim()).filter(p => p);
     const select = document.getElementById("pais");
-    paises.forEach(pais => {
-      const option = document.createElement("option");
-      option.value = pais;
-      option.textContent = pais;
-      select.appendChild(option);
-    });
+    if(select) {
+        paises.forEach(pais => {
+        const option = document.createElement("option");
+        option.value = pais;
+        option.textContent = pais;
+        select.appendChild(option);
+        });
+    }
   })
-  .catch(() => showPopup("⚠️ Error al cargar los países.", false));
+  .catch(() => console.error("Error cargando países"));
 
 // === Calcular edad ===
 function calcularEdad(fechaNacimiento) {
@@ -64,73 +70,84 @@ function calcularEdad(fechaNacimiento) {
   return edad;
 }
 
-// === REGISTRO ===
-document.getElementById("registerForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
+// === REGISTRO CON VERIFICACIÓN ===
+const registerForm = document.getElementById("registerForm");
 
-  const nombre = document.getElementById("nombre").value.trim();
-  const apellido = document.getElementById("apellido").value.trim();
-  const pais = document.getElementById("pais").value;
-  const fechaNacimiento = document.getElementById("fechaNacimiento").value;
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-  const confirmPassword = document.getElementById("confirmPassword").value;
+if (registerForm) {
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-  // Validaciones básicas
-  if (!nombre || !apellido || !pais || !fechaNacimiento || !email || !password || !confirmPassword) {
-    showPopup("⚠️ Por favor, completa todos los campos.");
-    return;
-  }
+      const nombre = document.getElementById("nombre").value.trim();
+      const apellido = document.getElementById("apellido").value.trim();
+      const pais = document.getElementById("pais").value;
+      const fechaNacimiento = document.getElementById("fechaNacimiento").value;
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
 
-  if (password !== confirmPassword) {
-    showPopup("⚠️ Las contraseñas no coinciden.");
-    return;
-  }
+      // Validaciones básicas
+      if (!nombre || !apellido || !pais || !fechaNacimiento || !email || !password || !confirmPassword) {
+        showPopup("⚠️ Por favor, completa todos los campos.");
+        return;
+      }
 
-  const edad = calcularEdad(fechaNacimiento);
-  if (edad < 13) {
-    showPopup("⚠️ Debes tener al menos 13 años para registrarte.");
-    return;
-  }
+      if (password !== confirmPassword) {
+        showPopup("⚠️ Las contraseñas no coinciden.");
+        return;
+      }
 
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+      const edad = calcularEdad(fechaNacimiento);
+      if (edad < 13) {
+        showPopup("⚠️ Debes tener al menos 13 años para registrarte.");
+        return;
+      }
 
-    await setDoc(doc(db, "usuarios", user.uid), {
-      nombre,
-      apellido,
-      pais,
-      fechaNacimiento,
-      edad,
-      email,
-      uid: user.uid,
-      fechaRegistro: new Date().toISOString()
+      try {
+        // 1. Crear usuario
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // 2. Enviar correo de verificación (NUEVO)
+        await sendEmailVerification(user);
+
+        // 3. Guardar en Firestore
+        await setDoc(doc(db, "usuarios", user.uid), {
+          nombre,
+          apellido,
+          pais,
+          fechaNacimiento,
+          edad,
+          email,
+          uid: user.uid,
+          fechaRegistro: new Date().toISOString()
+        });
+
+        // 4. Cerrar sesión inmediatamente (IMPORTANTE)
+        // Esto evita que entre directo sin verificar
+        await signOut(auth);
+
+        // 5. Avisar y redirigir al Login (no a Carpetas)
+        showPopup(`Hemos enviado un enlace de confirmación a ${email}. Por favor revísalo para activar tu cuenta.`, true, "¡Casi listo!");
+
+        // Damos tiempo para leer el mensaje antes de ir al login
+        setTimeout(() => window.location.href = "../LOGIN/login.html", 6000);
+
+      } catch (error) {
+        let mensaje = "";
+        switch (error.code) {
+          case "auth/email-already-in-use":
+            mensaje = "El correo ya está registrado.";
+            break;
+          case "auth/invalid-email":
+            mensaje = "El formato del correo no es válido.";
+            break;
+          case "auth/weak-password":
+            mensaje = "La contraseña es demasiado débil (mínimo 6 caracteres).";
+            break;
+          default:
+            mensaje = "Error: " + error.message;
+        }
+        showPopup(mensaje, false);
+      }
     });
-
-    localStorage.setItem("usuarioNombre", nombre);
-    showPopup(`✅ Registro exitoso. ¡Bienvenido, ${nombre}!`, true);
-
-    // Redirige después de unos segundos
-    setTimeout(() => window.location.href = "../CARPETAS/carpetas.html", 2500);
-
-  } catch (error) {
-    let mensaje = "";
-    switch (error.code) {
-      case "auth/email-already-in-use":
-        mensaje = "El correo ya está registrado.";
-        break;
-      case "auth/invalid-email":
-        mensaje = "El formato del correo no es válido.";
-        break;
-      case "auth/weak-password":
-        mensaje = "La contraseña es demasiado débil (mínimo 6 caracteres).";
-        break;
-      default:
-        mensaje = "Error: " + error.message;
-    }
-    showPopup("❌ " + mensaje);
-  }
-});
-
-
+}
