@@ -33,6 +33,11 @@ const expelModal = document.getElementById("delete-user-modal");
 const confirmExpelBtn = document.getElementById("confirm-expel-btn");
 const cancelExpelBtn = document.getElementById("cancel-expel-btn");
 const expelMsg = document.getElementById("delete-user-msg");
+// ... tus referencias existentes ...
+const leaveBtn = document.getElementById("details-leave-btn"); // <--- NUEVO
+const leaveModal = document.getElementById("leave-modal");     // <--- NUEVO
+const confirmLeaveBtn = document.getElementById("confirm-leave-btn"); // <--- NUEVO
+const cancelLeaveBtn = document.getElementById("cancel-leave-btn");   // <--- NUEVO
 
 // Función para abrir el modal (reemplaza al antiguo alert)
 function openExpelModal(uid, listName, email) {

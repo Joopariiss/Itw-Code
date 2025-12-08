@@ -235,6 +235,9 @@
               <button id="details-download-btn" class="btn btn-accent">
                   📥 Descargar Excel
               </button>
+              <button id="details-leave-btn" class="btn" style="background-color: #f59e0b; color: white; display: none;">
+                  🏃 Salir del Viaje
+              </button>
           </div>
         </div>
       </div>
@@ -291,6 +294,24 @@
           Expulsar
         </button>
         <button id="cancel-expel-btn" class="btn btn-secondary">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="leave-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3 class="mb-2" style="color: #f59e0b;">⚠️ Abandonar Viaje</h3>
+      <p class="mb-2 text-center">
+        ¿Estás seguro que quieres salir de este grupo? <br>
+        Tendrán que invitarte de nuevo para volver a entrar.
+      </p>
+      <div class="modal-buttons">
+        <button id="confirm-leave-btn" class="btn" style="background-color: #f59e0b; color: white;">
+          Sí, Salir
+        </button>
+        <button id="cancel-leave-btn" class="btn btn-secondary">
           Cancelar
         </button>
       </div>
