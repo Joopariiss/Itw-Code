@@ -221,11 +221,16 @@ async function checkInvitePermissions() {
       const data = snap.data();
       const isOwner = data.userId === currentUserId;
 
-      if (!isOwner) {
-        if (inviteBtn) inviteBtn.style.display = "none";
-        window.USER_IS_OWNER = false;
-      } else {
+      if (isOwner) {
+        // SOY DUEÑO: Puedo invitar, pero NO salir (debo borrar la carpeta si quiero irme)
         window.USER_IS_OWNER = true;
+        if (inviteBtn) inviteBtn.style.display = "inline-flex";
+        if (leaveBtn) leaveBtn.style.display = "none"; 
+      } else {
+        // SOY INVITADO: NO puedo invitar, pero SÍ puedo salir
+        window.USER_IS_OWNER = false;
+        if (inviteBtn) inviteBtn.style.display = "none";
+        if (leaveBtn) leaveBtn.style.display = "inline-flex"; 
       }
   } catch(e) { console.error(e); }
 }
@@ -448,3 +453,54 @@ downloadBtn?.addEventListener("click", async () => {
     alert("Error al descargar Excel.");
   }
 });
+
+// ==========================================
+// LÓGICA DE SALIR DEL VIAJE (INVITADOS)
+// ==========================================
+
+// 1. Abrir Modal
+if (leaveBtn) {
+    leaveBtn.addEventListener("click", () => {
+        if (leaveModal) leaveModal.classList.remove("hidden");
+    });
+}
+
+// 2. Cancelar
+if (cancelLeaveBtn) {
+    cancelLeaveBtn.addEventListener("click", () => {
+        if (leaveModal) leaveModal.classList.add("hidden");
+    });
+}
+
+// 3. Confirmar Salida
+if (confirmLeaveBtn) {
+    confirmLeaveBtn.addEventListener("click", async () => {
+        if (!window.folderId || !currentUserId) return;
+
+        // Bloqueo visual del botón para evitar doble clic
+        const originalText = confirmLeaveBtn.textContent;
+        confirmLeaveBtn.disabled = true;
+        confirmLeaveBtn.textContent = "Saliendo...";
+
+        try {
+            const folderRef = doc(db, "carpetas", window.folderId);
+
+            // Borramos al usuario de la lista de aceptados
+            await updateDoc(folderRef, {
+                invitadosAceptados: arrayRemove(currentUserId)
+            });
+
+            // Redirigir a la pantalla de carpetas
+            window.location.href = "../CARPETAS/carpetas.html";
+
+        } catch (error) {
+            console.error("Error al salir:", error);
+            alert("Hubo un error al intentar salir del viaje.");
+            
+            // Restaurar botón si falló
+            confirmLeaveBtn.disabled = false;
+            confirmLeaveBtn.textContent = originalText;
+            leaveModal.classList.add("hidden");
+        }
+    });
+}
