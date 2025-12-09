@@ -614,6 +614,23 @@ body {
         font-size: 20px !important;
         line-height: 1;
     }
+    /* Dentro de @media (max-width: 768px) en PERFIL/style.css */
+
+    /* 1. Ajustamos el cuadro contenedor del título */
+    .hero-header .overlay {
+        /* Reducimos el padding lateral (antes era 3rem, muy grande para móvil) */
+        padding: 1rem 1.5rem !important; 
+        
+        /* Dejamos que ocupe más ancho de pantalla si es necesario */
+        max-width: 90% !important; 
+    }
+
+    /* 2. Forzamos al texto a no romperse */
+    .hero-header h1 {
+        font-size: 1.8rem;      /* Un pelín más pequeño para asegurar que quepa */
+        white-space: nowrap;    /* LA CLAVE: Prohíbe que el texto baje de línea */
+        margin: 0;
+    }
 }
 
 /* =========================================
