@@ -467,43 +467,50 @@ function listenInventory() {
 }
 
 // ---------- ESCUCHAR PRESUPUESTO EN TIEMPO REAL ----------
+// ---------- ESCUCHAR PRESUPUESTO EN TIEMPO REAL (CORREGIDO) ----------
 function listenFolderData() {
   if (!folderId) return;
 
   const folderRef = doc(db, "carpetas", folderId);
 
-  // Escuchamos cambios en el documento de la carpeta (donde vive el presupuesto)
+  // Escuchamos cambios en el documento de la carpeta
   onSnapshot(folderRef, (docSnap) => {
     if (docSnap.exists()) {
       const data = docSnap.data();
 
-      // 1. Actualizamos la variable global en vivo
+      // 1. Actualizamos la variable global
       initialBudget = data.presupuestoInicial || 0;
 
-      // 2. Control inteligente del Popup de bienvenida
-      // Si el presupuesto cambió a algo mayor a 0, cerramos el popup para todos
-      if (initialBudget > 0) {
-         if (budgetScreen && !budgetScreen.classList.contains('hidden')) {
-             budgetScreen.classList.add('hidden');
-         }
+      // 2. Control del Popup de Bienvenida
+      if (budgetScreen) {
+          if (initialBudget > 0) {
+             // Si hay presupuesto, ocultamos el popup
+             if (!budgetScreen.classList.contains('hidden')) {
+                 budgetScreen.classList.add('hidden');
+             }
+          } else {
+             // 🔥 CORRECCIÓN: Si es 0 (carpeta nueva), MOSTRAMOS el popup
+             // Esto faltaba: quitar la clase 'hidden'
+             budgetScreen.classList.remove('hidden');
+          }
       }
 
-      // 3. Si tenemos el modal de editar abierto, actualizamos el input en vivo
-      // para que el usuario vea que el valor cambió
+      // 3. Actualizar modal de edición si está abierto
       const editInput = document.getElementById('new-budget-input');
       if (editInput) {
-          // Solo actualizamos si el usuario no está escribiendo activamente
           if (document.activeElement !== editInput) {
               editInput.value = initialBudget;
           }
       }
 
-      // 4. Recalculamos semáforos y totales
+      // 4. Recalculamos
       updateBudgetDisplay();
+    } else {
+        // Si no existe el doc (raro), asumimos 0 y mostramos popup
+        if (budgetScreen) budgetScreen.classList.remove('hidden');
     }
   });
 }
-
 
 const editBudgetBtn = document.getElementById('edit-budget-btn');
 
