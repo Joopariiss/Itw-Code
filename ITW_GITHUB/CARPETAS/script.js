@@ -376,7 +376,7 @@ async function renderFolder(folder, status = "propia") {
     }
     // Entrar al dashboard
     if (!currentMode || currentMode === "agregar") {
-       window.location.href = `../DASHBOARD/index.html?id=${folder.id}`;
+       window.location.href = `../DASHBOARD/dashBoard.html?id=${folder.id}`;
     }
   });
 
