@@ -370,27 +370,39 @@
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
-          const folderNameEl = document.getElementById("current-folder-name");
-          
-          // 2. INICIAR EL CONTADOR DE USUARIOS (NUEVO)
-          // Lo hacemos aquí para asegurarnos de que window.folderId ya existe
-          if (window.folderId) {
-              initPresence(); 
-          }
+            const folderNameEl = document.getElementById("current-folder-name");
+            
+            // ❌ BORRA O COMENTA ESTO DE AQUÍ ARRIBA
+            // if (window.folderId) {
+            //    initPresence(); 
+            // }
 
-          if (!window.folderId || !folderNameEl) return;
-          try {
-            const folderRef = doc(db, "carpetas", window.folderId);
-            const folderSnap = await getDoc(folderRef);
-            if (folderSnap.exists()) {
-              const data = folderSnap.data();
-              const folderName = data.name || "Sin nombre";
-              folderNameEl.textContent = folderName; 
-              setRandomHeaderImage(folderName);
+            if (!window.folderId || !folderNameEl) return;
+
+            try {
+                const folderRef = doc(db, "carpetas", window.folderId);
+                const folderSnap = await getDoc(folderRef);
+
+                if (folderSnap.exists()) {
+                    // ✅ CARPETA EXISTE: Ahora es seguro cargar datos y presencia
+                    const data = folderSnap.data();
+                    const folderName = data.name || "Sin nombre";
+                    folderNameEl.textContent = folderName; 
+                    setRandomHeaderImage(folderName);
+
+                    // 🔥 CORRECCIÓN: INICIAMOS LA PRESENCIA AQUÍ DENTRO 🔥
+                    // Así solo escribimos en la BD si la carpeta es real.
+                    initPresence(); 
+
+                } else {
+                    // ⛔ CARPETA NO EXISTE (O fue borrada)
+                    console.warn("La carpeta no existe. No iniciamos presencia.");
+                    alert("Este viaje ya no existe o fue eliminado.");
+                    window.location.href = "../CARPETAS/carpetas.html";
+                }
+            } catch (error) {
+                console.error("Error carpeta:", error);
             }
-          } catch (error) {
-            console.error("Error carpeta:", error);
-          }
         });
 
     
