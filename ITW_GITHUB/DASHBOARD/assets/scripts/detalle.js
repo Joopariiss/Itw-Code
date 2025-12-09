@@ -8,7 +8,8 @@ import {
     getDocs, 
     updateDoc, 
     arrayUnion, 
-    arrayRemove 
+    arrayRemove,
+    onSnapshot // <--- AGREGAR ESTO
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 import { getInventoryData } from "./inventory.js";
@@ -80,8 +81,7 @@ if (confirmExpelBtn) {
             userToDeleteId = null;
             listToDeleteFrom = null;
 
-            // Recargar la lista visualmente
-            loadParticipants(); 
+
 
         } catch (error) {
             console.error("Error eliminando usuario:", error);
@@ -94,27 +94,32 @@ if (confirmExpelBtn) {
 // ==========================================
 // 1. CARGAR USUARIOS
 // ==========================================
-async function loadParticipants() {
-    if (!folderId) return;
-    if (participantsList) participantsList.innerHTML = '<p class="text-muted">Cargando...</p>';
+// ==========================================
+// 1. CARGAR USUARIOS EN TIEMPO REAL (ON SNAPSHOT)
+// ==========================================
+function listenParticipants() {
+    if (!window.folderId) return;
 
-    try {
-        const folderRef = doc(db, "carpetas", folderId);
-        const snap = await getDoc(folderRef);
-        
+    const folderRef = doc(db, "carpetas", window.folderId);
+    const participantsList = document.getElementById('participants-list');
+
+    // Escuchamos cambios en la carpeta (invitaciones, expulsiones, abandonos)
+    onSnapshot(folderRef, async (snap) => {
         if (!snap.exists()) return;
-        const data = snap.data();
         
-        // Determinar si YO soy el dueño
+        const data = snap.data();
         const amIOwner = data.userId === currentUserId;
 
+        // Limpiamos la lista visualmente antes de volver a llenarla
         if (participantsList) participantsList.innerHTML = ''; 
+
+        // --- LÓGICA DE RENDERIZADO (Igual que antes, pero dentro del snapshot) ---
 
         // A) DUEÑO
         if (data.userId) {
-            // Intentamos cargar nombre/email, si falla mostramos genérico
             let ownerEmail = "Dueño";
             try {
+                // Buscamos info del dueño
                 const userDoc = await getDoc(doc(db, "usuarios", data.userId));
                 if (userDoc.exists()) ownerEmail = userDoc.data().email;
             } catch (e) { console.log("Error cargando dueño", e); }
@@ -124,36 +129,46 @@ async function loadParticipants() {
 
         // B) INVITADOS PENDIENTES
         if (data.invitadosPendientes && data.invitadosPendientes.length > 0) {
-            for (const uid of data.invitadosPendientes) {
+            // Usamos Promise.all para cargar todos los nombres en paralelo (más rápido)
+            const pendingPromises = data.invitadosPendientes.map(async (uid) => {
                 let email = "Usuario Pendiente";
                 try {
                     const userDoc = await getDoc(doc(db, "usuarios", uid));
                     if (userDoc.exists()) email = userDoc.data().email;
                 } catch (e) {}
-                
-                renderUserRow(email, "⏳ Pendiente", "status-pending", uid, "invitadosPendientes", amIOwner);
-            }
+                return { uid, email };
+            });
+
+            const pendingUsers = await Promise.all(pendingPromises);
+            
+            pendingUsers.forEach(user => {
+                renderUserRow(user.email, "⏳ Pendiente", "status-pending", user.uid, "invitadosPendientes", amIOwner);
+            });
         }
 
         // C) INVITADOS ACEPTADOS
         if (data.invitadosAceptados && data.invitadosAceptados.length > 0) {
-            for (const uid of data.invitadosAceptados) {
-                if (uid === data.userId) continue; 
+            const acceptedPromises = data.invitadosAceptados.map(async (uid) => {
+                if (uid === data.userId) return null; // Saltamos al dueño si está en la lista
 
                 let email = "Colaborador";
                 try {
                     const userDoc = await getDoc(doc(db, "usuarios", uid));
                     if (userDoc.exists()) email = userDoc.data().email;
                 } catch (e) {}
-                
-                renderUserRow(email, "🤝 Colaborador", "status-accepted", uid, "invitadosAceptados", amIOwner);
-            }
-        }
+                return { uid, email };
+            });
 
-    } catch (error) {
-        console.error("Error cargando participantes:", error);
-        if (participantsList) participantsList.innerHTML = '<p class="negative">Error al cargar lista.</p>';
-    }
+            const acceptedUsers = (await Promise.all(acceptedPromises)).filter(u => u !== null);
+
+            acceptedUsers.forEach(user => {
+                renderUserRow(user.email, "🤝 Colaborador", "status-accepted", user.uid, "invitadosAceptados", amIOwner);
+            });
+        }
+        
+        // Actualizamos permisos visuales en tiempo real (por si me quitan el rol de dueño o algo raro pasa)
+        checkInvitePermissions(); 
+    });
 }
 
 // Función renderUserRow actualizada para usar openExpelModal
@@ -237,23 +252,21 @@ async function checkInvitePermissions() {
 
 // Inicialización
 document.addEventListener("DOMContentLoaded", () => {
-    // Verificar permisos
-    checkInvitePermissions();
-
-    // Tabs listener para cargar lista al entrar en Detalles
-    const tabs = document.querySelectorAll('.tab-btn');
-    tabs.forEach(t => {
-        t.addEventListener('click', () => {
-            if (t.dataset.tab === 'details') {
-                loadParticipants();
-            }
-        });
-    });
-
-    // Si ya estamos en detalles al cargar (raro, pero posible)
-    if(document.querySelector('.tab-btn[data-tab="details"]')?.classList.contains('active')){
-        loadParticipants();
+    // 1. Iniciar escucha en tiempo real de participantes
+    // Esto reemplaza a loadParticipants() y checkInvitePermissions() manuales
+    if (window.folderId) {
+        listenParticipants();
+    } else {
+        // Pequeño retry por si folderId tarda en llegar desde el HTML
+        setTimeout(() => {
+            if(window.folderId) listenParticipants();
+        }, 500);
     }
+
+    // Ya NO necesitamos el listener en los tabs para cargar participantes
+    // porque el onSnapshot ya está activo en segundo plano siempre.
+    
+    // (Mantén aquí el listener de tabs si tienes otra lógica, pero borra la llamada a loadParticipants)
 });
 
 // ================================================================
@@ -318,7 +331,6 @@ sendInviteBtn?.addEventListener("click", async () => {
     }
     
     // 6. ACTUALIZAR LISTA DE FONDO
-    await loadParticipants(); 
 
     // 7. CERRAR MODAL (Y AQUÍ DESBLOQUEAMOS)
     setTimeout(() => {

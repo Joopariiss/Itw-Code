@@ -466,6 +466,44 @@ function listenInventory() {
   });
 }
 
+// ---------- ESCUCHAR PRESUPUESTO EN TIEMPO REAL ----------
+function listenFolderData() {
+  if (!folderId) return;
+
+  const folderRef = doc(db, "carpetas", folderId);
+
+  // Escuchamos cambios en el documento de la carpeta (donde vive el presupuesto)
+  onSnapshot(folderRef, (docSnap) => {
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+
+      // 1. Actualizamos la variable global en vivo
+      initialBudget = data.presupuestoInicial || 0;
+
+      // 2. Control inteligente del Popup de bienvenida
+      // Si el presupuesto cambió a algo mayor a 0, cerramos el popup para todos
+      if (initialBudget > 0) {
+         if (budgetScreen && !budgetScreen.classList.contains('hidden')) {
+             budgetScreen.classList.add('hidden');
+         }
+      }
+
+      // 3. Si tenemos el modal de editar abierto, actualizamos el input en vivo
+      // para que el usuario vea que el valor cambió
+      const editInput = document.getElementById('new-budget-input');
+      if (editInput) {
+          // Solo actualizamos si el usuario no está escribiendo activamente
+          if (document.activeElement !== editInput) {
+              editInput.value = initialBudget;
+          }
+      }
+
+      // 4. Recalculamos semáforos y totales
+      updateBudgetDisplay();
+    }
+  });
+}
+
 
 const editBudgetBtn = document.getElementById('edit-budget-btn');
 
@@ -522,10 +560,15 @@ if (editBudgetBtn) {
 // Inicialización
 document.addEventListener('DOMContentLoaded', async () => {
   renderSuggestions();
-  updateBudgetDisplay();
-  await cargarPresupuestoInicial();
-  listenInventory();
+  
+  // 1. Iniciamos los listeners de tiempo real
+  listenInventory();    // Escucha los items
+  listenFolderData();   // Escucha el presupuesto (NUEVO) 🔥
+  
+  // Nota: Ya no necesitamos llamar a cargarPresupuestoInicial() 
+  // porque listenFolderData() traerá los datos inmediatamente al cargar.
 });
+
 
 // === EXPORT PARA DESCARGAS (INVENTARIO) ===
 export async function getInventoryData() {
