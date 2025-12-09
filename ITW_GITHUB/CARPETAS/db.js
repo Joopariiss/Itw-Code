@@ -80,14 +80,23 @@ export async function deleteFolder(folderId) {
   try {
     const folderRef = doc(db, "carpetas", folderId);
 
-    // Eliminar subcolecciones conocidas (si existen)
+    // 1. Eliminar subcolecciones conocidas
+    // (Agrega aquí CUALQUIER subcolección que tu app use)
     await deleteSubcollection(folderRef, "inventario");
     await deleteSubcollection(folderRef, "calendario");
     await deleteSubcollection(folderRef, "itinerario");
+    
+    // 👇 AGREGA ESTAS LÍNEAS NUEVAS 👇
+    await deleteSubcollection(folderRef, "presencia"); 
+    await deleteSubcollection(folderRef, "checklist");
+    // Si usas 'objetos' o 'presupuestos', agrégalos aquí también:
+    // await deleteSubcollection(folderRef, "objetos");
+    // await deleteSubcollection(folderRef, "presupuestos");
 
-    // Eliminar documento principal
+    // 2. Eliminar documento principal
     await deleteDoc(folderRef);
-    console.log("✅ Carpeta y subcolecciones eliminadas:", folderId);
+    console.log("✅ Carpeta y TODAS sus subcolecciones eliminadas:", folderId);
+
   } catch (error) {
     console.error("❌ Error eliminando carpeta:", error);
   }
