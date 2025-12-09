@@ -8,7 +8,8 @@ import {
   deleteFolder, 
   updateFolder, 
   getFolderDates,
-  getOwnerName 
+  getOwnerName,
+  listenToInvitations // <--- AGREGAR ESTO AQUÍ
 } from "./db.js";
 
 // ✅ IMPORTAR la función desde global.js
@@ -123,15 +124,28 @@ function closeModal() {
   setMode(null);
 }
 
-// ---------- FIREBASE AUTH ----------
+// ---------- FIREBASE AUTH & REALTIME LISTENERS ----------
 auth.onAuthStateChanged(async (user) => {
   if (!user) return;
   userId = user.uid;
   setCurrentUserId(userId);
   localStorage.setItem("currentUserId", userId); 
+  
+  // 1. Carga inicial de carpetas (para ver las que ya tengo)
   await cargarCarpetas();
-});
 
+  // 2. 🔥 ACTIVAR ESCUCHA DE INVITACIONES (NUEVO)
+  listenToInvitations(userId, (newFolder) => {
+      console.log("🔔 ¡Invitación detectada en tiempo real!", newFolder.name);
+      
+      // A. Disparamos el popup visualmente
+      triggerInvitePopup(newFolder);
+      
+      // B. Recargamos la lista de fondo suavemente para que aparezca la carpeta gris
+      // (Opcional, pero recomendado para que el usuario vea la carpeta 'pendiente' detrás del popup)
+      cargarCarpetas();
+  });
+});
 
 // ---------- CARGAR CARPETAS (CON ORDENAMIENTO) ----------
 async function cargarCarpetas() {
@@ -160,17 +174,33 @@ async function cargarCarpetas() {
 }
 
 // ---------- FUNCIÓN EXTRAÍDA: MOSTRAR POPUP INVITACIÓN ----------
-function triggerInvitePopup(folder) {
-  // Borrar popup anterior si existe para evitar superposiciones
+// ---------- FUNCIÓN EXTRAÍDA: MOSTRAR POPUP INVITACIÓN (MEJORADA) ----------
+async function triggerInvitePopup(folder) {
+  // 1. Evitar duplicados
   const existingPopup = document.querySelector(".invite-popup");
   if (existingPopup) existingPopup.remove();
 
+  // 2. Obtener el nombre de quien invita (El dueño de la carpeta)
+  // Usamos la función que ya tienes importada de db.js
+  let inviterName = "Alguien";
+  try {
+      if (folder.userId) {
+          inviterName = await getOwnerName(folder.userId);
+      }
+  } catch (error) {
+      console.error("No se pudo obtener nombre del dueño", error);
+  }
+
+  // 3. Crear el HTML con el nombre incluido
   const confirmOverlay = document.createElement("div");
   confirmOverlay.classList.add("invite-popup");
   confirmOverlay.innerHTML = `
     <div class="popup-content">
       <h3>📩 Invitación a carpeta</h3>
-      <p>Has sido invitado a la carpeta <b>${folder.name}</b>.</p>
+      <p>
+        <b>${inviterName}</b> te ha invitado a colaborar en el viaje: <br>
+        <span style="font-size: 1.1rem; color: #548A5E;">"${folder.name}"</span>
+      </p>
       <div style="display:flex; justify-content:space-around; margin-top:15px;">
         <button id="acceptInvite" style="background:#4CAF50; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer;">Aceptar</button>
         <button id="rejectInvite" style="background:#d9534f; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer;">Rechazar</button>
@@ -179,7 +209,13 @@ function triggerInvitePopup(folder) {
   `;
   document.body.appendChild(confirmOverlay);
 
+  // 4. Eventos de los botones
   confirmOverlay.querySelector("#acceptInvite").onclick = async () => {
+    // Feedback visual inmediato
+    const btn = confirmOverlay.querySelector("#acceptInvite");
+    btn.textContent = "Uniéndose...";
+    btn.disabled = true;
+
     await acceptInvitation(folder.id, userId);
     document.body.removeChild(confirmOverlay);
     showPopup(`Has aceptado la invitación a "${folder.name}"`);
@@ -187,13 +223,16 @@ function triggerInvitePopup(folder) {
   };
 
   confirmOverlay.querySelector("#rejectInvite").onclick = async () => {
+    const btn = confirmOverlay.querySelector("#rejectInvite");
+    btn.textContent = "Rechazando...";
+    btn.disabled = true;
+
     await rejectInvitation(folder.id, userId);
     document.body.removeChild(confirmOverlay);
     showPopup(`Has rechazado la invitación a "${folder.name}"`);
     await cargarCarpetas();
   };
 }
-
 
 // ---------- RENDERIZAR UNA CARPETA (OPTIMIZADO) ----------
 // ---------- RENDERIZAR UNA CARPETA (OPTIMIZADO CON IMAGEN RÁPIDA) ----------

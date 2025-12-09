@@ -11,7 +11,8 @@ import {
   updateDoc,  
   arrayUnion,
   arrayRemove,
-  getDoc 
+  getDoc,
+  onSnapshot // <--- IMPORTANTE: Asegúrate de tener esto importado
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 /* ==========================================================
@@ -174,4 +175,25 @@ export async function getOwnerName(userId) {
     console.error("Error obteniendo nombre del dueño:", error);
     return "Desconocido";
   }
+}
+
+/* ==========================================================
+   🔔 ESCUCHAR INVITACIONES EN TIEMPO REAL
+   ========================================================== */
+export function listenToInvitations(userId, onInviteDetected) {
+  // Query: Busca carpetas donde mi ID esté en la lista de espera
+  const q = query(collection(db, "carpetas"), where("invitadosPendientes", "array-contains", userId));
+  
+  // Se queda escuchando cambios
+  return onSnapshot(q, (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+      // 'added' significa que apareció una carpeta nueva en esta query 
+      // (o sea, me acaban de invitar o entré a la app y ya estaba invitado)
+      if (change.type === "added") {
+        const folderData = { id: change.doc.id, ...change.doc.data() };
+        // Llamamos al callback que pasaremos desde script.js
+        onInviteDetected(folderData);
+      }
+    });
+  });
 }
