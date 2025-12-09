@@ -559,6 +559,63 @@ body {
     }
 }
 
+/* === BOTÓN CARPETAS (Igual a Logout pero a la derecha) === */
+.folders-button {
+    position: absolute; /* O fixed si prefieres que te siga al bajar */
+    top: 20px;
+    right: 20px; /* A la derecha, donde estaba el menú */
+    
+    font-size: 15px;
+    color: #F3F4F6;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.7); /* Mismo fondo oscuro */
+    border: none;
+    border-radius: 5px;
+    padding: 7px 13px;
+    text-align: center;
+    transition: background 0.3s ease, color 0.3s ease;
+    z-index: 120;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+}
+
+.folders-button:hover {
+    background-color: #548A5E; /* Verde corporativo al pasar el mouse */
+    color: white;
+}
+
+/* === RESPONSIVE PARA EL BOTÓN (Móvil) === */
+@media (max-width: 768px) {
+    .folders-button {
+        /* Transformación a botón circular (igual que el logout) */
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        padding: 0;
+        
+        /* Ocultamos el texto "Mis Carpetas" */
+        font-size: 0 !important;
+        
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        background-color: rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        
+        /* Aseguramos posición */
+        top: 20px;
+        right: 20px;
+    }
+
+    /* Insertamos el icono de carpeta solo en móvil */
+    .folders-button::after {
+        content: "📁"; 
+        font-size: 20px !important;
+        line-height: 1;
+    }
+}
+
 /* =========================================
    FIX BOTÓN "LOGOUT" EN MÓVIL (ICONO SOLAMENTE)
    ========================================= */
