@@ -17,15 +17,30 @@ import {
 /* ==========================================================
    CREAR CARPETA (AHORA CON FECHA)
    ========================================================== */
-export async function createFolder(name, userId) {
+// db.js
+export async function createFolder(name, userId, imageUrl) { 
   try {
+    // Si no viene imagen, ponemos una por defecto
+    const finalImage = imageUrl || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e";
+
     const docRef = await addDoc(collection(db, "carpetas"), {
       name: name,
       userId: userId,
-      createdAt: Date.now() // <--- NUEVO: Guardamos la fecha actual
+      createdAt: Date.now(),
+      imageUrl: finalImage
     });
+    
     console.log("📁 Carpeta creada con ID:", docRef.id);
-    return { id: docRef.id, name, createdAt: Date.now() };
+    
+    // 🔥 AQUÍ ESTABA EL ERROR: Agregamos userId al return
+    return { 
+        id: docRef.id, 
+        name, 
+        createdAt: Date.now(), 
+        imageUrl: finalImage, 
+        userId: userId // <--- ¡Esto faltaba!
+    };
+
   } catch (error) {
     console.error("❌ Error creando carpeta:", error);
   }

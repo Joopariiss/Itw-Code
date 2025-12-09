@@ -196,6 +196,7 @@ function triggerInvitePopup(folder) {
 
 
 // ---------- RENDERIZAR UNA CARPETA (OPTIMIZADO) ----------
+// ---------- RENDERIZAR UNA CARPETA (OPTIMIZADO CON IMAGEN RÁPIDA) ----------
 async function renderFolder(folder, status = "propia") {
 
   const fechas = await getFolderDates(folder.id);
@@ -213,13 +214,22 @@ async function renderFolder(folder, status = "propia") {
   card.className = "trip-card";
   card.dataset.id = folder.id;
   
-  // AGREGA ESTO: Un tooltip nativo que aparece al dejar el mouse encima
+  // Tooltip nativo
   card.title = "Click derecho para opciones";
 
-  const imageUrl = await getUnsplashImage(folder.name);
+  // === 🚀 OPTIMIZACIÓN DE IMAGEN ===
+  let imageUrl;
+  // 1. Si ya guardamos el link en Firebase, úsalo directo (Rápido)
+  if (folder.imageUrl) {
+      imageUrl = folder.imageUrl;
+  } else {
+      // 2. Si es carpeta vieja sin link, llama a la API (Lento, fallback)
+      imageUrl = await getUnsplashImage(folder.name);
+  }
 
+  // Agregamos loading="lazy" para que el navegador priorice lo visible
   card.innerHTML = `
-    <img src="${imageUrl}" alt="${folder.name}" class="trip-image" />
+    <img src="${imageUrl}" alt="${folder.name}" class="trip-image" loading="lazy" />
     <div class="trip-header">
       <div class="trip-title">${folder.name}</div>
       <div class="trip-date">
@@ -238,7 +248,7 @@ async function renderFolder(folder, status = "propia") {
     </div>
   `;
 
-  // LOGICA DE AUTO-POPUP
+  // LOGICA DE AUTO-POPUP (INVITACIONES)
   if (status === "pendiente") {
     if (!document.querySelector(".invite-popup")) {
        triggerInvitePopup(folder);
@@ -252,6 +262,7 @@ async function renderFolder(folder, status = "propia") {
       return;
     }
 
+    // Aunque uses click derecho, mantenemos esta seguridad por si acaso
     if (status !== "propia") {
       if (currentMode === "modificar") return showPopup("Solo el dueño puede modificar esta carpeta.");
       if (currentMode === "eliminar") return showPopup("Solo el dueño puede eliminar esta carpeta.");
@@ -265,36 +276,32 @@ async function renderFolder(folder, status = "propia") {
       addTripBtn.textContent = "Guardar cambios";
     } 
     else if (currentMode === "eliminar") {
-      // --- LÓGICA DE ELIMINAR (OPTIMIZADA) ---
+      // LÓGICA DE ELIMINAR (OPTIMIZADA UI)
       confirmMessage.textContent = `¿Seguro que quieres eliminar la carpeta "${folder.name}"?`;
       confirmModal.style.display = 'flex';
 
       confirmDeleteBtn.onclick = async () => {
-          // 1. Cerrar modal visualmente YA
           confirmModal.style.display = 'none'; 
           
-          // 2. 🔥 UI OPTIMISTA: Borrar tarjeta del DOM inmediatamente
+          // UI Optimista
           card.style.transition = "transform 0.3s, opacity 0.3s";
           card.style.transform = "scale(0.8)";
           card.style.opacity = "0";
-          setTimeout(() => card.remove(), 300); // Quitar del HTML tras animación
+          setTimeout(() => card.remove(), 300);
 
-          // 3. Mostrar mensaje de éxito YA
           showPopup(`Carpeta "${folder.name}" eliminada`); 
 
-          // 4. Borrar en Firebase en segundo plano (sin await que bloquee la UI)
           try {
              await deleteFolder(folder.id);
-             // ¡OJO! NO llamamos a cargarCarpetas() aquí. No hace falta.
           } catch (error) {
              console.error("Error eliminando:", error);
              showPopup("Error al eliminar en la nube.");
-             // Si falla, aquí sí recargaríamos para recuperar la carpeta
              cargarCarpetas(); 
           }
       };
     }
     else {
+      // Redirección normal
       window.location.href = `../DASHBOARD/index.html?id=${folder.id}`;
     }
   });
@@ -321,6 +328,7 @@ async function renderFolder(folder, status = "propia") {
     menu.style.left = `${e.pageX}px`;
     menu.style.display = "block";
 
+    // OPCIÓN MODIFICAR
     menu.querySelector(".edit-folder").onclick = () => {
       selectedFolderId = folder.id;
       selectedFolderDiv = card;
@@ -331,27 +339,24 @@ async function renderFolder(folder, status = "propia") {
       menu.remove();
     };
 
+    // OPCIÓN ELIMINAR
     menu.querySelector(".delete-folder").onclick = () => {
       menu.remove(); 
 
-      // --- LÓGICA DE ELIMINAR CONTEXTUAL (OPTIMIZADA) ---
       confirmMessage.textContent = `¿Seguro que quieres eliminar la carpeta "${folder.name}"?`;
       confirmModal.style.display = 'flex';
 
       confirmDeleteBtn.onclick = async () => {
-          // 1. Cerrar modal YA
           confirmModal.style.display = 'none';
 
-          // 2. 🔥 UI OPTIMISTA: Borrar visualmente YA
+          // UI Optimista
           card.style.transition = "transform 0.3s, opacity 0.3s";
           card.style.transform = "scale(0.8)";
           card.style.opacity = "0";
           setTimeout(() => card.remove(), 300);
 
-          // 3. Feedback YA
           showPopup(`Carpeta "${folder.name}" eliminada`);
 
-          // 4. Backend en segundo plano
           try {
              await deleteFolder(folder.id);
           } catch (error) {
@@ -365,11 +370,12 @@ async function renderFolder(folder, status = "propia") {
   });
 }
 // ---------- AGREGAR o MODIFICAR (OPTIMIZADO) ----------
+// script.js
+
 addTripBtn.addEventListener('click', async () => {
   const name = tripNameInput.value.trim();
   if (!name) return showPopup('Ingresa un nombre');
 
-  // 1. BLOQUEO DE BOTÓN (Evita duplicados)
   const originalBtnText = addTripBtn.textContent;
   addTripBtn.disabled = true;
   addTripBtn.textContent = originalBtnText === "Agregar" ? "Creando..." : "Guardando...";
@@ -377,36 +383,35 @@ addTripBtn.addEventListener('click', async () => {
   addTripBtn.style.cursor = "not-allowed";
 
   try {
+    // 1. Buscamos la imagen ANTES de guardar nada
+    // Esto asegura que guardemos la URL en Firebase
+    const fetchedImageUrl = await getUnsplashImage(name);
+
     if (currentMode === "modificar" && selectedFolderId) {
-      // --- LÓGICA DE MODIFICAR ---
+      // --- MODIFICAR ---
       await updateFolder(selectedFolderId, name);
       
-      // Actualización visual directa (sin recargar todo)
+      // Actualizamos visualmente
       if (selectedFolderDiv) {
         selectedFolderDiv.querySelector(".trip-title").textContent = name;
-        // Opcional: Actualizar imagen si quieres que cambie con el nombre
-        const newImageUrl = await getUnsplashImage(name);
-        selectedFolderDiv.querySelector(".trip-image").src = newImageUrl;
+        // Opcional: Si quieres que al cambiar nombre cambie la foto, descomenta:
+        // selectedFolderDiv.querySelector(".trip-image").src = fetchedImageUrl;
       }
       showPopup("Carpeta modificada correctamente");
 
     } else if (currentMode === "agregar") {
-      // --- LÓGICA DE AGREGAR (OPTIMIZADA) ---
+      // --- AGREGAR (OPTIMIZADO) ---
       
-      // 1. Crear en Firebase
-      const newFolderData = await createFolder(name, userId);
+      // 2. Pasamos la URL a la función de crear
+      const newFolderData = await createFolder(name, userId, fetchedImageUrl);
       
-      // 2. Renderizar SOLO esta tarjeta nueva
-      // Pasamos status "propia" porque acabamos de crearla
+      // 3. Renderizamos usando los datos que ya tenemos (sin volver a llamar a API)
       await renderFolder(newFolderData, "propia");
 
-      // 3. Truco visual: Mover la nueva tarjeta al principio
-      // Como renderFolder usa appendChild (la pone al final), la movemos al inicio
+      // Truco visual para moverla al inicio
       const newCard = tripList.lastElementChild;
       if (newCard) {
         tripList.prepend(newCard);
-        
-        // Pequeña animación para que se note que apareció
         newCard.style.animation = "fadeIn 0.5s ease-out";
       }
 
@@ -419,9 +424,8 @@ addTripBtn.addEventListener('click', async () => {
     console.error("Error:", error);
     showPopup("Hubo un error al procesar la solicitud.");
   } finally {
-    // 4. DESBLOQUEO DE BOTÓN (Siempre se ejecuta, haya error o no)
     addTripBtn.disabled = false;
-    addTripBtn.textContent = originalBtnText; // Restauramos texto original
+    addTripBtn.textContent = originalBtnText;
     addTripBtn.style.opacity = "1";
     addTripBtn.style.cursor = "pointer";
   }
