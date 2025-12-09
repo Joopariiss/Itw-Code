@@ -64,6 +64,10 @@ let selectedFolderId = null;
 let selectedFolderDiv = null;
 let currentMode = null;
 
+// 👇 ¡ESTAS SON LAS QUE FALTABAN! AGREGALAS:
+let originalFolderName = ""; 
+let originalFolderImage = null;
+
 // === UNSPLASH ===
 async function getUnsplashImage(folderName) {
   const apiUrl = `https://api.unsplash.com/search/photos?query=${
@@ -235,7 +239,7 @@ async function triggerInvitePopup(folder) {
 }
 
 // ---------- RENDERIZAR UNA CARPETA (OPTIMIZADO) ----------
-// ---------- RENDERIZAR UNA CARPETA (OPTIMIZADO CON IMAGEN RÁPIDA) ----------
+// ---------- RENDERIZAR UNA CARPETA (PC + MÓVIL) ----------
 async function renderFolder(folder, status = "propia") {
 
   const fechas = await getFolderDates(folder.id);
@@ -253,20 +257,21 @@ async function renderFolder(folder, status = "propia") {
   card.className = "trip-card";
   card.dataset.id = folder.id;
   
-  // Tooltip nativo
-  card.title = "Click derecho para opciones";
+  // Tooltip dinámico
+  if (status === "propia") {
+      card.title = "Click derecho (o mantener presionado) para opciones";
+  } else {
+      card.title = "Carpeta compartida";
+  }
 
   // === 🚀 OPTIMIZACIÓN DE IMAGEN ===
   let imageUrl;
-  // 1. Si ya guardamos el link en Firebase, úsalo directo (Rápido)
   if (folder.imageUrl) {
       imageUrl = folder.imageUrl;
   } else {
-      // 2. Si es carpeta vieja sin link, llama a la API (Lento, fallback)
       imageUrl = await getUnsplashImage(folder.name);
   }
 
-  // Agregamos loading="lazy" para que el navegador priorice lo visible
   card.innerHTML = `
     <img src="${imageUrl}" alt="${folder.name}" class="trip-image" loading="lazy" />
     <div class="trip-header">
@@ -294,67 +299,16 @@ async function renderFolder(folder, status = "propia") {
     }
   }
 
-  // === EVENTO CLICK EN TARJETA ===
-  card.addEventListener("click", async () => {
-    if (status === "pendiente") {
-      triggerInvitePopup(folder);
-      return;
-    }
-
-    // Aunque uses click derecho, mantenemos esta seguridad por si acaso
-    if (status !== "propia") {
-      if (currentMode === "modificar") return showPopup("Solo el dueño puede modificar esta carpeta.");
-      if (currentMode === "eliminar") return showPopup("Solo el dueño puede eliminar esta carpeta.");
-    }
-
-    if (currentMode === "modificar") {
-      selectedFolderId = folder.id;
-      selectedFolderDiv = card;
-      modal.style.display = 'flex';
-      tripNameInput.value = folder.name;
-      addTripBtn.textContent = "Guardar cambios";
-    } 
-    else if (currentMode === "eliminar") {
-      // LÓGICA DE ELIMINAR (OPTIMIZADA UI)
-      confirmMessage.textContent = `¿Seguro que quieres eliminar la carpeta "${folder.name}"?`;
-      confirmModal.style.display = 'flex';
-
-      confirmDeleteBtn.onclick = async () => {
-          confirmModal.style.display = 'none'; 
-          
-          // UI Optimista
-          card.style.transition = "transform 0.3s, opacity 0.3s";
-          card.style.transform = "scale(0.8)";
-          card.style.opacity = "0";
-          setTimeout(() => card.remove(), 300);
-
-          showPopup(`Carpeta "${folder.name}" eliminada`); 
-
-          try {
-             await deleteFolder(folder.id);
-          } catch (error) {
-             console.error("Error eliminando:", error);
-             showPopup("Error al eliminar en la nube.");
-             cargarCarpetas(); 
-          }
-      };
-    }
-    else {
-      // Redirección normal
-      window.location.href = `../DASHBOARD/index.html?id=${folder.id}`;
-    }
-  });
-
-  tripList.appendChild(card);
-
-  // === MENÚ CONTEXTUAL (CLICK DERECHO) ===
-  card.addEventListener("contextmenu", (e) => {
-    e.preventDefault();
-
+  // === FUNCIÓN AUXILIAR: MOSTRAR MENÚ ===
+  const showCustomMenu = (x, y) => {
+    
+    // 🔒 SEGURIDAD: Si no es propia, NO hacemos nada (ni en PC ni en Móvil)
     if (status !== "propia") return;
 
+    // 1. Limpiar menús previos
     document.querySelectorAll(".context-menu").forEach(menu => menu.remove());
 
+    // 2. Crear menú (SOLO MODIFICAR Y ELIMINAR)
     const menu = document.createElement("div");
     menu.className = "context-menu";
     menu.innerHTML = `
@@ -363,14 +317,22 @@ async function renderFolder(folder, status = "propia") {
     `;
     document.body.appendChild(menu);
 
-    menu.style.top  = `${e.pageY}px`;
-    menu.style.left = `${e.pageX}px`;
+    // 3. Posicionar menú
+    menu.style.top  = `${y}px`;
+    menu.style.left = `${x}px`;
     menu.style.display = "block";
 
-    // OPCIÓN MODIFICAR
+    // 4. Asignar eventos
+    
+    // -- MODIFICAR --
     menu.querySelector(".edit-folder").onclick = () => {
       selectedFolderId = folder.id;
       selectedFolderDiv = card;
+      
+      // Guardamos valores para la edición inteligente
+      originalFolderName = folder.name; 
+      originalFolderImage = folder.imageUrl;
+
       modal.style.display = 'flex';
       tripNameInput.value = folder.name;
       addTripBtn.textContent = "Guardar cambios";
@@ -378,36 +340,77 @@ async function renderFolder(folder, status = "propia") {
       menu.remove();
     };
 
-    // OPCIÓN ELIMINAR
+    // -- ELIMINAR --
     menu.querySelector(".delete-folder").onclick = () => {
       menu.remove(); 
-
       confirmMessage.textContent = `¿Seguro que quieres eliminar la carpeta "${folder.name}"?`;
       confirmModal.style.display = 'flex';
 
       confirmDeleteBtn.onclick = async () => {
           confirmModal.style.display = 'none';
-
           // UI Optimista
           card.style.transition = "transform 0.3s, opacity 0.3s";
           card.style.transform = "scale(0.8)";
           card.style.opacity = "0";
           setTimeout(() => card.remove(), 300);
-
+          
           showPopup(`Carpeta "${folder.name}" eliminada`);
-
-          try {
-             await deleteFolder(folder.id);
-          } catch (error) {
-             console.error("Error eliminando:", error);
-             cargarCarpetas(); 
-          }
+          try { await deleteFolder(folder.id); } 
+          catch (error) { cargarCarpetas(); }
       };
     };
 
-    document.addEventListener("click", () => menu.remove(), { once: true });
+    // Cerrar menú al hacer clic fuera o hacer scroll
+    setTimeout(() => {
+        const closeMenu = () => menu.remove();
+        document.addEventListener("click", closeMenu, { once: true });
+        document.addEventListener("scroll", closeMenu, { once: true });
+    }, 10);
+  };
+
+  // === EVENTO CLICK IZQUIERDO (ENTRAR A LA CARPETA) ===
+  card.addEventListener("click", async () => {
+    if (status === "pendiente") {
+      triggerInvitePopup(folder);
+      return;
+    }
+    // Entrar al dashboard
+    if (!currentMode || currentMode === "agregar") {
+       window.location.href = `../DASHBOARD/index.html?id=${folder.id}`;
+    }
   });
+
+  // === EVENTO CLICK DERECHO (PC) ===
+  card.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    showCustomMenu(e.pageX, e.pageY);
+  });
+
+  // === EVENTO MANTENER PRESIONADO (MÓVIL) ===
+  let touchTimer;
+  const longPressDuration = 600; // 0.6 segundos
+
+  card.addEventListener("touchstart", (e) => {
+      // Solo iniciamos el timer si es carpeta propia
+      if (status === "propia") {
+          touchTimer = setTimeout(() => {
+              const touch = e.touches[0];
+              showCustomMenu(touch.pageX, touch.pageY);
+              
+              // Vibración suave
+              if (navigator.vibrate) navigator.vibrate(50);
+          }, longPressDuration);
+      }
+  }, { passive: true });
+
+  card.addEventListener("touchend", () => clearTimeout(touchTimer));
+  card.addEventListener("touchmove", () => clearTimeout(touchTimer));
+
+  tripList.appendChild(card);
 }
+
+
+
 // ---------- AGREGAR o MODIFICAR (OPTIMIZADO) ----------
 // script.js
 
