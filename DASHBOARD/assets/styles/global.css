@@ -286,10 +286,6 @@ input:focus, textarea:focus, select:focus {
 /* ============================================== */
 /* === BADGE DE USUARIOS ONLINE === */
 /* ============================================== */
-/* ============================================== */
-/* === BADGE DE USUARIOS ONLINE === */
-/* ============================================== */
-
 .online-badge {
     position: fixed;
     top: 25px;        /* Alineación vertical igual */
