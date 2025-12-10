@@ -374,10 +374,24 @@ input:-webkit-autofill:active {
 @media (max-width: 768px) {
     /* 1. Ajustar el encabezado Hero */
     .hero-header {
-        height: 120px; /* Más bajito */
+        /* height: 120px;  <-- ESTO LO CAMBIAMOS POR: */
+        height: auto !important; 
+        min-height: 120px;
+        padding: 20px 0;
     }
+    
+    /* AGREGAMOS ESTO PARA EL RECUADRO NEGRO */
+    .hero-header .overlay {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+        margin: 0 15px;
+        width: auto !important;
+    }
+
     .hero-header h1 {
-        font-size: 1.8rem; /* Letra más pequeña */
+        font-size: 1.8rem; 
     }
     .folder-name {
         font-size: 1rem;
