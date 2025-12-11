@@ -463,3 +463,27 @@ input:-webkit-autofill:active {
         margin-top: -2px; /* Pequeño ajuste visual para centrar perfecto */
     }
 }
+
+/* =========================================
+   FIX TABLET: HEADER Y RECUADRO NEGRO
+   Ajuste para iPad/Tablets (hasta 1024px)
+   ========================================= */
+@media (max-width: 1024px) {
+    /* 1. Quitamos la altura fija para que el header crezca según el contenido */
+    .hero-header {
+        height: auto !important; 
+        min-height: 150px;
+        padding: 30px 0; /* Un poco de aire arriba y abajo */
+    }
+    
+    /* 2. Hacemos que el recuadro negro fluya y empuje los tabs hacia abajo */
+    .hero-header .overlay {
+        position: relative !important; /* Ya no flota, ahora ocupa espacio real */
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+        margin: 0 auto; /* Centrado horizontalmente */
+        width: 80% !important; /* Ancho controlado para que no toque los bordes */
+        max-width: 500px;
+    }
+}
