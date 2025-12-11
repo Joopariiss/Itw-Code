@@ -254,29 +254,57 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* --- Tabs de Navegación --- */
+/* ==================================================== */
+/* === TABS DE NAVEGACIÓN (ESTILO CLÁSICO NEÓN) === */
+/* ==================================================== */
+
 .tabs {
     display: flex;
     justify-content: center;
     background: var(--card);
-    /* CAMBIO: Quitamos el padding-top de 2rem porque ya no hay superposición */
-    padding-top: 0; 
+    padding: 0; /* Sin padding extra para que pegue bien */
     border-bottom: 1px solid var(--border);
+    gap: 0; /* Los mantenemos juntos */
 }
 
 .tab-btn {
+    /* 1. Restauramos el fondo transparente */
     background: transparent;
     border: none;
-    color: var(--muted-foreground);
+    color: #9CA3AF; /* Gris suave (muted) */
+    
+    /* 2. Dimensiones originales */
     padding: 1rem 2rem;
     cursor: pointer;
     font-size: 1rem;
     font-weight: 600;
-    border-bottom: 3px solid transparent;
+    
+    /* 3. La línea inferior invisible (preparada) */
+    border-bottom: 3px solid transparent; 
+    border-radius: 0; /* Quitamos bordes redondos */
+    
+    transition: all 0.3s ease;
 }
 
+.tab-btn:hover {
+    color: #F3F4F6; /* Blanco al pasar el mouse */
+    background-color: rgba(255, 255, 255, 0.02); /* Un fondo casi imperceptible */
+}
+
+/* === ESTADO ACTIVO (SUBRAYADO NEÓN) === */
 .tab-btn.active {
-    color: var(--primary);
-    border-bottom-color: var(--primary);
+    /* 1. Texto Verde Brillante */
+    color: #548A5E; 
+    
+    /* 2. La línea inferior se pinta de verde */
+    border-bottom-color: #548A5E;
+    
+    /* 3. EL EFECTO NEÓN (GLOW) */
+    /* Resplandor en el texto */
+    text-shadow: 0 0 15px rgba(84, 138, 94, 0.8);
+    
+    /* Resplandor que sale de la línea hacia abajo */
+    box-shadow: 0 10px 20px -5px rgba(84, 138, 94, 0.4);
 }
 
 .tab-content { display: none; padding: 20px; }

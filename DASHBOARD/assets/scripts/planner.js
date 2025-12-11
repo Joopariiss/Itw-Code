@@ -193,7 +193,6 @@ function renderItinerary() {
   title.style.marginTop = "0";
   title.style.marginBottom = "1rem";
   title.style.textAlign = "center";
-  title.style.color = "#2e2e2e";
   title.style.fontWeight = "600";
   itinerarySection.appendChild(title);
 

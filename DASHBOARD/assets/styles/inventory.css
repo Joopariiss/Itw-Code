@@ -302,6 +302,52 @@
     .col-cost { font-size: 0.9rem; text-align: right; }
 }
 
+/* ============================================== */
+/* === BOTÓN "AGREGAR ITEM" (ESTILO SHINY) === */
+/* ============================================== */
+.btn-shiny-add-item {
+    width: 100%;           /* Ancho completo del contenedor */
+    padding: 12px;         /* Relleno cómodo */
+    margin-top: 10px;      /* Separación del input anterior */
+    
+    /* Estilo Visual */
+    background-color: #548A5E; /* Tu Verde Principal */
+    color: #ffffff;
+    border: none;
+    border-radius: 30px;   /* Forma de píldora (Pill shape) */
+    
+    /* Tipografía */
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    
+    /* Flexbox para centrar texto e icono */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    
+    /* EL EFECTO DE BRILLO (Glow) */
+    box-shadow: 0 4px 15px rgba(84, 138, 94, 0.4);
+    
+    /* Transición suave */
+    transition: all 0.3s ease;
+}
+
+/* Hover: Se eleva y brilla más */
+.btn-shiny-add-item:hover {
+    background-color: #44704B;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(84, 138, 94, 0.6);
+}
+
+/* Click: Efecto de presión */
+.btn-shiny-add-item:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(84, 138, 94, 0.4);
+}
+
 /* =========================================
    FIX ANTI-ZOOM Y MEJORA TÁCTIL (MÓVIL)
    ========================================= */

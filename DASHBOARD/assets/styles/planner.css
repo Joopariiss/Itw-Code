@@ -34,11 +34,26 @@
     padding: 1.5rem;
 }
 
+/* === TÍTULO ITINERARIO CON EFECTO BRILLANTE === */
 #itinerary-section h2 {
-    color: var(--primary);
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 1rem;
+    /* 1. Color Blanco Puro */
+    color: #ffffff;
+    
+    /* 2. El Efecto Brillante (Glow) */
+    /* Sombra suave verde que imita la luz de los botones */
+    text-shadow: 0 0 10px rgba(84, 138, 94, 0.8), 
+                 0 0 20px rgba(84, 138, 94, 0.4);
+    
+    /* 3. Ajustes de espaciado y borde */
     margin-top: 0;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(84, 138, 94, 0.3); /* Borde verde sutil */
+    
+    /* 4. Tipografía */
+    font-size: 1.8rem;
+    text-align: center;
+    letter-spacing: 1px;
 }
 
 /* === ITEMS DEL ITINERARIO (DÍAS Y ACTIVIDADES) === */
@@ -68,22 +83,44 @@
 }
 
 /* --- BOTÓN AGREGAR ACTIVIDAD --- */
-/* Este es el que te faltaba */
+/* --- BOTÓN AGREGAR ACTIVIDAD (Versión Shiny Mini) --- */
 .add-activity-btn {
-    background-color: var(--primary);
-    color: var(--primary-foreground);
+    /* 1. Colores y Texto */
+    background-color: #548A5E; /* Verde Acento */
+    color: #ffffff;
     border: none;
-    padding: 0.4rem 0.8rem;
-    border-radius: var(--radius);
-    cursor: pointer;
     font-size: 0.85rem;
-    font-weight: 600;
-    transition: all 0.2s ease;
+    font-weight: 700; /* Letra más gruesa */
+    letter-spacing: 0.3px;
+    
+    /* 2. Forma y Tamaño */
+    padding: 8px 16px;   /* Un poco más relleno que antes */
+    border-radius: 20px; /* Bordes totalmente redondos (Pill) */
+    cursor: pointer;
+    
+    /* 3. EL EFECTO BRILLANTE (Ajustado para tamaño pequeño) */
+    box-shadow: 0 3px 10px rgba(84, 138, 94, 0.4);
+    
+    /* 4. Transición */
+    transition: all 0.3s ease;
+    
+    /* Centrado */
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
 
+/* Efecto Hover */
 .add-activity-btn:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
+    transform: translateY(-2px); /* Se eleva un poquito */
+    box-shadow: 0 5px 15px rgba(84, 138, 94, 0.6); /* Brillo más intenso */
+    background-color: #44704B; 
+}
+
+/* Efecto Click */
+.add-activity-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(84, 138, 94, 0.4);
 }
 
 /* --- ACTIVIDAD INDIVIDUAL --- */

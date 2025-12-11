@@ -14,22 +14,32 @@
     font-style: italic;
 }
 
-/* --- BARRA DE PROGRESO --- */
+/* --- BARRA DE PROGRESO (EFECTO NEÓN) --- */
 .progress-track-wrapper {
     margin-bottom: 3rem;
 }
 
 .progress-track {
-    background-color: rgba(255, 255, 255, 0.1);
-    height: 4px !important;
-    border-radius: 4px;
+    /* Fondo más oscuro para que el neón resalte más */
+    background-color: rgba(0, 0, 0, 0.3); 
+    /* La hacemos un poco más gruesa (de 4px a 8px) para que se vea el color */
+    height: 8px !important; 
+    border-radius: 10px;
+    overflow: visible; /* Importante para que el brillo no se corte */
 }
 
 .progress-fill {
-    background-color: #00897B; /* Verde Teal */
+    /* 1. El color base (Tu verde principal) */
+    background-color: #548A5E; 
+    
     height: 100%;
-    border-radius: 4px;
-    transition: width 0.4s ease;
+    border-radius: 10px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* 2. EL EFECTO DE LUZ NEÓN */
+    /* Dos capas de sombra para crear un núcleo brillante y un halo exterior */
+    box-shadow: 0 0 10px rgba(84, 138, 94, 0.9), 
+                0 0 20px rgba(84, 138, 94, 0.5);
 }
 
 .checklist-summary {
@@ -194,6 +204,56 @@
     padding: 12px;
     border-radius: 6px;
     flex: 1;
+}
+
+/* ============================================== */
+/* === BOTÓN "AGREGAR" CHECKLIST (SHINY) === */
+/* ============================================== */
+.btn-shiny-checklist {
+    /* Estilo Visual Base */
+    background-color: #548A5E; /* Verde Acento */
+    color: #ffffff;
+    border: none;
+    border-radius: 30px; /* Pill shape */
+    
+    /* Dimensiones y Texto */
+    padding: 0 25px; /* Relleno lateral generoso */
+    height: 48px;    /* Altura fija para igualar a los inputs */
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap; /* Evita que el texto se rompa */
+    
+    /* Flex para icono */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    
+    /* EFECTO BRILLANTE (Glow) */
+    box-shadow: 0 4px 15px rgba(84, 138, 94, 0.4);
+    transition: all 0.3s ease;
+}
+
+/* Hover */
+.btn-shiny-checklist:hover {
+    background-color: #44704B;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(84, 138, 94, 0.6);
+}
+
+/* Active */
+.btn-shiny-checklist:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(84, 138, 94, 0.4);
+}
+
+/* RESPONSIVE: En móvil ocupa todo el ancho */
+@media (max-width: 768px) {
+    .btn-shiny-checklist {
+        width: 100%;
+        margin-top: 5px;
+    }
 }
 
 @media (max-width: 600px) {
