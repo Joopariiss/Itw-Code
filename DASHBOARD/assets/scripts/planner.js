@@ -40,8 +40,9 @@ calendarActions.style.flexDirection = "column";
 calendarActions.style.gap = "0.5rem";
 calendarActions.style.marginTop = "1rem";
 calendarActions.innerHTML = `
-  <button id="lock-calendar-btn" class="btn btn-primary">🔒 Establecer fechas</button>
-  <button id="unlock-calendar-btn" class="btn btn-secondary" style="display:none;">✏️ Editar fechas</button>
+  <button id="lock-calendar-btn" class="btn btn-shiny-action">🔒 Establecer fechas</button>
+  
+  <button id="unlock-calendar-btn" class="btn btn-secondary" style="display:none; width: 100%; margin-top: 15px;">✏️ Editar fechas</button>
 `;
 calendarSection.appendChild(calendarActions);
 

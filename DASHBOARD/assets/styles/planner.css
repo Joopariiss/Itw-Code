@@ -157,6 +157,51 @@
     display: none; 
 }
 
+/* ==================================================== */
+/* === BOTÓN BRILLANTE (ESTILO "AGREGAR CARPETA") === */
+/* ==================================================== */
+.btn-shiny-action {
+    width: 100%;           /* Ocupa todo el ancho del calendario */
+    margin-top: 15px;
+    padding: 12px 24px;
+    
+    /* Texto */
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #ffffff; /* Aseguramos texto blanco */
+
+    /* Forma y Color */
+    border-radius: 30px;   /* Bordes muy redondeados (Pill shape) */
+    background-color: #548A5E; /* Tu verde principal */
+    border: none;
+    cursor: pointer;
+    
+    /* EL EFECTO BRILLANTE (Sombra verde difuminada) */
+    box-shadow: 0 4px 15px rgba(84, 138, 94, 0.5); 
+    
+    /* Flex para centrar icono y texto */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    
+    transition: all 0.3s ease;
+}
+
+/* Efecto al pasar el mouse (Se eleva y brilla más) */
+.btn-shiny-action:hover {
+    transform: translateY(-3px); 
+    box-shadow: 0 8px 25px rgba(84, 138, 94, 0.7); 
+    background-color: #44704B; /* Un poco más oscuro al hover */
+}
+
+/* Efecto al hacer click */
+.btn-shiny-action:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(84, 138, 94, 0.4);
+}
+
 /* Responsive */
 @media (max-width: 900px) {
     .planner-container { grid-template-columns: 1fr; }
@@ -198,3 +243,4 @@
         padding-top: 8px;
     }
 }
+
