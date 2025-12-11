@@ -276,45 +276,60 @@ body[data-mode="modificar"] .trip:hover {
     gap: 200px; 
 }
 
-/* Botones horizontales */
-.folder-buttons {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
+/* ... (Estilos anteriores) ... */
+
+/* === CORRECCIÓN BOTÓN AGREGAR CARPETA === */
+
+/* 1. Ajustamos el contenedor para que no aplaste el botón */
+.buttons-box {
+    position: absolute;
+    top: 180px;
+    right: 25px;
+    /* Quitamos padding y background que no sirven */
+    padding: 0;
+    background: none;
+    /* Importante: dejamos que el ancho se ajuste al contenido */
+    width: auto;
+    z-index: 10; /* Aseguramos que quede por encima */
 }
 
-/* Botones individuales (dentro del buttons-box) */
+/* 2. Ajustamos el contenedor flexible del botón */
+.folder-buttons {
+    display: flex;
+    /* Quitamos el space-between y el gap que no son necesarios para un solo botón */
+    justify-content: flex-end; 
+    width: auto; /* Que se ajuste al ancho del botón */
+}
+
+/* 3. Estilo específico para el botón "Agregar Carpeta" */
 .folder-buttons .menu-toggle {
-    flex: 1;
-    text-align: center;
-    padding: 10px 0;
+    /* Quitamos flex: 1 para que no intente estirarse infinitamente */
+    flex: none; 
+    
+    /* Le damos un padding generoso a los lados para que el texto respire */
+    padding: 12px 24px;
+    
+    /* Aseguramos que el texto no se rompa en varias líneas */
+    white-space: nowrap;
+    
+    /* Un poco más de estilo para que se vea como un botón importante */
     font-size: 1rem;
-    border-radius: 8px;
+    font-weight: 600;
+    border-radius: 30px; /* Bordes más redondeados estilo "pill" */
+    box-shadow: 0 4px 15px rgba(84, 138, 94, 0.4); /* Sombra verde suave */
+    
     background-color: #548A5E; /* Verde Acento Elegante */
     color: #F3F4F6;
-    transition: 0.3s;
+    transition: all 0.3s ease;
 }
 
 .folder-buttons .menu-toggle:hover {
-    background-color: #44704B; /* Tono de verde más oscuro al hover */
+    background-color: #44704B; /* Tono más oscuro al hover */
+    transform: translateY(-3px); /* Pequeño efecto de elevación */
+    box-shadow: 0 6px 20px rgba(84, 138, 94, 0.6); /* Sombra más pronunciada */
 }
 
-
-/* Cuadro de botones (Contenedor del botón "Agregar Carpeta") */
-.buttons-box {
-    /* Eliminamos el background blanco para que quede limpio */
-    background: none; 
-    box-shadow: none;
-    padding: 0;
-    
-    /* Mantenemos el posicionamiento para el botón flotante "Agregar Carpeta" */
-    position: absolute;
-    /* --- MODIFICACIÓN CLAVE AQUÍ --- */
-    top: 180px; /* Se ajusta de 160px a 180px para bajarlo 30px del header (150px de altura) */
-    /* ------------------------------ */
-    right: 25px;
-}
-
+/* ... (Resto del CSS) ... */
 
 /* El resto del CSS se mantiene igual, conservando la paleta "Aventura Elegante" */
 

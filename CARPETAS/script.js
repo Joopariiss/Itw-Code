@@ -170,7 +170,7 @@ async function cargarCarpetas() {
 
   if (allFolders.length === 0) {
       tripList.innerHTML = `
-          <div style="text-align:center; color:#ccc; width:100%; grid-column: 1 / -1; margin-top: 50px;">
+          <div id="emptyState" style="text-align:center; color:#ccc; width:100%; grid-column: 1 / -1; margin-top: 50px;">
               <i class='bx bx-map-alt' style="font-size: 3rem; margin-bottom: 10px;"></i>
               <h3>No tienes viajes aún</h3>
               <p>¡Crea tu primera carpeta para empezar la aventura!</p>
@@ -178,7 +178,7 @@ async function cargarCarpetas() {
       `;
       return;
   }
-// ... si hay carpetas, sigue el for loop ...
+  // ... si hay carpetas, sigue el for loop ...
 
   // 3. Renderizar en orden
   for (const folder of allFolders) {
@@ -359,13 +359,35 @@ async function renderFolder(folder, status = "propia") {
       confirmMessage.textContent = `¿Seguro que quieres eliminar la carpeta "${folder.name}"?`;
       confirmModal.style.display = 'flex';
 
+      // En script.js -> renderFolder() -> menu.querySelector(".delete-folder").onclick...
+
       confirmDeleteBtn.onclick = async () => {
           confirmModal.style.display = 'none';
+          
           // UI Optimista
           card.style.transition = "transform 0.3s, opacity 0.3s";
           card.style.transform = "scale(0.8)";
           card.style.opacity = "0";
-          setTimeout(() => card.remove(), 300);
+
+          // === AQUÍ ESTÁ LA MAGIA ===
+          setTimeout(() => {
+              card.remove(); // 1. Eliminamos la tarjeta del DOM
+
+              // 2. Verificamos cuántas tarjetas quedan
+              const remainingCards = tripList.querySelectorAll('.trip-card');
+
+              // 3. Si ya no quedan tarjetas (es decir, length es 0), mostramos el mensaje de vacío
+              if (remainingCards.length === 0) {
+                  tripList.innerHTML = `
+                      <div id="emptyState" style="text-align:center; color:#ccc; width:100%; grid-column: 1 / -1; margin-top: 50px;">
+                          <i class='bx bx-map-alt' style="font-size: 3rem; margin-bottom: 10px;"></i>
+                          <h3>No tienes viajes aún</h3>
+                          <p>¡Crea tu primera carpeta para empezar la aventura!</p>
+                      </div>
+                  `;
+              }
+          }, 300);
+          // ==========================
           
           showPopup(`Carpeta "${folder.name}" eliminada`);
           try { await deleteFolder(folder.id); } 
@@ -459,6 +481,12 @@ addTripBtn.addEventListener('click', async () => {
       
       // 2. Pasamos la URL a la función de crear
       const newFolderData = await createFolder(name, userId, fetchedImageUrl);
+
+      // Verificamos si existe el "Estado Vacío" y lo eliminamos del DOM
+      const emptyState = document.getElementById("emptyState");
+      if (emptyState) {
+          emptyState.remove();
+      }
       
       // 3. Renderizamos usando los datos que ya tenemos (sin volver a llamar a API)
       await renderFolder(newFolderData, "propia");
