@@ -166,6 +166,19 @@ async function cargarCarpetas() {
     const dateB = b.createdAt || 0;
     return dateB - dateA; // De mayor a menor (Más nuevo arriba)
   });
+  // ... después de obtener allFolders ...
+
+  if (allFolders.length === 0) {
+      tripList.innerHTML = `
+          <div style="text-align:center; color:#ccc; width:100%; grid-column: 1 / -1; margin-top: 50px;">
+              <i class='bx bx-map-alt' style="font-size: 3rem; margin-bottom: 10px;"></i>
+              <h3>No tienes viajes aún</h3>
+              <p>¡Crea tu primera carpeta para empezar la aventura!</p>
+          </div>
+      `;
+      return;
+  }
+// ... si hay carpetas, sigue el for loop ...
 
   // 3. Renderizar en orden
   for (const folder of allFolders) {
