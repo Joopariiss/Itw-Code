@@ -402,20 +402,24 @@ input:-webkit-autofill:active {
 @media (max-width: 768px) {
     /* 1. Ajustar el encabezado Hero */
     .hero-header {
-        /* height: 120px;  <-- ESTO LO CAMBIAMOS POR: */
         height: auto !important; 
         min-height: 120px;
-        padding: 20px 0;
+        
+        /* CAMBIO CLAVE: 
+           70px arriba -> Empuja el título abajo para librar la flecha.
+           30px abajo  -> Espacio para respirar antes de los tabs. */
+        padding: 70px 0 30px 0; 
     }
-    
-    /* AGREGAMOS ESTO PARA EL RECUADRO NEGRO */
-    .hero-header .overlay {
-        position: relative !important;
-        top: auto !important;
-        left: auto !important;
-        transform: none !important;
-        margin: 0 15px;
-        width: auto !important;
+
+    /* ... el resto del código de .overlay, h1, etc. déjalo igual ... */
+    /* 1. Ajustar el encabezado Hero */
+    .hero-header {
+        height: auto !important; 
+        min-height: 120px;
+        
+        /* AGREGAMOS !important AL FINAL */
+        /* Esto obliga al navegador a usar este espacio en celulares sí o sí */
+        padding: 70px 0 30px 0 !important; 
     }
 
     .hero-header h1 {
