@@ -130,7 +130,7 @@ if (registerForm) {
         showPopup(`Hemos enviado un enlace de confirmación a ${email}. Por favor revísalo para activar tu cuenta.`, true, "¡Casi listo!");
 
         // Damos tiempo para leer el mensaje antes de ir al login
-        setTimeout(() => window.location.href = "../LOGIN/login.html", 6000);
+        setTimeout(() => window.location.href = "../LOGIN/login.html", 4000);
 
       } catch (error) {
         let mensaje = "";
