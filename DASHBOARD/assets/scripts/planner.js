@@ -313,15 +313,20 @@ saveActivityBtn.addEventListener('click', () => {
   const desc = activityDescInput.value.trim();
   const time = activityTimeInput.value;
 
-  if (!desc) return alert('Por favor ingresa una descripción.');
-
+  // CAMBIO 1: Usar showPopup en vez de alert si falta descripción
+  if (!desc) {
+     showPopup('⚠️ Por favor ingresa una descripción.', "error");
+     return;
+  }
   // Validación de duplicados
   const isDuplicate = editingDay.activities.some(a =>
     a.time === time && (!editingActivity || a.id !== editingActivity.id)
   );
 
   if (isDuplicate) {
-    alert("Ya existe una actividad a esa hora.");
+    // CAMBIO 2: Aquí estaba el problema del "pop up feo"
+    // Reemplazamos alert() por showPopup()
+    showPopup("⚠️ Ya existe una actividad a esa hora.", "error"); 
     return;
   }
 
